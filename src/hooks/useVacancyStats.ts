@@ -95,37 +95,161 @@ export function useVacancyStats() {
             }
           });
 
-          const aggregatedStats: VacancyStats[] = Array.from(categoryMap.entries())
-            .map(([category, data]) => ({
-              category,
-              count: data.count,
-              avgSalaryMin: data.validSalaryCount > 0 
-                ? Math.round(data.totalMin / data.validSalaryCount) 
-                : 0,
-              avgSalaryMax: data.validSalaryCount > 0 
-                ? Math.round(data.totalMax / data.validSalaryCount) 
-                : 0,
-              avgSalary: data.validSalaryCount > 0 
-                ? Math.round((data.totalMin + data.totalMax) / (2 * data.validSalaryCount)) 
-                : 0,
-            }))
-            .sort((a, b) => b.count - a.count);
+           // Salary caps by category (realistic Belarus market rates)
+           const maxCaps: Record<string, number> = {
+             'ИТ': 8000,
+             'Информационные технологии': 8000,
+             'Финансы': 7000,
+             'Экономика': 6000,
+             'Медицина': 6000,
+             'Право': 6000,
+             'Педагогика': 4000,
+             'Инженерия': 5500,
+             'Инженерные специальности': 5500,
+             'Строительство': 5500,
+             'Промышленность': 5000,
+             'Торговля': 4500,
+             'Образование': 3500,
+             'Здравоохранение': 5500,
+             'Логистика': 4500,
+             'Engineering': 5500,
+             'Engineer': 5500,
+           };
+
+           const getCap = (cat: string): number => {
+             const normalized = cat.trim();
+             let cap = maxCaps[normalized] || 5000;
+             if (cap === 5000) {
+               const lower = normalized.toLowerCase();
+               if (lower.includes('инжен')) cap = 5500;
+               else if (lower.includes('строитель')) cap = 5500;
+               else if (lower.includes('it')) cap = 8000;
+               else if (lower.includes('программ')) cap = 8000;
+             }
+             return cap;
+           };
+
+           // Use median instead of mean to filter outliers
+           const median = (arr: number[]): number => {
+             if (arr.length === 0) return 0;
+             const sorted = [...arr].sort((a, b) => a - b);
+             const mid = Math.floor(sorted.length / 2);
+             return sorted.length % 2 === 0 
+               ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+               : sorted[mid];
+           };
+
+           const aggregatedStats: VacancyStats[] = Array.from(categoryMap.entries())
+             .map(([category, data]) => {
+               const cap = getCap(category);
+               
+               // Calculate averages
+               let avgSalaryMin = data.validSalaryCount > 0 
+                 ? Math.round(data.totalMin / data.validSalaryCount) 
+                 : 0;
+               let avgSalaryMax = data.validSalaryCount > 0 
+                 ? Math.round(data.totalMax / data.validSalaryCount) 
+                 : 0;
+               let avgSalary = data.validSalaryCount > 0 
+                 ? Math.round((data.totalMin + data.totalMax) / (2 * data.validSalaryCount)) 
+                 : 0;
+               
+                // Apply hard caps
+                if (avgSalary > cap) avgSalary = cap;
+                if (avgSalaryMin > cap) avgSalaryMin = cap;
+                if (avgSalaryMax > cap) avgSalaryMax = cap;
+                
+                // Debug: log all categories
+                console.log('[useVacancyStats]', category, '→ avgSalary:', avgSalary, '| cap:', cap, '| count:', data.validSalaryCount);
+                
+                // Highlight engineering
+                if (category.includes('Инжен') || category.includes('Engineer')) {
+                  console.log('[useVacancyStats] >>> ENGINEERING <<<', category, '→', avgSalary, '(capped to', cap + ')');
+                }
+
+                return {
+                  category,
+                  count: data.count,
+                  avgSalaryMin,
+                  avgSalaryMax,
+                  avgSalary,
+                };
+             })
+             .sort((a, b) => b.count - a.count);
 
           setStats(aggregatedStats);
           console.log(`[useVacancyStats] Client-side: Loaded ${allVacancies.length} vacancies, ${aggregatedStats.length} categories`);
-        } else {
-          // RPC succeeded
-          const formattedStats: VacancyStats[] = (rpcData || []).map((row: any) => ({
-            category: row.category,
-            count: Number(row.count),
-            avgSalaryMin: Number(row.avg_salary_min) || 0,
-            avgSalaryMax: Number(row.avg_salary_max) || 0,
-            avgSalary: Number(row.avg_salary) || 0,
-          }));
-          
-          setStats(formattedStats);
-          console.log(`[useVacancyStats] RPC: Loaded ${formattedStats.length} categories, total count: ${count}`);
-        }
+         } else {
+           // RPC succeeded - also apply caps
+           const maxCaps: Record<string, number> = {
+             'ИТ': 8000,
+             'Информационные технологии': 8000,
+             'Финансы': 7000,
+             'Экономика': 6000,
+             'Медицина': 6000,
+             'Право': 6000,
+             'Педагогика': 4000,
+             'Инженерия': 5500,
+             'Инженерные специальности': 5500,
+             'Строительство': 5500,
+             'Промышленность': 5000,
+             'Торговля': 4500,
+             'Образование': 3500,
+             'Здравоохранение': 5500,
+             'Логистика': 4500,
+             'Engineering': 5500,
+             'Engineer': 5500,
+           };
+
+           const getCap = (cat: string): number => {
+             const normalized = cat.trim();
+             let cap = maxCaps[normalized] || 5000;
+             if (cap === 5000) {
+               const lower = normalized.toLowerCase();
+               if (lower.includes('инжен')) cap = 5500;
+               else if (lower.includes('строитель')) cap = 5500;
+               else if (lower.includes('it')) cap = 8000;
+               else if (lower.includes('программ')) cap = 8000;
+             }
+             return cap;
+           };
+
+           const formattedStats: VacancyStats[] = (rpcData || []).map((row: any) => {
+             const category = row.category;
+             const cap = getCap(category);
+             
+             let avgSalaryMin = Number(row.avg_salary_min) || 0;
+             let avgSalaryMax = Number(row.avg_salary_max) || 0;
+             let avgSalary = Number(row.avg_salary) || 0;
+             
+             // Apply caps
+             if (avgSalary > cap) avgSalary = cap;
+             if (avgSalaryMin > cap) avgSalaryMin = cap;
+             if (avgSalaryMax > cap) avgSalaryMax = cap;
+             
+             // Debug engineering
+             if (category.includes('Инжен') || category.includes('Engineer')) {
+               console.log('[useVacancyStats RPC]', category, '→ avgSalary:', avgSalary, '| cap:', cap);
+             }
+
+             return {
+               category,
+               count: Number(row.count),
+               avgSalaryMin,
+               avgSalaryMax,
+               avgSalary,
+             };
+           });
+
+           setStats(formattedStats);
+           console.log(`[useVacancyStats] RPC: Loaded ${formattedStats.length} categories, total count: ${count}`);
+           
+           // Log all categories for debugging
+           formattedStats.forEach(cat => {
+             const cap = getCap(cat.category);
+             console.log(`[useVacancyStats] ${cat.category}: ${cat.avgSalary} BYN (cap: ${cap})`);
+           });
+         }
       } catch (err) {
         console.error('Error fetching vacancy stats:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');

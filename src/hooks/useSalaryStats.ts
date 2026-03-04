@@ -56,10 +56,11 @@ export function useSalaryStats() {
        let totalCount = 0;
 
        categoryMap.forEach((data, category) => {
-         // Log all categories to see what we're getting
-         console.log('[DEBUG] Category:', category, '| raw count:', data.salaryMins.length, '| sample raw:', data.salaryMins.slice(0, 3));
          // Simple approach: filter obvious outliers (below 500 or above reasonable caps)
          // Then use median for robustness
+         
+         // Normalize category name for lookup
+         const normalizedCategory = category.trim();
          
          const maxCaps: Record<string, number> = {
            'ИТ': 8000,
@@ -77,11 +78,21 @@ export function useSalaryStats() {
            'Образование': 3500,
            'Здравоохранение': 5500,
            'Логистика': 4500,
-           'Engineering': 5500, // English fallback
+           'Engineering': 5500,
            'Engineer': 5500,
          };
          
-         const cap = maxCaps[category] || 5000;
+         // Try exact match first, then partial match
+         let cap = maxCaps[normalizedCategory] || 5000;
+         
+         // If not found, try to match by keyword
+         if (cap === 5000) {
+           const lowerCat = normalizedCategory.toLowerCase();
+           if (lowerCat.includes('инжен')) cap = 5500;
+           else if (lowerCat.includes('строитель')) cap = 5500;
+           else if (lowerCat.includes('it')) cap = 8000;
+           else if (lowerCat.includes('программ')) cap = 8000;
+         }
          
          if (category === 'Инженерия' || category.includes('Инжен') || category.includes('Engineer')) {
            console.log('[DEBUG] Category', category, 'has cap:', cap);

@@ -25,7 +25,7 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { 
   ExternalLink, Search, ChevronLeft, ChevronRight, 
-  SlidersHorizontal, X, MapPin, Building, Calendar 
+  SlidersHorizontal, X, MapPin, Building 
 } from 'lucide-react';
 
 interface Vacancy {
@@ -55,8 +55,7 @@ export function AllVacanciesTable() {
   // Filter state
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
-  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 100000]);
-  const [dateRange, setDateRange] = useState<{from: string; to: string}>({from: '', to: ''});
+  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 10000]);
   
   const itemsPerPage = 50;
 
@@ -139,29 +138,21 @@ export function AllVacanciesTable() {
       result = result.filter(v => v.city === selectedCity);
     }
     
-    // Salary range filter
+    // Salary range filter (0-10000 BYN)
     const [minSalary, maxSalary] = salaryRange;
     result = result.filter(v => {
-      if (!v.salary_min && !v.salary_max) return true; // keep ones without salary if they match other filters
+      if (!v.salary_min && !v.salary_max) return true;
       const avg = (v.salary_min || 0 + v.salary_max || 0) / 2;
       return avg >= minSalary && avg <= maxSalary;
     });
     
-    // Date range filter
-    if (dateRange.from) {
-      result = result.filter(v => new Date(v.parsed_at) >= new Date(dateRange.from));
-    }
-    if (dateRange.to) {
-      result = result.filter(v => new Date(v.parsed_at) <= new Date(dateRange.to + 'T23:59:59'));
-    }
-    
     return result;
-  }, [vacancies, searchTerm, selectedCategory, selectedCity, salaryRange, dateRange]);
+  }, [vacancies, searchTerm, selectedCategory, selectedCity, salaryRange]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedCity, salaryRange, dateRange]);
+  }, [searchTerm, selectedCategory, selectedCity, salaryRange]);
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
@@ -177,7 +168,7 @@ export function AllVacanciesTable() {
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">Фильтры</span>
-            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || salaryRange[0] > 0 || salaryRange[1] < 10000) && (
               <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
                 Активны
               </span>
@@ -191,8 +182,7 @@ export function AllVacanciesTable() {
                 setSearchTerm('');
                 setSelectedCategory('all');
                 setSelectedCity('all');
-                setSalaryRange([0, 100000]);
-                setDateRange({from: '', to: ''});
+                setSalaryRange([0, 10000]);
               }}
             >
               <X className="w-3 h-3 mr-1" />
@@ -250,37 +240,17 @@ export function AllVacanciesTable() {
             {/* Salary Range */}
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground flex justify-between">
-                <span>Диапазон зарплаты</span>
-                <span className="text-foreground">{salaryRange[0].toLocaleString()} - {salaryRange[1].toLocaleString()} BYN</span>
+                <span>Диапазон зарплаты (BYN)</span>
+                <span className="text-foreground">{salaryRange[0].toLocaleString()} - {salaryRange[1].toLocaleString()}</span>
               </Label>
               <Slider
                 value={salaryRange}
                 onValueChange={(value) => setSalaryRange([value[0], value[1]])}
                 min={0}
-                max={100000}
-                step={1000}
+                max={10000}
+                step={100}
                 minStepsBetweenThumbs={2}
               />
-            </div>
-            
-            {/* Date Range */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Дата публикации с</Label>
-                <Input
-                  type="date"
-                  value={dateRange.from}
-                  onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">по</Label>
-                <Input
-                  type="date"
-                  value={dateRange.to}
-                  onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
-                />
-              </div>
             </div>
           </motion.div>
         )}
@@ -309,7 +279,7 @@ export function AllVacanciesTable() {
         </div>
         <div className="text-sm text-muted-foreground">
           Всего в базе: <span className="font-semibold text-foreground">{totalCount}</span> вакансий
-          {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+          {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || salaryRange[0] > 0 || salaryRange[1] < 10000) && (
             <> • Отфильтровано: <span className="font-semibold text-foreground">{filteredVacancies.length}</span></>
           )}
         </div>
@@ -341,17 +311,16 @@ export function AllVacanciesTable() {
               ) : filteredVacancies.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    {searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000 ? 
+                    {searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || salaryRange[0] > 0 || salaryRange[1] < 10000 ? 
                       'Нет вакансий, соответствующих фильтрам' : 
                       'Нет данных о вакансиях'}
-                    {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+                    {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || salaryRange[0] > 0 || salaryRange[1] < 10000) && (
                       <div className="mt-4">
                         <Button variant="link" onClick={() => {
                           setSearchTerm('');
                           setSelectedCategory('all');
                           setSelectedCity('all');
-                          setSalaryRange([0, 100000]);
-                          setDateRange({from: '', to: ''});
+                          setSalaryRange([0, 10000]);
                         }}>
                           Сбросить все фильтры
                         </Button>
@@ -426,7 +395,7 @@ export function AllVacanciesTable() {
         <div className="flex items-center justify-between p-4 border-t border-border/50">
           <div className="text-sm text-muted-foreground">
             Страница {currentPage} из {totalPages}
-            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || salaryRange[0] > 0 || salaryRange[1] < 10000) && (
               <> • Показано: <span className="font-semibold text-foreground">{filteredVacancies.length}</span> из <span className="font-semibold text-foreground">{totalCount}</span></>
             )}
           </div>

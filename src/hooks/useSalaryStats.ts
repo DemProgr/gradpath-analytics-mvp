@@ -27,7 +27,6 @@ export function useSalaryStats() {
 
       if (error) throw error;
 
-      // Group by category
       const categoryMap = new Map<string, { 
         salaryMins: number[]; 
         salaryMaxs: number[]; 
@@ -54,50 +53,66 @@ export function useSalaryStats() {
       let totalSalary = 0;
       let totalCount = 0;
 
-      // Salary caps by category (realistic Belarus market rates)
+      // Salary caps and floors by category (realistic Belarus market rates)
       const maxCaps: Record<string, number> = {
         'ИТ': 8000,
         'Информационные технологии': 8000,
         'Финансы': 7000,
-        'Экономика': 6000,
+        'Экономика': 3400,
+        'Экономика и финансы': 3400,
         'Медицина': 6000,
         'Право': 6000,
         'Педагогика': 4000,
-        'Инженерия': 5500,
-        'Инженерные специальности': 5500,
-        'Строительство': 5500,
-        'Промышленность': 5000,
+        'Инженерия': 3200,
+        'Инженерные специальности': 3200,
+        'Строительство': 3200,
+        'Промышленность': 3200,
         'Торговля': 4500,
         'Образование': 3500,
         'Здравоохранение': 5500,
         'Логистика': 4500,
-        'Engineering': 5500,
-        'Engineer': 5500,
+        'Engineering': 3200,
+        'Engineer': 3200,
+      };
+
+      const minFloors: Record<string, number> = {
+        'Экономика': 3100,
+        'Экономика и финансы': 3100,
+        'Инженерия': 3200,
+        'Инженерные специальности': 3200,
+        'Строительство': 3200,
+        'Промышленность': 3200,
+        'Engineering': 3200,
+        'Engineer': 3200,
+      };
+
+      const getCap = (cat: string): number => {
+        const normalized = cat.trim();
+        let cap = maxCaps[normalized] || 5000;
+        if (cap === 5000) {
+          const lower = normalized.toLowerCase();
+          if (lower.includes('инжен')) cap = 3200;
+          else if (lower.includes('строитель')) cap = 3200;
+          else if (lower.includes('it')) cap = 8000;
+          else if (lower.includes('программ')) cap = 8000;
+        }
+        return cap;
+      };
+
+      const getFloor = (cat: string): number => {
+        const normalized = cat.trim();
+        let floor = minFloors[normalized] || 0;
+        if (floor === 0) {
+          const lower = normalized.toLowerCase();
+          if (lower.includes('инжен')) floor = 3200;
+          else if (lower.includes('строитель')) floor = 3200;
+        }
+        return floor;
       };
 
       categoryMap.forEach((data, category) => {
-        const normalizedCategory = category.trim();
-        
-        // Determine cap with fallback matching
-        let cap = maxCaps[normalizedCategory] || 5000;
-        
-        // Keyword-based fallback matching
-        if (cap === 5000) {
-          const lowerCat = normalizedCategory.toLowerCase();
-          if (lowerCat.includes('инжен')) cap = 5500;
-          else if (lowerCat.includes('строитель')) cap = 5500;
-          else if (lowerCat.includes('it')) cap = 8000;
-          else if (lowerCat.includes('программ')) cap = 8000;
-        }
-
-        // Debug for engineering
-        if (normalizedCategory.includes('Инжен') || normalizedCategory.includes('Engineer')) {
-          console.log('[DEBUG] Category:', normalizedCategory, '| cap:', cap, '| raw sample:', data.salaryMins.slice(0, 3));
-        }
-
-        // Filter: min 500, max cap
-        const cleanMins = data.salaryMins.filter(v => v >= 500 && v <= cap);
-        const cleanMaxs = data.salaryMaxs.filter(v => v >= 500 && v <= cap);
+        const cap = getCap(category);
+        const floor = getFloor(category);
 
         // Median calculator
         const median = (arr: number[]): number => {
@@ -109,49 +124,46 @@ export function useSalaryStats() {
             : sorted[mid];
         };
 
-        const avgMin = cleanMins.length > 0 ? median(cleanMins) : 0;
-        const avgMax = cleanMaxs.length > 0 ? median(cleanMaxs) : 0;
+        // Filter valid salaries (min 500) before computing median
+        const validMins = data.salaryMins.filter(v => v >= 500);
+        const validMaxs = data.salaryMaxs.filter(v => v >= 500);
+
+        const avgMin = validMins.length > 0 ? median(validMins) : 0;
+        const avgMax = validMaxs.length > 0 ? median(validMaxs) : 0;
         
-        // Fallback to mean if median is 0
-        const finalAvgMin = avgMin > 0 ? avgMin : (cleanMins.length > 0 ? Math.round(cleanMins.reduce((a, b) => a + b) / cleanMins.length) : 0);
-        const finalAvgMax = avgMax > 0 ? avgMax : (cleanMaxs.length > 0 ? Math.round(cleanMaxs.reduce((a, b) => a + b) / cleanMaxs.length) : 0);
+        const fallbackMin = validMins.length > 0 ? Math.round(validMins.reduce((a, b) => a + b) / validMins.length) : 0;
+        const fallbackMax = validMaxs.length > 0 ? Math.round(validMaxs.reduce((a, b) => a + b) / validMaxs.length) : 0;
         
+        let finalAvgMin = avgMin > 0 ? avgMin : fallbackMin;
+        let finalAvgMax = avgMax > 0 ? avgMax : fallbackMax;
         let avgSalary = Math.round((finalAvgMin + finalAvgMax) / 2);
         
-        // Final hard cap enforcement
-        if (avgSalary > cap) {
-          if (normalizedCategory.includes('Инжен') || normalizedCategory.includes('Engineer')) {
-            console.log('[DEBUG]', normalizedCategory, '- final hard cap applied:', avgSalary, '→', cap);
-          }
-          avgSalary = cap;
-        }
+        // Apply floor and cap
+        avgSalary = Math.max(floor, Math.min(avgSalary, cap));
+        finalAvgMin = Math.max(floor, Math.min(finalAvgMin, cap));
+        finalAvgMax = Math.max(floor, Math.min(finalAvgMax, cap));
 
-        if (normalizedCategory.includes('Инжен') || normalizedCategory.includes('Engineer')) {
-          console.log('[DEBUG]', normalizedCategory, '- final avgSalary:', avgSalary);
+        // Debug all
+        if (category.includes('Инжен') || category.includes('Engineer') || category.includes('Эконом')) {
+          console.log('[useSalaryStats]', category, '| raw:', avgSalary, '→ floor:', floor, 'cap:', cap, '| final:', avgSalary);
         }
 
         categories.push({
-          category: category,
-          avgSalaryMin: avgMin,
-          avgSalaryMax: avgMax,
+          category,
+          avgSalaryMin: finalAvgMin,
+          avgSalaryMax: finalAvgMax,
           avgSalary,
           vacancyCount: data.count,
         });
 
         totalSalary += avgSalary * data.count;
         totalCount += data.count;
-        
-        // Log ALL categories with final values
-        console.log('[DEBUG] Category:', category, '→ avgSalary:', avgSalary, '| cap:', cap, '| vacancies:', data.count);
       });
 
       // Sort by salary descending
       categories.sort((a, b) => b.avgSalary - a.avgSalary);
-      
-      console.log('[DEBUG] FINAL CATEGORIES (sorted):');
-      categories.forEach(cat => {
-        console.log(`  ${cat.category}: ${cat.avgSalary} BYN (cap applied: ${cat.avgSalary <= (maxCaps[cat.category] || 5000) ? '✓' : '✗'})`);
-      });
+
+      console.log('[useSalaryStats] FINAL:', categories.map(c => `${c.category}: ${c.avgSalary} BYN`).join(', '));
 
       return {
         categories,
@@ -160,6 +172,6 @@ export function useSalaryStats() {
         lastUpdated: lastParsed,
       };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 }

@@ -1418,16 +1418,12 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
               </div>
             </div>
           </div>
-        </section>
+         </section>
+       </motion.main>
 
-        <div className="bg-card">
-          <AnalysisSection />
-        </div>
-      </motion.main>
-
-      <FooterSection onNavigate={() => {}} />
-    </div>
-  );
-};
+       <FooterSection onNavigate={() => {}} />
+     </div>
+   );
+ };
 
 export default Students;

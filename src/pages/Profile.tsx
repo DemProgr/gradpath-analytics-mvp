@@ -1,18 +1,20 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Mail, Shield, LogOut, ArrowLeft, Settings, Sun, Moon, Eye } from 'lucide-react';
+import { User, Mail, Shield, LogOut, ArrowLeft, Settings, Sun, Moon, Eye, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/hooks/useTheme';
+import { useLanguage, Language } from '@/hooks/useLanguage';
 
 export default function Profile() {
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
 
   // Проверяем авторизацию
   useEffect(() => {
@@ -24,8 +26,8 @@ export default function Profile() {
   const handleSignOut = async () => {
     await signOut();
     toast({
-      title: 'Выход выполнен',
-      description: 'Вы успешно вышли из аккаунта.',
+      title: t('profile.logoutSuccess'),
+      description: t('profile.logoutSuccessDesc'),
     });
     navigate('/');
   };
@@ -35,7 +37,7 @@ export default function Profile() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Загрузка...</p>
+          <p className="text-muted-foreground">{t('profile.loading')}</p>
         </div>
       </div>
     );
@@ -58,9 +60,9 @@ export default function Profile() {
                 onClick={() => navigate(-1)}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Назад
+                {t('profile.back')}
               </Button>
-              <h1 className="font-serif text-xl font-semibold">Профиль</h1>
+              <h1 className="font-serif text-xl font-semibold">{t('profile.title')}</h1>
             </div>
           </div>
         </div>
@@ -90,7 +92,7 @@ export default function Profile() {
                 <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
                   <Mail className="w-5 h-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Email</p>
+                    <p className="text-sm font-medium">{t('profile.email')}</p>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
@@ -98,18 +100,10 @@ export default function Profile() {
                 <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
                   <Shield className="w-5 h-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Роль</p>
+                    <p className="text-sm font-medium">{t('profile.role')}</p>
                     <p className="text-sm text-muted-foreground">
-                      {isAdmin ? 'Администратор' : 'Пользователь'}
+                      {isAdmin ? t('profile.admin') : t('profile.user')}
                     </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
-                  <Settings className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">ID пользователя</p>
-                    <p className="text-sm text-muted-foreground font-mono">{user.id}</p>
                   </div>
                 </div>
               </CardContent>
@@ -117,8 +111,8 @@ export default function Profile() {
 
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle>Внешний вид</CardTitle>
-                <CardDescription>Выберите тему оформления</CardDescription>
+                <CardTitle>{t('profile.appearance')}</CardTitle>
+                <CardDescription>{t('profile.appearanceDesc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -131,7 +125,7 @@ export default function Profile() {
                     }`}
                   >
                     <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary' : ''}`}>Светлая</span>
+                    <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary' : ''}`}>{t('profile.theme.light')}</span>
                   </button>
 
                   <button
@@ -143,7 +137,7 @@ export default function Profile() {
                     }`}
                   >
                     <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary' : ''}`}>Тёмная</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary' : ''}`}>{t('profile.theme.dark')}</span>
                   </button>
 
                   <button
@@ -155,7 +149,53 @@ export default function Profile() {
                     }`}
                   >
                     <Eye className={`w-6 h-6 ${theme === 'high-contrast' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`text-sm font-medium ${theme === 'high-contrast' ? 'text-primary' : ''}`}>Для слабовидящих</span>
+                    <span className={`text-sm font-medium ${theme === 'high-contrast' ? 'text-primary' : ''}`}>{t('profile.theme.highContrast')}</span>
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>{t('profile.language')}</CardTitle>
+                <CardDescription>{t('profile.languageDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setLanguage('ru')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                      language === 'ru'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Globe className={`w-6 h-6 ${language === 'ru' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${language === 'ru' ? 'text-primary' : ''}`}>Русский</span>
+                  </button>
+
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                      language === 'en'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Globe className={`w-6 h-6 ${language === 'en' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${language === 'en' ? 'text-primary' : ''}`}>English</span>
+                  </button>
+
+                  <button
+                    onClick={() => setLanguage('be')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                      language === 'be'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <Globe className={`w-6 h-6 ${language === 'be' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`text-sm font-medium ${language === 'be' ? 'text-primary' : ''}`}>Беларуская</span>
                   </button>
                 </div>
               </CardContent>
@@ -163,14 +203,14 @@ export default function Profile() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Действия</CardTitle>
+                <CardTitle>{t('profile.actions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {isAdmin && (
                   <Link to="/admin">
                     <Button variant="outline" className="w-full justify-start">
                       <Shield className="w-4 h-4 mr-2" />
-                      Перейти в админ-панель
+                      {t('profile.adminPanel')}
                     </Button>
                   </Link>
                 )}
@@ -181,7 +221,7 @@ export default function Profile() {
                   onClick={() => navigate('/forgot-password')}
                 >
                   <Settings className="w-4 h-4 mr-2" />
-                  Изменить пароль
+                  {t('profile.changePassword')}
                 </Button>
 
                 <Button
@@ -190,7 +230,7 @@ export default function Profile() {
                   onClick={handleSignOut}
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Выйти из аккаунта
+                  {t('profile.logout')}
                 </Button>
               </CardContent>
             </Card>

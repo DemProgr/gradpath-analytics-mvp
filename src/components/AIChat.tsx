@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, User, Loader2, Trash2, Bookmark } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Loader2, Trash2, Bookmark, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAIChat } from '@/hooks/useAIChat';
@@ -34,7 +34,11 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
     isLoading, 
     sendMessage, 
     clearChat, 
-    savedRecommendations 
+    savedRecommendations,
+    savedMessages,
+    setSavedMessages,
+    saveMessage,
+    isMessageSaved
   } = useAIChat();
 
   useEffect(() => {
@@ -268,6 +272,31 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                 </div>
               )}
 
+              {/* Saved Messages Panel */}
+              {showHistory && savedMessages.length > 0 && (
+                <div className="space-y-4 mt-6 pt-6 border-t">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-red-500" />
+                    Избранные сообщения
+                  </h4>
+                  <div className="space-y-3">
+                    {savedMessages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className="flex gap-2"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                          <Bot className="w-4 h-4" />
+                        </div>
+                        <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-[85%]">
+                          <FormattedMessage content={msg.content} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Messages */}
               {!showHistory && messages.map((message, index) => (
                 <motion.div
@@ -291,24 +320,65 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                       <Bot className="w-4 h-4" />
                     )}
                   </div>
-                  <div className={cn(
-                    'max-w-[85%] rounded-2xl px-4 py-3 text-sm',
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-br-md'
-                      : 'bg-muted rounded-bl-md'
-                  )}>
-                    <FormattedMessage content={message.content} />
+                  <div className="flex flex-col">
+                    <div className={cn(
+                      'max-w-[85%] rounded-2xl px-4 py-3 text-sm',
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground rounded-br-md'
+                        : 'bg-muted rounded-bl-md'
+                    )}>
+                      <FormattedMessage content={message.content} />
+                      
+                      {/* Recommendations from message */}
+                      {message.recommendations && message.recommendations.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                          {message.recommendations.map((rec, i) => (
+                            <RecommendationCard
+                              key={i}
+                              recommendation={rec}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     
-                    {/* Recommendations from message */}
-                    {message.recommendations && message.recommendations.length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {message.recommendations.map((rec, i) => (
-                          <RecommendationCard
-                            key={i}
-                            recommendation={rec}
+                    {/* Heart button for saving AI messages */}
+                    {message.role === 'assistant' && (
+                      <motion.button
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          if (isMessageSaved(message)) {
+                            // Remove from saved - need to implement unsave
+                            setSavedMessages(prev => {
+                              const updated = prev.filter(m => 
+                                !(m.content === message.content && m.timestamp.getTime() === message.timestamp.getTime())
+                              );
+                              localStorage.setItem('ai_chat_messages', JSON.stringify(updated));
+                              return updated;
+                            });
+                          } else {
+                            saveMessage(message);
+                          }
+                        }}
+                        className="self-start mt-1 p-1 hover:bg-muted/50 rounded-full transition-colors"
+                      >
+                        <motion.div
+                          animate={isMessageSaved(message) ? { scale: [1, 1.2, 1] } : {}}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <Heart 
+                            className={cn(
+                              "w-4 h-4 transition-colors",
+                              isMessageSaved(message) 
+                                ? "fill-red-500 text-red-500" 
+                                : "text-muted-foreground hover:text-red-500"
+                            )} 
                           />
-                        ))}
-                      </div>
+                        </motion.div>
+                      </motion.button>
                     )}
                   </div>
                 </motion.div>

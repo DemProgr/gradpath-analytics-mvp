@@ -104,6 +104,8 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          name_be: string | null
+          name_en: string | null
           university_id: string
           updated_at: string
         }
@@ -113,6 +115,8 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          name_be?: string | null
+          name_en?: string | null
           university_id: string
           updated_at?: string
         }
@@ -122,6 +126,8 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          name_be?: string | null
+          name_en?: string | null
           university_id?: string
           updated_at?: string
         }
@@ -311,9 +317,13 @@ export type Database = {
           created_at: string
           description: string | null
           full_name: string
+          full_name_be: string | null
+          full_name_en: string | null
           id: string
           logo_url: string | null
           short_name: string
+          short_name_be: string | null
+          short_name_en: string | null
           updated_at: string
           website: string | null
         }
@@ -322,9 +332,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           full_name: string
+          full_name_be?: string | null
+          full_name_en?: string | null
           id?: string
           logo_url?: string | null
           short_name: string
+          short_name_be?: string | null
+          short_name_en?: string | null
           updated_at?: string
           website?: string | null
         }
@@ -333,9 +347,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           full_name?: string
+          full_name_be?: string | null
+          full_name_en?: string | null
           id?: string
           logo_url?: string | null
           short_name?: string
+          short_name_be?: string | null
+          short_name_en?: string | null
           updated_at?: string
           website?: string | null
         }

@@ -8,46 +8,70 @@ import { Label } from '@/components/ui/label';
 import { UNIVERSITIES, FACULTIES } from '@/data/belarusData';
 import { getFeatureImportance } from '@/lib/ml/employmentPredictor';
 import { getCityByUniversity } from '@/data/universityLocations';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const featureLabels: Record<string, string> = {
-  faculty_employment_rate: 'Направление',
-  gpa_normalized: 'Средний балл',
-  experience_normalized: 'Опыт работы',
-  city_economic_factor: 'Город',
-  university_prestige: 'Престиж ВУЗа',
-  industry_growth_rate: 'Рост индустрии',
-  composite_market_score: 'Рыночный потенциал',
+  faculty_employment_rate: '',
+  gpa_normalized: '',
+  experience_normalized: '',
+  city_economic_factor: '',
+  university_prestige: '',
+  industry_growth_rate: '',
+  composite_market_score: '',
   gpa_experience_interaction: 'GPA × Опыт',
-  faculty_university_match: 'Совместимость ВУЗ-факультет',
-  internships_normalized: 'Стажировки',
-  projects_normalized: 'Проекты'
+  faculty_university_match: '',
+  internships_normalized: '',
+  projects_normalized: ''
 };
 
-const mlModelInfo = [
-  { 
-    icon: GitBranch, 
-    title: 'Stacking Ensemble', 
-    description: 'Комбинация XGBoost, LightGBM и RandomForest для максимальной точности' 
-  },
-  { 
-    icon: BarChart3, 
-    title: 'SHAP-анализ', 
-    description: 'Интерпретируемость модели через анализ вклада каждого признака' 
-  },
-  { 
-    icon: Cpu, 
-    title: '12 признаков', 
-    description: 'GPA, опыт, ВУЗ, город, стажировки, проекты, сертификаты и др.' 
-  },
-  { 
-    icon: Zap, 
-    title: 'Изотоническая калибровка', 
-    description: 'Корректировка вероятностей для более точных прогнозов' 
-  },
+const mlModelInfoInit = [
+  { icon: GitBranch, title: '', description: '' },
+  { icon: BarChart3, title: '', description: '' },
+  { icon: Cpu, title: '', description: '' },
+  { icon: Zap, title: '', description: '' },
 ];
 
 export function AnalysisSection() {
+  const { t } = useLanguage();
   const [faculty, setFaculty] = useState('ИТ');
+  
+  // Update feature labels based on language
+  const featureLabelsResolved: Record<string, string> = {
+    faculty_employment_rate: t('analysis.facultyEmploymentRate'),
+    gpa_normalized: t('analysis.gpaNormalized'),
+    experience_normalized: t('analysis.experienceNormalized'),
+    city_economic_factor: t('analysis.cityEconomicFactor'),
+    university_prestige: t('analysis.universityPrestige'),
+    industry_growth_rate: t('analysis.industryGrowthRate'),
+    composite_market_score: t('analysis.compositeMarketScore'),
+    gpa_experience_interaction: 'GPA × ' + t('analysis.experienceNormalized'),
+    faculty_university_match: t('analysis.facultyUniversityMatch'),
+    internships_normalized: t('analysis.internshipsNormalized'),
+    projects_normalized: t('analysis.projectsNormalized')
+  };
+
+  const mlModelInfo = [
+    { 
+      icon: GitBranch, 
+      title: t('analysis.model'), 
+      description: t('analysis.modelDesc') 
+    },
+    { 
+      icon: BarChart3, 
+      title: t('analysis.shap'), 
+      description: t('analysis.shapDesc') 
+    },
+    { 
+      icon: Cpu, 
+      title: t('analysis.features'), 
+      description: t('analysis.featuresDesc') 
+    },
+    { 
+      icon: Zap, 
+      title: t('analysis.isotonicCalibration'), 
+      description: t('analysis.isotonicCalibrationDesc') 
+    },
+  ];
   const [university, setUniversity] = useState('БГУ');
   const [gpa, setGpa] = useState([7.5]);
   const [experience, setExperience] = useState([1]);
@@ -62,7 +86,7 @@ export function AnalysisSection() {
       .map(item => ({ 
         key: item.name, 
         value: item.importance, 
-        label: featureLabels[item.name] || item.name 
+        label: featureLabelsResolved[item.name] || item.name 
       }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8);
@@ -270,13 +294,13 @@ export function AnalysisSection() {
           viewport={{ once: true }}
           className="mt-10"
         >
-          <h3 className="font-serif text-xl font-semibold text-center mb-6">Метрики модели</h3>
+          <h3 className="font-serif text-xl font-semibold text-center mb-6">{t('stats.methodology')}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: 'Точность (Accuracy)', value: '82.3%', description: 'Доля правильных предсказаний' },
-              { label: 'ROC-AUC', value: '0.847', description: 'Качество классификации' },
-              { label: 'Precision', value: '85.6%', description: 'Точность положительных предсказаний' },
-              { label: 'Recall', value: '81.2%', description: 'Полнота выявления' },
+              { label: t('analysis.accuracyVal'), value: '82.3%', description: t('analysis.accuracyDesc') },
+              { label: t('analysis.rocAuc'), value: '0.847', description: t('analysis.rocAucDesc') },
+              { label: t('analysis.precisionVal'), value: '85.6%', description: t('analysis.precisionDesc') },
+              { label: t('analysis.recallVal'), value: '81.2%', description: t('analysis.recallDesc') },
             ].map((metric) => (
               <div key={metric.label} className="text-center p-4 bg-secondary/50 rounded-xl">
                 <p className="font-serif text-2xl font-semibold text-foreground">{metric.value}</p>

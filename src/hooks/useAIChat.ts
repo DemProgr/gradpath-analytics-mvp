@@ -34,6 +34,7 @@ export interface Message {
   timestamp: Date;
   recommendations?: Recommendation[];
   parsedQuery?: ParsedQuery;
+  isSaved?: boolean;
 }
 
 export interface UseAIChatReturn {
@@ -44,6 +45,10 @@ export interface UseAIChatReturn {
   clearChat: () => void;
   savedRecommendations: Recommendation[];
   saveRecommendation: (rec: Recommendation) => void;
+  savedMessages: Message[];
+  setSavedMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  saveMessage: (message: Message) => void;
+  isMessageSaved: (message: Message) => boolean;
 }
 
 // OpenRouter API (supports many AI models, works from browser)
@@ -211,12 +216,14 @@ function parseUserQuery(query: string): ParsedQuery {
 
 const STORAGE_KEY = 'gradpath_chat_history';
 const RECOMMENDATIONS_KEY = 'gradpath_saved_recommendations';
+const MESSAGES_KEY = 'gradpath_saved_messages';
 
 export function useAIChat(): UseAIChatReturn {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedRecommendations, setSavedRecommendations] = useState<Recommendation[]>([]);
+  const [savedMessages, setSavedMessages] = useState<Message[]>([]);
 
   // Загрузка истории из localStorage
   useEffect(() => {
@@ -233,6 +240,11 @@ export function useAIChat(): UseAIChatReturn {
       const savedRecs = localStorage.getItem(RECOMMENDATIONS_KEY);
       if (savedRecs) {
         setSavedRecommendations(JSON.parse(savedRecs));
+      }
+      
+      const savedMsgs = localStorage.getItem(MESSAGES_KEY);
+      if (savedMsgs) {
+        setSavedMessages(JSON.parse(savedMsgs));
       }
     } catch (e) {
       console.error('Error loading chat history:', e);
@@ -258,6 +270,25 @@ export function useAIChat(): UseAIChatReturn {
       return updated;
     });
   }, []);
+
+  const saveMessage = useCallback((message: Message) => {
+    setSavedMessages(prev => {
+      const exists = prev.some(m => 
+        m.content === message.content && m.timestamp.getTime() === message.timestamp.getTime()
+      );
+      if (exists) return prev;
+      
+      const updated = [...prev, message];
+      localStorage.setItem(MESSAGES_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const isMessageSaved = useCallback((message: Message) => {
+    return savedMessages.some(m => 
+      m.content === message.content && m.timestamp.getTime() === message.timestamp.getTime()
+    );
+  }, [savedMessages]);
 
   const sendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
@@ -371,5 +402,9 @@ ${contextMessages}
     clearChat,
     savedRecommendations,
     saveRecommendation,
+    savedMessages,
+    setSavedMessages,
+    saveMessage,
+    isMessageSaved,
   };
 }

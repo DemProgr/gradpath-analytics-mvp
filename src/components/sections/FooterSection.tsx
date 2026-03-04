@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
 import { GraduationCap } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface FooterSectionProps {
   onNavigate: (section: string) => void;
 }
 
 export function FooterSection({ onNavigate }: FooterSectionProps) {
+  const { t, language } = useLanguage();
+
+  const countryName = language === 'ru' ? 'Беларусь' : language === 'en' ? 'Belarus' : 'Беларусь';
+
   return (
     <footer className="py-12 border-t border-border">
       <div className="section-container">
@@ -16,7 +21,7 @@ export function FooterSection({ onNavigate }: FooterSectionProps) {
               GradInsight
             </span>
             <span className="text-muted-foreground">•</span>
-            <span className="text-sm text-muted-foreground">Беларусь</span>
+            <span className="text-sm text-muted-foreground">{countryName}</span>
           </div>
 
           {/* Links */}
@@ -25,25 +30,25 @@ export function FooterSection({ onNavigate }: FooterSectionProps) {
               onClick={() => onNavigate('overview')} 
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Статистика
+              {t('footer.statistics')}
             </button>
             <button 
               onClick={() => onNavigate('universities')} 
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              ВУЗы
+              {t('footer.universities')}
             </button>
             <button 
               onClick={() => onNavigate('market')} 
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Рынок труда
+              {t('footer.jobMarket')}
             </button>
             <button 
               onClick={() => onNavigate('analysis')} 
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              ML анализ
+              {t('footer.mlAnalysis')}
             </button>
           </nav>
 
@@ -55,8 +60,7 @@ export function FooterSection({ onNavigate }: FooterSectionProps) {
 
         <div className="mt-8 pt-6 border-t border-border/50 text-center">
           <p className="text-xs text-muted-foreground">
-            Данные на основе анализа rabota.by и открытых источников • 
-            ML-модели обучены на данных 1200+ выпускников
+            {t('footer.dataNote')}
           </p>
         </div>
       </div>

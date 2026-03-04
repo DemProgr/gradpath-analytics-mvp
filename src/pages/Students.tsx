@@ -6,6 +6,7 @@ import { MarketSection } from '@/components/sections/MarketSection';
 import { AnalysisSection } from '@/components/sections/AnalysisSection';
 import { CareerPathsSection } from '@/components/sections/CareerPathsSection';
 import { Briefcase, TrendingUp, Target, Award } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface StudentsProps {
   isChatOpen?: boolean;
@@ -14,6 +15,7 @@ interface StudentsProps {
 
 const Students = ({ isChatOpen = false }: StudentsProps) => {
   const [activeSection, setActiveSection] = useState('overview');
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,40 +38,39 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
                 <Briefcase className="w-5 h-5" />
-                <span className="text-sm font-medium">Для студентов</span>
+                <span className="text-sm font-medium">{t('students.badge')}</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6">
-                Подготовься к рынку труда
+                {t('students.title')}
               </h1>
               
               <p className="text-lg text-muted-foreground mb-8">
-                Узнай, какие навыки востребованы, сколько платят работодатели 
-                и как построить успешную карьеру в твоей сфере.
+                {t('students.subtitle')}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
                 <div className="card-elevated p-6 text-left">
                   <TrendingUp className="w-8 h-8 text-primary mb-4" />
-                  <h3 className="font-semibold text-foreground mb-2">Рынок труда</h3>
+                  <h3 className="font-semibold text-foreground mb-2">{t('students.jobMarket')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Актуальная статистика вакансий и зарплат
+                    {t('students.jobMarketDesc')}
                   </p>
                 </div>
                 
                 <div className="card-elevated p-6 text-left">
                   <Target className="w-8 h-8 text-primary mb-4" />
-                  <h3 className="font-semibold text-foreground mb-2">Важные критерии</h3>
+                  <h3 className="font-semibold text-foreground mb-2">{t('students.criteria')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    ML-анализ факторов успешного трудоустройства
+                    {t('students.criteriaDesc')}
                   </p>
                 </div>
                 
                 <div className="card-elevated p-6 text-left">
                   <Award className="w-8 h-8 text-primary mb-4" />
-                  <h3 className="font-semibold text-foreground mb-2">Карьерный рост</h3>
+                  <h3 className="font-semibold text-foreground mb-2">{t('students.growth')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Пути развития в разных профессиях
+                    {t('students.growthDesc')}
                   </p>
                 </div>
               </div>

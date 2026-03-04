@@ -7,6 +7,7 @@ import { MarketSection } from '@/components/sections/MarketSection';
 import { AnalysisSection } from '@/components/sections/AnalysisSection';
 import { DataMethodologySection } from '@/components/sections/DataMethodologySection';
 import { BarChart3, TrendingUp, Brain, Database } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface StatisticsProps {
   isChatOpen?: boolean;
@@ -14,6 +15,7 @@ interface StatisticsProps {
 }
 
 const Statistics = ({ isChatOpen = false }: StatisticsProps) => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-background">
       <Header chatOpen={isChatOpen} />
@@ -36,15 +38,14 @@ const Statistics = ({ isChatOpen = false }: StatisticsProps) => {
               <div className="flex items-center justify-center gap-2 mb-4">
                 <BarChart3 className="w-6 h-6 text-primary" />
                 <span className="text-sm text-primary uppercase tracking-wider font-semibold">
-                  Аналитика и статистика
+                  {t('nav.analytics')}
                 </span>
               </div>
               <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-                Данные о рынке труда
+                {t('stats.title')}
               </h1>
               <p className="text-muted-foreground text-lg">
-                Полная аналитика вакансий, зарплат и прогнозы на основе машинного обучения. 
-                Все данные получены из открытых источников.
+                {t('stats.subtitle')}
               </p>
             </motion.div>
 
@@ -57,19 +58,19 @@ const Statistics = ({ isChatOpen = false }: StatisticsProps) => {
             >
               <a href="#vacancies" className="p-4 bg-background rounded-xl border border-border hover:border-primary/50 transition-colors text-center">
                 <TrendingUp className="w-6 h-6 mx-auto mb-2 text-primary" />
-                <span className="text-sm font-medium">Вакансии</span>
+                <span className="text-sm font-medium">{t('stats.vacancies')}</span>
               </a>
               <a href="#salaries" className="p-4 bg-background rounded-xl border border-border hover:border-primary/50 transition-colors text-center">
                 <BarChart3 className="w-6 h-6 mx-auto mb-2 text-primary" />
-                <span className="text-sm font-medium">Зарплаты</span>
+                <span className="text-sm font-medium">{t('stats.salaries')}</span>
               </a>
               <a href="#analysis" className="p-4 bg-background rounded-xl border border-border hover:border-primary/50 transition-colors text-center">
                 <Brain className="w-6 h-6 mx-auto mb-2 text-primary" />
-                <span className="text-sm font-medium">ML-анализ</span>
+                <span className="text-sm font-medium">{t('stats.mlAnalysis')}</span>
               </a>
               <a href="#methodology" className="p-4 bg-background rounded-xl border border-border hover:border-primary/50 transition-colors text-center">
                 <Database className="w-6 h-6 mx-auto mb-2 text-primary" />
-                <span className="text-sm font-medium">Методология</span>
+                <span className="text-sm font-medium">{t('stats.methodology')}</span>
               </a>
             </motion.div>
           </div>
@@ -101,7 +102,7 @@ const Statistics = ({ isChatOpen = false }: StatisticsProps) => {
         </div>
       </motion.main>
 
-      <FooterSection />
+      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage, translateCategory } from '@/hooks/useLanguage';
 import { 
   Table, 
   TableBody, 
@@ -29,6 +30,7 @@ interface Vacancy {
 }
 
 export function AllVacanciesTable() {
+  const { t, language } = useLanguage();
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,19 +120,19 @@ export function AllVacanciesTable() {
           <Table>
             <TableHeader>
               <TableRow className="border-border/50 bg-secondary/50">
-                <TableHead className="text-muted-foreground">Вакансия</TableHead>
-                <TableHead className="text-muted-foreground">Компания</TableHead>
-                <TableHead className="text-muted-foreground">Город</TableHead>
-                <TableHead className="text-muted-foreground">Категория</TableHead>
-                <TableHead className="text-muted-foreground text-right">Зарплата</TableHead>
-                <TableHead className="text-muted-foreground">Источник</TableHead>
+                <TableHead className="text-muted-foreground">{t('stats.vacancy')}</TableHead>
+                <TableHead className="text-muted-foreground">{t('stats.company')}</TableHead>
+                <TableHead className="text-muted-foreground">{t('stats.city')}</TableHead>
+                <TableHead className="text-muted-foreground">{t('stats.category')}</TableHead>
+                <TableHead className="text-muted-foreground text-right">{t('stats.salary')}</TableHead>
+                <TableHead className="text-muted-foreground">{t('stats.source')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredVacancies.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    {searchTerm ? 'Нет вакансий, соответствующих поиску' : 'Нет данных'}
+                    {searchTerm ? t('stats.noSearchResults') : t('stats.noData')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -156,7 +158,7 @@ export function AllVacanciesTable() {
                     <TableCell>
                       {vacancy.category ? (
                         <Badge variant="secondary" className="text-xs">
-                          {vacancy.category}
+                          {translateCategory(vacancy.category, language)}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground">—</span>

@@ -4,6 +4,20 @@ import { VacanciesChart } from '@/components/charts/VacanciesChart';
 import { SalaryByFacultyChart } from '@/components/charts/SalaryByFacultyChart';
 import { useSalaryStats } from '@/hooks/useSalaryStats';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage } from '@/hooks/useLanguage';
+
+// Translation helper for categories
+const translateCategory = (cat: string, t: (key: string) => string): string => {
+  const map: Record<string, string> = {
+    'ИТ': t('category.it'),
+    'Медицина': t('category.medicine'),
+    'Инженерия': t('category.engineering'),
+    'Экономика': t('category.economics'),
+    'Педагогика': t('category.education'),
+    'Юриспруденция': t('category.law'),
+  };
+  return map[cat] || cat;
+};
 
 // Fallback данные только если нет данных из БД
 const fallbackInsights = [
@@ -19,6 +33,7 @@ const fallbackInsights = [
 
 export function MarketSection() {
   const { data: salaryStats, isLoading, error } = useSalaryStats();
+  const { t, language } = useLanguage();
 
   // Преобразуем данные из БД в формат для отображения
   const marketInsights = salaryStats?.categories.slice(0, 4).map((cat, index) => {
@@ -32,23 +47,23 @@ export function MarketSection() {
     };
 
     return {
-      title: cat.category,
-      demand: cat.avgSalary > 2000 ? 'высокий' : cat.avgSalary > 1500 ? 'средний' : 'низкий',
+      title: translateCategory(cat.category, t),
+      demand: cat.avgSalary > 2000 ? t('market.high') : cat.avgSalary > 1500 ? t('market.medium') : t('market.low'),
       trend: trendMap[cat.category] || 'stable',
-      avgSalary: `${cat.avgSalary.toLocaleString('ru-RU')} BYN`,
+      avgSalary: `${cat.avgSalary.toLocaleString(language === 'be' ? 'be-BY' : language === 'en' ? 'en-US' : 'ru-RU')} BYN`,
       avgMin: cat.avgSalaryMin,
       avgMax: cat.avgSalaryMax,
       vacancies: cat.vacancyCount,
-      description: `${cat.vacancyCount} вакансий с указанной зарплатой (${cat.avgSalaryMin.toLocaleString('ru-RU')}–${cat.avgSalaryMax.toLocaleString('ru-RU')} BYN)`
+      description: `${cat.vacancyCount} ${t('market.vacancies')} (${cat.avgSalaryMin.toLocaleString(language === 'be' ? 'be-BY' : language === 'en' ? 'en-US' : 'ru-RU')}–${cat.avgSalaryMax.toLocaleString(language === 'be' ? 'be-BY' : language === 'en' ? 'en-US' : 'ru-RU')} BYN)`
     };
   }) || [];
 
   // Данные о требованиях к опыту из реальных вакансий
   const requirements = [
-    { label: 'Без опыта', percent: 25, color: 'bg-primary' },
-    { label: '1-3 года', percent: 45, color: 'bg-primary/70' },
-    { label: '3-5 лет', percent: 22, color: 'bg-primary/50' },
-    { label: '5+ лет', percent: 8, color: 'bg-primary/30' },
+    { label: t('market.noExperience'), percent: 25, color: 'bg-primary' },
+    { label: '1-3 ' + t('market.years'), percent: 45, color: 'bg-primary/70' },
+    { label: '3-5 ' + t('market.years'), percent: 22, color: 'bg-primary/50' },
+    { label: '5+ ' + t('market.years'), percent: 8, color: 'bg-primary/30' },
   ];
 
   return (
@@ -61,18 +76,17 @@ export function MarketSection() {
           viewport={{ once: true }}
           className="mb-10 sm:mb-16"
         >
-          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-3">Рынок труда</p>
+          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-3">{t('market.title')}</p>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-            Знай свою<br />ценность.
+            {t('market.titleValue')}
           </h2>
           <p className="text-muted-foreground max-w-xl">
-            Анализ {salaryStats?.totalVacancies || '—'} вакансий с rabota.by. 
-            Реальные данные о зарплатах по направлениям.
+            {t('market.analysis').replace('{count}', String(salaryStats?.totalVacancies || '—'))}
           </p>
           {salaryStats?.lastUpdated && (
             <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
               <RefreshCw className="w-3 h-3" />
-              Обновлено: {new Date(salaryStats.lastUpdated).toLocaleDateString('ru-RU')}
+              {t('market.updated')}: {new Date(salaryStats.lastUpdated).toLocaleDateString(language === 'be' ? 'be-BY' : language === 'en' ? 'en-US' : 'ru-RU')}
             </p>
           )}
         </motion.div>

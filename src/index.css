@@ -140,6 +140,11 @@
            hover:bg-foreground/5 transition-colors;
   }
 
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-full font-medium 
+           hover:opacity-90 transition-opacity;
+  }
+
   .gradient-olive {
     background: linear-gradient(135deg, hsl(75, 35%, 35%), hsl(75, 30%, 45%));
   }

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,14 +22,6 @@ interface HeaderProps {
   chatOpen?: boolean;
 }
 
-const navItems = [
-  { id: '/', label: 'Главная', isRoute: true },
-  { id: '/applicants', label: 'Абитуриентам', isRoute: true },
-  { id: '/students', label: 'Студентам', isRoute: true },
-  { id: '/statistics', label: 'Аналитика', isRoute: true },
-  { id: '/admission-stats', label: 'Поступление', isRoute: true },
-];
-
 export function Header({ activeSection, onSectionChange, chatOpen = false }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -36,6 +29,15 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { id: '/', label: t('nav.home'), isRoute: true },
+    { id: '/applicants', label: t('nav.applicants'), isRoute: true },
+    { id: '/students', label: t('nav.students'), isRoute: true },
+    { id: '/statistics', label: t('nav.analytics'), isRoute: true },
+    { id: '/admission-stats', label: t('nav.admission'), isRoute: true },
+  ];
 
   const handleNavClick = (section: string) => {
     if (onSectionChange) {
@@ -49,8 +51,8 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
   const handleSignOut = async () => {
     await signOut();
     toast({
-      title: 'Выход выполнен',
-      description: 'Вы успешно вышли из аккаунта.',
+      title: t('profile.logoutSuccess'),
+      description: t('profile.logoutSuccessDesc'),
     });
     navigate('/');
   };
@@ -73,8 +75,8 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <span className="font-serif text-xl sm:text-2xl font-semibold text-foreground">
-                GradInsight
+<span className="font-serif text-xl sm:text-2xl font-semibold text-foreground">
+                GradPath Analytics
               </span>
             </motion.div>
           </Link>

@@ -6,9 +6,11 @@ import { useVacancyStats } from '@/hooks/useVacancyStats';
 import { Briefcase, TrendingUp, Wallet, Building2, MapPin } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage, translateCategory } from '@/hooks/useLanguage';
 
 export function VacancyAnalyticsSection() {
   const { stats, loading } = useVacancyStats();
+  const { t, language } = useLanguage();
 
   // Calculate totals
   const totalVacancies = stats.reduce((sum, s) => sum + s.count, 0);
@@ -22,6 +24,12 @@ export function VacancyAnalyticsSection() {
   const overallAvgSalary = categoriesWithSalary.length > 0
     ? Math.round(categoriesWithSalary.reduce((sum, s) => sum + s.avgSalary, 0) / categoriesWithSalary.length)
     : 0;
+
+  const getLocale = () => {
+    if (language === 'en') return 'en-US';
+    if (language === 'be') return 'be-BY';
+    return 'ru-RU';
+  };
 
   if (loading) {
     return (
@@ -52,10 +60,10 @@ export function VacancyAnalyticsSection() {
           className="mb-8"
         >
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-            Аналитика рынка труда
+            {t('stats.vacanciesAnalytics')}
           </h2>
           <p className="text-muted-foreground">
-            Данные с rabota.by • Обновлено: {new Date().toLocaleDateString('ru-RU')}
+            {t('stats.vacanciesAnalyticsDesc')} • {t('market.updated')}: {new Date().toLocaleDateString(getLocale())}
           </p>
         </motion.div>
 
@@ -71,10 +79,10 @@ export function VacancyAnalyticsSection() {
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-muted-foreground text-sm">Всего вакансий</span>
+              <span className="text-muted-foreground text-sm">{t('stats.totalVacancies')}</span>
             </div>
-            <p className="text-3xl font-bold text-primary">{totalVacancies.toLocaleString('ru-RU')}</p>
-            <p className="text-muted-foreground text-sm">по {totalCategories} категориям</p>
+            <p className="text-3xl font-bold text-primary">{totalVacancies.toLocaleString(getLocale())}</p>
+            <p className="text-muted-foreground text-sm">{t('stats.byCategories').replace('{count}', String(totalCategories))}</p>
           </motion.div>
 
           <motion.div
@@ -87,10 +95,10 @@ export function VacancyAnalyticsSection() {
               <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-accent" />
               </div>
-              <span className="text-muted-foreground text-sm">Топ направление</span>
+              <span className="text-muted-foreground text-sm">{t('stats.topDirection')}</span>
             </div>
-            <p className="text-xl font-bold text-foreground truncate">{topCategory?.category || 'Нет данных'}</p>
-            <p className="text-accent font-semibold">{topCategory?.count.toLocaleString('ru-RU') || 0} вакансий</p>
+            <p className="text-xl font-bold text-foreground truncate">{topCategory ? translateCategory(topCategory.category, language) : t('stats.noData')}</p>
+            <p className="text-accent font-semibold">{topCategory?.count.toLocaleString(getLocale()) || 0} {t('stats.vacanciesCount')}</p>
           </motion.div>
 
           <motion.div
@@ -103,9 +111,9 @@ export function VacancyAnalyticsSection() {
               <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
                 <Wallet className="w-5 h-5 text-muted-foreground" />
               </div>
-              <span className="text-muted-foreground text-sm">Средняя зарплата</span>
+              <span className="text-muted-foreground text-sm">{t('stats.avgSalary')}</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{overallAvgSalary.toLocaleString('ru-RU')}</p>
+            <p className="text-3xl font-bold text-foreground">{overallAvgSalary.toLocaleString(getLocale())}</p>
             <p className="text-muted-foreground text-sm">BYN</p>
           </motion.div>
 
@@ -119,10 +127,10 @@ export function VacancyAnalyticsSection() {
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-muted-foreground text-sm">Категорий</span>
+              <span className="text-muted-foreground text-sm">{t('stats.categories')}</span>
             </div>
             <p className="text-3xl font-bold text-primary">{totalCategories}</p>
-            <p className="text-muted-foreground text-sm">направлений</p>
+            <p className="text-muted-foreground text-sm">{t('stats.directions')}</p>
           </motion.div>
         </div>
 
@@ -141,16 +149,16 @@ export function VacancyAnalyticsSection() {
             className="card-elevated p-6"
           >
             <h3 className="text-lg font-semibold text-foreground mb-6">
-              Детальная статистика по направлениям
+              {t('stats.detailedStats')}
             </h3>
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-border/50">
-                    <TableHead className="text-muted-foreground">Категория</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Вакансий</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Ср. зарплата</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Диапазон</TableHead>
+                    <TableHead className="text-muted-foreground">{t('stats.category')}</TableHead>
+                    <TableHead className="text-muted-foreground text-right">{t('stats.vacanciesShort')}</TableHead>
+                    <TableHead className="text-muted-foreground text-right">{t('stats.avgSalaryShort')}</TableHead>
+                    <TableHead className="text-muted-foreground text-right">{t('stats.range')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -159,19 +167,19 @@ export function VacancyAnalyticsSection() {
                       key={stat.category}
                       className="border-border/30 hover:bg-secondary/50 transition-colors"
                     >
-                      <TableCell className="font-medium text-foreground">{stat.category}</TableCell>
+                      <TableCell className="font-medium text-foreground">{translateCategory(stat.category, language)}</TableCell>
                       <TableCell className="text-right text-muted-foreground">
-                        {stat.count.toLocaleString('ru-RU')}
+                        {stat.count.toLocaleString(getLocale())}
                       </TableCell>
                       <TableCell className="text-right text-foreground">
                         {stat.avgSalary > 0 
-                          ? `${stat.avgSalary.toLocaleString('ru-RU')} BYN`
+                          ? `${stat.avgSalary.toLocaleString(getLocale())} BYN`
                           : '—'
                         }
                       </TableCell>
                       <TableCell className="text-right text-muted-foreground">
                         {stat.avgSalaryMin > 0 && stat.avgSalaryMax > 0
-                          ? `${stat.avgSalaryMin.toLocaleString('ru-RU')} - ${stat.avgSalaryMax.toLocaleString('ru-RU')}`
+                          ? `${stat.avgSalaryMin.toLocaleString(getLocale())} - ${stat.avgSalaryMax.toLocaleString(getLocale())}`
                           : '—'
                         }
                       </TableCell>
@@ -191,7 +199,7 @@ export function VacancyAnalyticsSection() {
           className="mt-8"
         >
           <h3 className="text-xl font-semibold text-foreground mb-6">
-            Все вакансии
+            {t('stats.allVacancies')}
           </h3>
           <AllVacanciesTable />
         </motion.div>

@@ -2,15 +2,15 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, ExternalLink, GraduationCap, BookOpen, Users } from 'lucide-react';
 import { ALL_UNIVERSITIES, UNIVERSITY_AVERAGE_MARKS } from '@/data/universityMarks';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function UniversitiesSection() {
-  // Используем статический список всех университетов
+  const { t } = useLanguage();
   const universities = ALL_UNIVERSITIES;
   const isLoading = false;
 
   const universityCount = universities.length;
 
-  // Рассчитываем средний балл по всем университетам
   const averageMark = Math.round(
     Object.values(UNIVERSITY_AVERAGE_MARKS).reduce((a, b) => a + b, 0) / Object.values(UNIVERSITY_AVERAGE_MARKS).length
   );
@@ -25,13 +25,12 @@ export function UniversitiesSection() {
           viewport={{ once: true }}
           className="mb-10 sm:mb-16"
         >
-          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-3">ВУЗы Беларуси</p>
+          <p className="text-sm text-muted-foreground uppercase tracking-wider mb-3">{t('footer.universities')}</p>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-            Выбери свой<br />университет.
+            {t('unis.title')}
           </h2>
           <p className="text-muted-foreground max-w-xl">
-            Информация о государственных университетах Беларуси.
-            Указаны средние проходные баллы за 2025 год.
+            {t('unis.subtitle')}
           </p>
         </motion.div>
 
@@ -47,10 +46,10 @@ export function UniversitiesSection() {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm text-muted-foreground">В каталоге</span>
+              <span className="text-sm text-muted-foreground">{t('unis.inCatalog')}</span>
             </div>
             <p className="font-serif text-3xl font-semibold">{universityCount}</p>
-            <p className="text-sm text-muted-foreground mt-1">университетов</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('unis.universities')}</p>
           </div>
           
           <div className="card-elevated p-6">
@@ -58,10 +57,10 @@ export function UniversitiesSection() {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm text-muted-foreground">Всего в РБ</span>
+              <span className="text-sm text-muted-foreground">{t('unis.totalInRB')}</span>
             </div>
-            <p className="font-serif text-3xl font-semibold">~42</p>
-            <p className="text-sm text-muted-foreground mt-1">учреждений ВО</p>
+            <p className="font-serif text-3xl font-semibold">51</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('unis.institutions')}</p>
           </div>
           
           <div className="card-elevated p-6">
@@ -69,10 +68,10 @@ export function UniversitiesSection() {
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm text-muted-foreground">Средний балл</span>
+              <span className="text-sm text-muted-foreground">{t('unis.avgScore')}</span>
             </div>
             <p className="font-serif text-3xl font-semibold">{averageMark}</p>
-            <p className="text-sm text-muted-foreground mt-1">для поступления</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('unis.forAdmission')}</p>
           </div>
         </motion.div>
 
@@ -136,8 +135,7 @@ export function UniversitiesSection() {
           className="text-center mt-10 p-4 bg-accent/30 rounded-xl"
         >
           <p className="text-xs text-muted-foreground">
-            <strong>Источники данных:</strong> Средние проходные баллы указаны за 2025 год.
-            Данные предоставлены для справки — рекомендуем проверять актуальную информацию на официальных сайтах университетов.
+            {t('unis.sourceNote')}
           </p>
         </motion.div>
       </div>

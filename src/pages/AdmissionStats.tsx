@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, TrendingDown, Minus, GraduationCap, Users, Award, BookOpen, Filter, BarChart3 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { useLanguage, getUniversityTranslatedName, getFacultyTranslatedName } from '@/hooks/useLanguage';
 
 interface AdmissionStatsProps {
   isChatOpen?: boolean;
@@ -22,6 +23,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
   const [selectedYear, setSelectedYear] = useState<string>('2025');
   const [selectedFaculty, setSelectedFaculty] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
+  const { t, language } = useLanguage();
 
   // Fetch universities
   const { data: universities } = useQuery({
@@ -29,7 +31,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('universities')
-        .select('id, short_name, full_name')
+        .select('id, short_name, short_name_en, short_name_be, full_name, full_name_en, full_name_be')
         .order('short_name');
       if (error) throw error;
       return data;
@@ -42,7 +44,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
     queryFn: async () => {
       let query = supabase
         .from('faculties')
-        .select('id, name, university_id')
+        .select('id, name, name_en, name_be, university_id')
         .order('name');
       
       if (selectedUniversity !== 'all') {
@@ -68,9 +70,16 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
             code,
             faculties:faculty_id (
               name,
+              name_en,
+              name_be,
               universities:university_id (
                 id,
-                short_name
+                short_name,
+                short_name_en,
+                short_name_be,
+                full_name,
+                full_name_en,
+                full_name_be
               )
             )
           )
@@ -130,15 +139,15 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
 
   const avgScore = aggregatedStats?.avgScores.length 
     ? (aggregatedStats.avgScores.reduce((a: number, b: number) => a + b, 0) / aggregatedStats.avgScores.length).toFixed(1)
-    : 'Н/Д';
+    : t('common.noData');
 
   const minScore = aggregatedStats?.minScores.length
     ? Math.min(...aggregatedStats.minScores).toFixed(1)
-    : 'Н/Д';
+    : t('common.noData');
 
   const competition = aggregatedStats && aggregatedStats.totalBudgetPlaces > 0
     ? (aggregatedStats.totalApplications / aggregatedStats.totalBudgetPlaces).toFixed(1)
-    : 'Н/Д';
+    : t('common.noData');
 
   // Prepare chart data by grouping stats by year for comparison
   const prepareChartData = () => {
@@ -200,20 +209,20 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-                  Статистика поступления
+                  {t('admission.title')}
                 </h1>
                 <p className="text-muted-foreground">
-                  Проходные баллы, конкурс и количество мест по годам
+                  {t('admission.subtitle')}
                 </p>
               </div>
               
               <div className="flex flex-wrap gap-3">
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Год" />
+                    <SelectValue placeholder={t('common.year')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Все годы</SelectItem>
+                    <SelectItem value="all">{t('admission.allYears')}</SelectItem>
                     {years.map(year => (
                       <SelectItem key={year} value={year}>{year}</SelectItem>
                     ))}
@@ -225,25 +234,25 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                   setSelectedFaculty('all'); // Reset faculty when university changes
                 }}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Университет" />
+                    <SelectValue placeholder={t('admission.university')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Все университеты</SelectItem>
+                    <SelectItem value="all">{t('admission.allUniversities')}</SelectItem>
                     {universities?.map(uni => (
-                      <SelectItem key={uni.id} value={uni.id}>{uni.short_name}</SelectItem>
+                      <SelectItem key={uni.id} value={uni.id}>{getUniversityTranslatedName(uni, language)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
 
                 <Select value={selectedFaculty} onValueChange={setSelectedFaculty}>
                   <SelectTrigger className="w-[220px]">
-                    <SelectValue placeholder="Факультет" />
+                    <SelectValue placeholder={t('admission.faculty')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Все факультеты</SelectItem>
+                    <SelectItem value="all">{t('admission.allFaculties')}</SelectItem>
                     {faculties?.map(fac => (
                       <SelectItem key={fac.id} value={fac.id}>
-                        {fac.name.length > 30 ? fac.name.substring(0, 30) + '...' : fac.name}
+                        {getFacultyTranslatedName(fac, language).length > 30 ? getFacultyTranslatedName(fac, language).substring(0, 30) + '...' : getFacultyTranslatedName(fac, language)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -255,18 +264,24 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
             {(selectedUniversity !== 'all' || selectedFaculty !== 'all' || selectedYear !== 'all') && (
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <Filter className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Активные фильтры:</span>
+                <span className="text-sm text-muted-foreground">{t('admission.activeFilters')}:</span>
                 {selectedYear !== 'all' && (
-                  <Badge variant="secondary">{selectedYear} год</Badge>
+                  <Badge variant="secondary">{selectedYear} {t('admission.yearBadge')}</Badge>
                 )}
                 {selectedUniversity !== 'all' && (
                   <Badge variant="secondary">
-                    {universities?.find(u => u.id === selectedUniversity)?.short_name}
+                    {(() => {
+                      const uni = universities?.find(u => u.id === selectedUniversity);
+                      return uni ? getUniversityTranslatedName(uni, language) : '';
+                    })()}
                   </Badge>
                 )}
                 {selectedFaculty !== 'all' && (
                   <Badge variant="secondary">
-                    {faculties?.find(f => f.id === selectedFaculty)?.name?.substring(0, 25)}...
+                    {(() => {
+                      const fac = faculties?.find(f => f.id === selectedFaculty);
+                      return fac ? getFacultyTranslatedName(fac, language).substring(0, 25) + '...' : '';
+                    })()}
                   </Badge>
                 )}
               </div>
@@ -281,7 +296,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                       <GraduationCap className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Бюджетных мест</p>
+                      <p className="text-sm text-muted-foreground">{t('admission.budgetPlaces')}</p>
                       <p className="text-2xl font-bold">{aggregatedStats?.totalBudgetPlaces || 0}</p>
                     </div>
                   </div>
@@ -295,7 +310,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                       <BookOpen className="w-5 h-5 text-secondary-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Платных мест</p>
+                      <p className="text-sm text-muted-foreground">{t('admission.paidPlaces')}</p>
                       <p className="text-2xl font-bold">{aggregatedStats?.totalPaidPlaces || 0}</p>
                     </div>
                   </div>
@@ -309,7 +324,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                       <Award className="w-5 h-5 text-green-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Средний балл</p>
+                      <p className="text-sm text-muted-foreground">{t('admission.avgScore')}</p>
                       <p className="text-2xl font-bold">{avgScore}</p>
                     </div>
                   </div>
@@ -323,7 +338,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                       <Users className="w-5 h-5 text-orange-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Конкурс (чел/место)</p>
+                      <p className="text-sm text-muted-foreground">{t('admission.competition')}</p>
                       <p className="text-2xl font-bold">{competition}</p>
                     </div>
                   </div>
@@ -333,17 +348,17 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
 
             <Tabs defaultValue="table" className="space-y-6">
               <TabsList>
-                <TabsTrigger value="table">Таблица</TabsTrigger>
-                <TabsTrigger value="charts">Графики</TabsTrigger>
-              <TabsTrigger value="comparison">Сравнение по годам</TabsTrigger>
+                <TabsTrigger value="table">{t('admission.table')}</TabsTrigger>
+                <TabsTrigger value="charts">{t('admission.charts')}</TabsTrigger>
+              <TabsTrigger value="comparison">{t('admission.comparison')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="table">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Детальная статистика по специальностям</CardTitle>
+                    <CardTitle>{t('admission.detailStats')}</CardTitle>
                     <CardDescription>
-                      Данные о проходных баллах и количестве мест
+                      {t('admission.detailStatsDesc')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -356,14 +371,14 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Специальность</TableHead>
-                              <TableHead>Университет</TableHead>
-                              <TableHead className="text-center">Год</TableHead>
-                              <TableHead className="text-right">Бюджет</TableHead>
-                              <TableHead className="text-right">Платное</TableHead>
-                              <TableHead className="text-right">Мин. балл</TableHead>
-                              <TableHead className="text-right">Ср. балл</TableHead>
-                              <TableHead className="text-right">Заявок</TableHead>
+                              <TableHead>{t('admission.specialty')}</TableHead>
+                              <TableHead>{t('admission.uni')}</TableHead>
+                              <TableHead className="text-center">{t('admission.year')}</TableHead>
+                              <TableHead className="text-right">{t('admission.budget')}</TableHead>
+                              <TableHead className="text-right">{t('admission.paid')}</TableHead>
+                              <TableHead className="text-right">{t('admission.minScore')}</TableHead>
+                              <TableHead className="text-right">{t('admission.avgScoreShort')}</TableHead>
+                              <TableHead className="text-right">{t('admission.applications')}</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -371,7 +386,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                               <TableRow key={stat.id}>
                                 <TableCell className="font-medium max-w-[200px]">
                                   <div className="truncate" title={stat.specialties?.name}>
-                                    {stat.specialties?.name || 'Н/Д'}
+                                    {stat.specialties?.name || t('common.noData')}
                                   </div>
                                   {stat.specialties?.code && (
                                     <span className="text-xs text-muted-foreground">
@@ -381,7 +396,9 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                                 </TableCell>
                                 <TableCell>
                                   <Badge variant="outline">
-                                    {stat.specialties?.faculties?.universities?.short_name || 'Н/Д'}
+                                    {stat.specialties?.faculties?.universities ? 
+                                      getUniversityTranslatedName(stat.specialties.faculties.universities, language) : 
+                                      t('common.noData')}
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-center">{stat.year}</TableCell>
@@ -401,9 +418,9 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                       </div>
                     ) : (
                       <div className="text-center py-12 text-muted-foreground">
-                        <p>Нет данных для отображения.</p>
+                        <p>{t('admission.noData')}</p>
                         <p className="text-sm mt-2">
-                          Данные загружаются из базы. Убедитесь, что таблица admission_stats заполнена.
+                          {t('admission.noDataDesc')}
                         </p>
                       </div>
                     )}
@@ -415,8 +432,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Динамика количества мест</CardTitle>
-                      <CardDescription>Бюджетные и платные места по годам</CardDescription>
+                      <CardTitle>{t('admission.placesDynamics')}</CardTitle>
+                      <CardDescription>{t('admission.placesDynamicsDesc')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {chartDataArray.length > 0 ? (
@@ -433,13 +450,13 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                               }}
                             />
                             <Legend />
-                            <Bar dataKey="budgetPlaces" name="Бюджет" fill="hsl(var(--primary))" />
-                            <Bar dataKey="paidPlaces" name="Платное" fill="hsl(var(--muted-foreground))" />
+                            <Bar dataKey="budgetPlaces" name={t('admission.budgetShort')} fill="hsl(var(--primary))" />
+                            <Bar dataKey="paidPlaces" name={t('admission.paid')} fill="hsl(var(--muted-foreground))" />
                           </BarChart>
                         </ResponsiveContainer>
                       ) : (
                         <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                          Нет данных для графика
+                          {t('admission.noChartData')}
                         </div>
                       )}
                     </CardContent>
@@ -447,8 +464,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Динамика проходных баллов</CardTitle>
-                      <CardDescription>Средний проходной балл по годам</CardDescription>
+                      <CardTitle>{t('admission.scoreDynamics')}</CardTitle>
+                      <CardDescription>{t('admission.scoreDynamicsDesc')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {chartDataArray.length > 0 ? (
@@ -467,7 +484,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                             <Line 
                               type="monotone" 
                               dataKey="avgScore" 
-                              name="Средний балл"
+                              name={t('admission.avgScore')}
                               stroke="hsl(var(--primary))" 
                               strokeWidth={2}
                               dot={{ fill: 'hsl(var(--primary))' }}
@@ -476,7 +493,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                         </ResponsiveContainer>
                       ) : (
                         <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                          Нет данных для графика
+                          {t('admission.noChartData')}
                         </div>
                       )}
                     </CardContent>
@@ -484,8 +501,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Минимальные проходные баллы</CardTitle>
-                      <CardDescription>Динамика минимальных баллов по годам</CardDescription>
+                      <CardTitle>{t('admission.minScores')}</CardTitle>
+                      <CardDescription>{t('admission.minScoresDesc')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {chartDataArray.length > 0 ? (
@@ -504,7 +521,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                             <Line 
                               type="monotone" 
                               dataKey="minScore" 
-                              name="Мин. балл"
+                              name={t('admission.minScore')}
                               stroke="hsl(var(--accent))" 
                               strokeWidth={2}
                               dot={{ fill: 'hsl(var(--accent))' }}
@@ -512,7 +529,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                             <Line 
                               type="monotone" 
                               dataKey="avgScore" 
-                              name="Средний балл"
+                              name={t('admission.avgScore')}
                               stroke="hsl(var(--primary))" 
                               strokeWidth={2}
                               dot={{ fill: 'hsl(var(--primary))' }}
@@ -521,7 +538,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                         </ResponsiveContainer>
                       ) : (
                         <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                          Нет данных для графика
+                          {t('admission.noChartData')}
                         </div>
                       )}
                     </CardContent>
@@ -534,10 +551,10 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5" />
-                      Сравнение проходных баллов по годам
+                      {t('admission.comparisonTitle')}
                     </CardTitle>
                     <CardDescription>
-                      Выберите специальность для детального сравнения показателей за разные годы
+                      {t('admission.comparisonDesc')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -556,9 +573,9 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                               }}
                             />
                             <Legend />
-                            <Bar dataKey="budgetPlaces" name="Бюджет" fill="hsl(var(--primary))" />
-                            <Bar dataKey="paidPlaces" name="Платное" fill="hsl(var(--muted-foreground))" />
-                            <Bar dataKey="applications" name="Заявки" fill="hsl(var(--accent))" />
+                            <Bar dataKey="budgetPlaces" name={t('admission.budgetShort')} fill="hsl(var(--primary))" />
+                            <Bar dataKey="paidPlaces" name={t('admission.paid')} fill="hsl(var(--muted-foreground))" />
+                            <Bar dataKey="applications" name={t('admission.applicationsShort')} fill="hsl(var(--accent))" />
                           </BarChart>
                         </ResponsiveContainer>
                         
@@ -568,10 +585,10 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                               <CardContent className="pt-4">
                                 <h4 className="text-lg font-bold mb-2">{yearData.year}</h4>
                                 <div className="space-y-1 text-sm">
-                                  <p>Бюджет: <span className="font-medium">{yearData.budgetPlaces}</span></p>
-                                  <p>Платное: <span className="font-medium">{yearData.paidPlaces || 0}</span></p>
-                                  <p>Ср. балл: <span className="font-medium">{yearData.avgScore || 'Н/Д'}</span></p>
-                                  <p>Мин. балл: <span className="font-medium">{yearData.minScore || 'Н/Д'}</span></p>
+                                  <p>{t('admission.budgetShort')}: <span className="font-medium">{yearData.budgetPlaces}</span></p>
+                                  <p>{t('admission.paid')}: <span className="font-medium">{yearData.paidPlaces || 0}</span></p>
+                                  <p>{t('admission.avgScoreShort')}: <span className="font-medium">{yearData.avgScore || '—'}</span></p>
+                                  <p>{t('admission.minScore')}: <span className="font-medium">{yearData.minScore || '—'}</span></p>
                                 </div>
                               </CardContent>
                             </Card>
@@ -581,8 +598,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
                         <BarChart3 className="w-12 h-12 mb-4 opacity-50" />
-                        <p>Для сравнения нужны данные за несколько лет</p>
-                        <p className="text-sm mt-2">Выберите "Все годы" в фильтре для просмотра сравнения</p>
+                        <p>{t('admission.comparisonNeedData')}</p>
+                        <p className="text-sm mt-2">{t('admission.selectAllYears')}</p>
                       </div>
                     )}
                   </CardContent>
@@ -594,9 +611,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
             <Card className="mt-6 bg-muted/50">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Источник данных:</strong> Статистика загружается из базы данных. 
-                  Для обновления данных используйте парсинг в панели администратора или 
-                  добавьте данные вручную. Отображаются только реальные данные из таблицы admission_stats.
+                  <strong>{t('admission.dataSource')}</strong> {t('admission.dataSourceDesc')}
                 </p>
               </CardContent>
             </Card>

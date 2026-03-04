@@ -7,6 +7,7 @@ import { UniversitiesSection } from '@/components/sections/UniversitiesSection';
 import { FooterSection } from '@/components/sections/FooterSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, GraduationCap, Users, TrendingUp } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface IndexProps {
   isChatOpen?: boolean;
@@ -16,6 +17,7 @@ interface IndexProps {
 const Index = ({ isChatOpen = false }: IndexProps) => {
   const [activeSection, setActiveSection] = useState('overview');
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   const sectionsRef = {
     overview: useRef<HTMLDivElement>(null),
@@ -58,29 +60,29 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
 
   const quickLinks = [
     {
-      title: 'Для абитуриентов',
-      description: 'Проходные баллы, специальности, сроки подачи документов',
+      title: t('quickLinks.forApplicants'),
+      description: t('quickLinks.forApplicantsDesc'),
       icon: GraduationCap,
-      path: '/applicants',
+      path: '/applicants#specialties',
       color: 'bg-blue-500/10 text-blue-600',
     },
     {
-      title: 'Для студентов',
-      description: 'Рынок труда, зарплаты, требования к опыту',
+      title: t('quickLinks.forStudents'),
+      description: t('quickLinks.forStudentsDesc'),
       icon: Users,
-      path: '/students',
+      path: '/students#market',
       color: 'bg-green-500/10 text-green-600',
     },
     {
-      title: 'Статистика',
-      description: 'Вакансии, зарплаты, ML-анализ рынка труда',
+      title: t('quickLinks.statistics'),
+      description: t('quickLinks.statisticsDesc'),
       icon: BarChart3,
-      path: '/statistics',
+      path: '/statistics#vacancies',
       color: 'bg-purple-500/10 text-purple-600',
     },
     {
-      title: 'Поступление',
-      description: 'Баллы прошлых лет, статистика зачислений',
+      title: t('quickLinks.admission'),
+      description: t('quickLinks.admissionDesc'),
       icon: TrendingUp,
       path: '/admission-stats',
       color: 'bg-orange-500/10 text-orange-600',
@@ -113,10 +115,10 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
               className="text-center mb-8"
             >
               <h2 className="font-serif text-2xl sm:text-3xl font-medium text-foreground mb-2">
-                Выбери свой путь
+                {t('quickLinks.title')}
               </h2>
               <p className="text-muted-foreground">
-                Данные и инструменты для принятия решений
+                {t('quickLinks.subtitle')}
               </p>
             </motion.div>
 

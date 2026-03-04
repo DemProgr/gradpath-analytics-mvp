@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   Select,
   SelectContent,
@@ -107,6 +108,7 @@ const UniversityDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
   const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function fetchUniversity() {
@@ -273,15 +275,15 @@ const UniversityDetail = () => {
         <main className="pt-24 pb-16">
           <div className="section-container text-center">
             <h1 className="text-3xl font-display font-bold text-foreground mb-4">
-              Университет не найден
+              {t('uni.notFound')}
             </h1>
             <p className="text-muted-foreground mb-8">
-              К сожалению, информация о данном университете отсутствует.
+              {t('uni.notFoundDesc')}
             </p>
             <Link to="/applicants">
               <Button>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Вернуться к списку
+                {t('uni.backToList')}
               </Button>
             </Link>
           </div>
@@ -315,7 +317,7 @@ const UniversityDetail = () => {
                 className="inline-flex items-center gap-2 text-green-900 hover:text-green-700 transition-colors mb-4"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Назад к списку
+                {t('uni.backToList')}
               </Link>
               <h1 className="text-3xl md:text-5xl font-display font-bold text-green-900 mb-2">
                 {university.short_name}
@@ -348,7 +350,7 @@ const UniversityDetail = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 >
                   <Globe className="w-4 h-4" />
-                  <span>Сайт</span>
+                  <span>{t('uni.website')}</span>
                 </a>
               )}
 
@@ -358,36 +360,36 @@ const UniversityDetail = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
                 >
                   <BarChart3 className="w-4 h-4" />
-                  <span>Баллы</span>
+                  <span>{t('uni.scores')}</span>
                 </a>
               )}
               
               <Badge variant="outline" className="px-4 py-2">
                 <GraduationCap className="w-4 h-4 mr-2" />
-                {faculties.length} факультетов
+                {faculties.length} {t('uni.faculties')}
               </Badge>
               
               {institutes.length > 0 && (
                 <Badge variant="outline" className="px-4 py-2">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  {institutes.length} институтов
+                  {institutes.length} {t('uni.institutes')}
                 </Badge>
               )}
               
               <Badge variant="outline" className="px-4 py-2">
                 <BookOpen className="w-4 h-4 mr-2" />
-                {specialties.length} специальностей
+                {specialties.length} {t('uni.specialties')}
               </Badge>
             </div>
 
             {/* Description */}
             <Card className="mb-8">
               <CardHeader>
-                <CardTitle>О университете</CardTitle>
+                <CardTitle>{t('uni.about')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  {extendedDescription || university.description || 'Информация о университете загружается...'}
+                  {extendedDescription || university.description || t('common.loading')}
                 </p>
               </CardContent>
             </Card>

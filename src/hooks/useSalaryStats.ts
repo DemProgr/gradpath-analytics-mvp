@@ -51,11 +51,13 @@ export function useSalaryStats() {
         }
       });
 
-      const categories: CategorySalaryStats[] = [];
-      let totalSalary = 0;
-      let totalCount = 0;
+       const categories: CategorySalaryStats[] = [];
+       let totalSalary = 0;
+       let totalCount = 0;
 
        categoryMap.forEach((data, category) => {
+         // Log all categories to see what we're getting
+         console.log('[DEBUG] Category:', category, '| raw count:', data.salaryMins.length, '| sample raw:', data.salaryMins.slice(0, 3));
          // Simple approach: filter obvious outliers (below 500 or above reasonable caps)
          // Then use median for robustness
          
@@ -68,23 +70,30 @@ export function useSalaryStats() {
            'Право': 6000,
            'Педагогика': 4000,
            'Инженерия': 5500,
+           'Инженерные специальности': 5500,
            'Строительство': 5500,
            'Промышленность': 5000,
            'Торговля': 4500,
            'Образование': 3500,
            'Здравоохранение': 5500,
            'Логистика': 4500,
+           'Engineering': 5500, // English fallback
+           'Engineer': 5500,
          };
          
          const cap = maxCaps[category] || 5000;
+         
+         if (category === 'Инженерия' || category.includes('Инжен') || category.includes('Engineer')) {
+           console.log('[DEBUG] Category', category, 'has cap:', cap);
+         }
          
          // Filter: remove values below 500 and above category cap
          const cleanMins = data.salaryMins.filter(v => v >= 500 && v <= cap);
          const cleanMaxs = data.salaryMaxs.filter(v => v >= 500 && v <= cap);
          
-         if (category === 'Инженерия') {
-           console.log('[DEBUG] Инженерия - rawMins count:', data.salaryMins.length, 'sample:', data.salaryMins.slice(0, 5));
-           console.log('[DEBUG] Инженерия - cleanMins count:', cleanMins.length, 'cap:', cap, 'sample:', cleanMins.slice(0, 5));
+         if (category === 'Инженерия' || category.includes('Инжен') || category.includes('Engineer')) {
+           console.log('[DEBUG]', category, '- rawMins count:', data.salaryMins.length, 'sample:', data.salaryMins.slice(0, 5));
+           console.log('[DEBUG]', category, '- cleanMins count:', cleanMins.length, 'cap:', cap, 'sample:', cleanMins.slice(0, 5));
          }
 
          // Use median

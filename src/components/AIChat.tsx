@@ -29,17 +29,19 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
     }
   };
 
-  const { 
-    messages, 
-    isLoading, 
-    sendMessage, 
-    clearChat, 
-    savedRecommendations,
-    savedMessages,
-    setSavedMessages,
-    saveMessage,
-    isMessageSaved
-  } = useAIChat();
+   const { 
+     messages, 
+     isLoading, 
+     sendMessage, 
+     clearChat, 
+     savedRecommendations,
+     savedMessages,
+     setSavedMessages,
+     saveMessage,
+     isMessageSaved,
+     clearSavedRecommendations,
+     clearSavedMessages
+   } = useAIChat();
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -249,53 +251,77 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                 </div>
               )}
 
-              {/* Saved Recommendations Panel */}
-              {showHistory && (
-                <div className="space-y-4">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Bookmark className="w-4 h-4" />
-                    Сохраненные рекомендации
-                  </h4>
-                  {savedRecommendations.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      Пока нет сохраненных вариантов
-                    </p>
-                  ) : (
-                    savedRecommendations.map((rec, i) => (
-                      <RecommendationCard
-                        key={i}
-                        recommendation={rec}
-                        isSaved={true}
-                      />
-                    ))
-                  )}
-                </div>
-              )}
+               {/* Saved Recommendations Panel */}
+               {showHistory && (
+                 <div className="space-y-4">
+                   <div className="flex items-center justify-between">
+                     <h4 className="font-semibold flex items-center gap-2">
+                       <Bookmark className="w-4 h-4" />
+                       Сохраненные рекомендации
+                     </h4>
+                     {savedRecommendations.length > 0 && (
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={clearSavedRecommendations}
+                         className="h-8 text-xs"
+                       >
+                         <Trash2 className="w-3 h-3 mr-1" />
+                         Очистить все
+                       </Button>
+                     )}
+                   </div>
+                   {savedRecommendations.length === 0 ? (
+                     <p className="text-sm text-muted-foreground text-center py-8">
+                       Пока нет сохраненных вариантов
+                     </p>
+                   ) : (
+                     savedRecommendations.map((rec, i) => (
+                       <RecommendationCard
+                         key={i}
+                         recommendation={rec}
+                         isSaved={true}
+                       />
+                     ))
+                   )}
+                 </div>
+               )}
 
-              {/* Saved Messages Panel */}
-              {showHistory && savedMessages.length > 0 && (
-                <div className="space-y-4 mt-6 pt-6 border-t">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-red-500" />
-                    Избранные сообщения
-                  </h4>
-                  <div className="space-y-3">
-                    {savedMessages.map((msg, i) => (
-                      <div
-                        key={i}
-                        className="flex gap-2"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                          <Bot className="w-4 h-4" />
-                        </div>
-                        <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-[85%]">
-                          <FormattedMessage content={msg.content} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+               {/* Saved Messages Panel */}
+               {showHistory && savedMessages.length > 0 && (
+                 <div className="space-y-4 mt-6 pt-6 border-t">
+                   <div className="flex items-center justify-between">
+                     <h4 className="font-semibold flex items-center gap-2">
+                       <Heart className="w-4 h-4 text-red-500" />
+                       Избранные сообщения
+                     </h4>
+                     <Button
+                       variant="ghost"
+                       size="sm"
+                       onClick={clearSavedMessages}
+                       className="h-8 text-xs"
+                     >
+                       <Trash2 className="w-3 h-3 mr-1" />
+                       Очистить все
+                     </Button>
+                   </div>
+                   <div className="space-y-3">
+                     {savedMessages.map((msg, i) => (
+                       <div
+                         key={i}
+                         className="flex gap-2"
+                       >
+                         <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                           <Bot className="w-4 h-4" />
+                         </div>
+                         <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-[85%]">
+                           <FormattedMessage content={msg.content} />
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+               )}
 
               {/* Messages */}
               {!showHistory && messages.map((message, index) => (

@@ -45,10 +45,12 @@ export interface UseAIChatReturn {
   clearChat: () => void;
   savedRecommendations: Recommendation[];
   saveRecommendation: (rec: Recommendation) => void;
+  clearSavedRecommendations: () => void;
   savedMessages: Message[];
   setSavedMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   saveMessage: (message: Message) => void;
   isMessageSaved: (message: Message) => boolean;
+  clearSavedMessages: () => void;
 }
 
 // OpenRouter API (supports many AI models, works from browser)
@@ -244,7 +246,11 @@ export function useAIChat(): UseAIChatReturn {
       
       const savedMsgs = localStorage.getItem(MESSAGES_KEY);
       if (savedMsgs) {
-        setSavedMessages(JSON.parse(savedMsgs));
+        const parsed = JSON.parse(savedMsgs);
+        setSavedMessages(parsed.map((m: Message) => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        })));
       }
     } catch (e) {
       console.error('Error loading chat history:', e);
@@ -284,11 +290,21 @@ export function useAIChat(): UseAIChatReturn {
     });
   }, []);
 
-  const isMessageSaved = useCallback((message: Message) => {
-    return savedMessages.some(m => 
-      m.content === message.content && m.timestamp.getTime() === message.timestamp.getTime()
-    );
-  }, [savedMessages]);
+   const isMessageSaved = useCallback((message: Message) => {
+     return savedMessages.some(m => 
+       m.content === message.content && m.timestamp.getTime() === message.timestamp.getTime()
+     );
+   }, [savedMessages]);
+
+   const clearSavedMessages = useCallback(() => {
+     setSavedMessages([]);
+     localStorage.removeItem(MESSAGES_KEY);
+   }, []);
+
+   const clearSavedRecommendations = useCallback(() => {
+     setSavedRecommendations([]);
+     localStorage.removeItem(RECOMMENDATIONS_KEY);
+   }, []);
 
   const sendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
@@ -394,17 +410,19 @@ ${contextMessages}
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
-  return {
-    messages,
-    isLoading,
-    error,
-    sendMessage,
-    clearChat,
-    savedRecommendations,
-    saveRecommendation,
-    savedMessages,
-    setSavedMessages,
-    saveMessage,
-    isMessageSaved,
-  };
+   return {
+     messages,
+     isLoading,
+     error,
+     sendMessage,
+     clearChat,
+     savedRecommendations,
+     saveRecommendation,
+     clearSavedRecommendations,
+     savedMessages,
+     setSavedMessages,
+     saveMessage,
+     isMessageSaved,
+     clearSavedMessages,
+   };
 }

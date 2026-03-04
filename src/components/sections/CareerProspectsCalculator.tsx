@@ -526,26 +526,7 @@ export function CareerProspectsCalculator({ className }: { className?: string })
                       <Progress value={demand} className="h-2" />
                     </div>
                   ))}
-                </div>
-
-                <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-green-500/10 rounded-lg">
-                    <p className="text-2xl font-bold text-green-500">{calculateProspects.employmentChance}%</p>
-                    <p className="text-xs text-muted-foreground">Трудоустройство</p>
-                  </div>
-                  <div className="text-center p-3 bg-blue-500/10 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-500">+{data.growthRate}%</p>
-                    <p className="text-xs text-muted-foreground">Рост в год</p>
-                  </div>
-                  <div className="text-center p-3 bg-amber-500/10 rounded-lg">
-                    <p className="text-2xl font-bold text-amber-500">{calculateProspects.stabilityScore}%</p>
-                    <p className="text-xs text-muted-foreground">Стабильность</p>
-                  </div>
-                  <div className="text-center p-3 bg-purple-500/10 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-500">+{calculateProspects.skillScore}</p>
-                    <p className="text-xs text-muted-foreground">Балл навыков</p>
-                  </div>
-                </div>
+                 </div>
               </CardContent>
             </Card>
           </TabsContent>

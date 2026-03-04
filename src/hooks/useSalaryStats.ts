@@ -55,14 +55,65 @@ export function useSalaryStats() {
       let totalSalary = 0;
       let totalCount = 0;
 
-      categoryMap.forEach((data, category) => {
-        const avgMin = data.salaryMins.length > 0 
-          ? Math.round(data.salaryMins.reduce((a, b) => a + b, 0) / data.salaryMins.length)
-          : 0;
-        const avgMax = data.salaryMaxs.length > 0 
-          ? Math.round(data.salaryMaxs.reduce((a, b) => a + b, 0) / data.salaryMaxs.length)
-          : avgMin;
-        const avgSalary = Math.round((avgMin + avgMax) / 2);
+       categoryMap.forEach((data, category) => {
+         // Filter outliers using IQR method
+         const filterOutliers = (arr: number[]): number[] => {
+           if (arr.length < 5) return arr;
+           const sorted = [...arr].sort((a, b) => a - b);
+           const q1 = sorted[Math.floor(sorted.length * 0.25)];
+           const q3 = sorted[Math.floor(sorted.length * 0.75)];
+           const iqr = q3 - q1;
+           const lowerBound = q1 - 1.5 * iqr;
+           const upperBound = q3 + 1.5 * iqr;
+           return sorted.filter(v => v >= lowerBound && v <= upperBound);
+         };
+
+         let filteredMins = filterOutliers(data.salaryMins);
+         let filteredMaxs = filterOutliers(data.salaryMaxs);
+
+         // Apply sanity caps - realistic salary ranges for Belarus (BYN)
+         const applyCap = (arr: number[], maxCap: number): number[] => {
+           return arr.filter(v => v <= maxCap && v >= 500); // min 500 BYN
+         };
+
+         // Category-specific max salary caps (realistic upper bounds)
+         const maxCaps: Record<string, number> = {
+           'ИТ': 8000,
+           'Информационные технологии': 8000,
+           'Финансы': 7000,
+           'Экономика': 6000,
+           'Медицина': 6000,
+           'Юриспруденция': 6000,
+           'Педагогика': 4000,
+           'Инженерия': 5500,
+           'Строительство': 5500,
+           'Промышленность': 5000,
+           'Торговля': 4500,
+           'Образование': 3500,
+           'Здравоохранение': 5500,
+           'Логистика': 4500,
+         };
+
+         const cap = maxCaps[category] || 5000; // default cap
+         filteredMins = applyCap(filteredMins, cap);
+         filteredMaxs = applyCap(filteredMaxs, cap);
+
+         // Use median instead of mean for robustness
+         const median = (arr: number[]): number => {
+           if (arr.length === 0) return 0;
+           const sorted = [...arr].sort((a, b) => a - b);
+           const mid = Math.floor(sorted.length / 2);
+           return sorted.length % 2 === 0 
+             ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+             : sorted[mid];
+         };
+
+         const avgMin = median(filteredMins);
+         const avgMax = median(filteredMaxs);
+         // Fallback to mean if median is 0 (too few samples)
+         const finalAvgMin = avgMin > 0 ? avgMin : Math.round(filteredMins.reduce((a, b) => a + b, 0) / filteredMins.length) || 0;
+         const finalAvgMax = avgMax > 0 ? avgMax : Math.round(filteredMaxs.reduce((a, b) => a + b, 0) / filteredMaxs.length) || 0;
+         const avgSalary = Math.round((finalAvgMin + finalAvgMax) / 2);
 
         categories.push({
           category,

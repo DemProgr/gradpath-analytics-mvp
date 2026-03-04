@@ -1,39 +1,42 @@
 /**
- * Employment Prediction Module
- * Main API for ML predictions
- * Integrates feature engineering, gradient boosting, and salary prediction
+ * Модуль прогнозирования трудоустройства
+ * Основной API для ML-прогнозов
  */
 
-import { engineerFeatures, GraduateFeatures, getFeatureImportance } from './featureEngineering';
+import { engineerFeatures, GraduateFeatures, getFeatureImportance, calculateFacultyUniversityMatch } from './featureEngineering';
 import { gradientBoostingEnsemble } from './gradientBoosting';
 import { predictSalary, generateSalaryForecast, getSalaryConfidenceInterval, getIndustryTrend } from './salaryPredictor';
 
 export interface PredictionResult {
-  employmentProbability: number;
-  expectedSalary: number;
-  confidence: number;
-  riskLevel: 'low' | 'medium' | 'high';
+  employmentProbability: number;      // Вероятность трудоустройства (%)
+  expectedSalary: number;             // Ожидаемая зарплата (BYN)
+  confidence: number;                 // Уверенность модели (0-1)
+  riskLevel: 'low' | 'medium' | 'high'; // Уровень риска
   modelDetails: {
-    algorithm: string;
-    features: number;
-    rocAuc: number;
+    algorithm: string;                // Алгоритм
+    features: number;                 // Количество признаков
+    rocAuc: number;                  // Качество модели
   };
-  salaryForecast: { year: number; salary: number }[];
-  recommendations: string[];
+  salaryForecast: { year: number; salary: number }[]; // Прогноз зарплаты
+  recommendations: string[];          // Рекомендации
+  factorContributions?: {            // Вклад каждого фактора (опционально)
+    feature: string;
+    contribution: number;
+  }[];
 }
 
 export interface ModelMetrics {
-  rocAuc: number;
-  accuracy: number;
-  precision: number;
-  recall: number;
-  f1Score: number;
+  rocAuc: number;    // Площадь под ROC-кривой
+  accuracy: number;   // Точность классификации
+  precision: number;  // Точность (precision)
+  recall: number;     // Полнота (recall)
+  f1Score: number;    // F1-мера
 }
 
-// Model performance metrics from validation (modelValidator.ts)
+// Метрики качества модели после валидации
 const MODEL_METRICS: ModelMetrics = {
-  rocAuc: 0.878,
-  accuracy: 0.847,
+  rocAuc: 0.878,   // 87.8% - отличное качество
+  accuracy: 0.847, // 84.7% - точность
   precision: 0.862,
   recall: 0.834,
   f1Score: 0.856
@@ -100,8 +103,8 @@ function getRiskLevel(probability: number): 'low' | 'medium' | 'high' {
 }
 
 /**
- * Generate personalized recommendations
- * Now includes skill-specific advice
+ * Сгенерировать персональные рекомендации
+ * Конкретные, измеримые, с цифрами влияния
  */
 function generateRecommendations(
   data: GraduateFeatures,
@@ -110,57 +113,67 @@ function generateRecommendations(
   const recommendations: string[] = [];
   const industryTrend = getIndustryTrend(data.faculty);
 
-  // Skill-based recommendations (NEW)
-  if (data.hardSkills && data.hardSkills < 7) {
-    recommendations.push('Улучшение hard skills (технических навыков) повысит конкурентоспособность на 10-15%');
+  // 1. Рекомендации по навыкам (НОВОЕ - наиболее важные)
+  if (data.hardSkills !== undefined && data.hardSkills < 7) {
+    const improvement = Math.round((7 - data.hardSkills) * 1.5);
+    recommendations.push(`Hard Skills: повысьте с ${data.hardSkills}/10 до 7+ → +${improvement}% к вероятности`);
   }
   
-  if (data.softSkills && data.softSkills < 6) {
-    recommendations.push('Развитие soft skills (коммуникация, teamwork) важно для успешных собеседований');
+  if (data.softSkills !== undefined && data.softSkills < 6) {
+    const improvement = Math.round((6 - data.softSkills) * 1.2);
+    recommendations.push(`Soft Skills: выработайте навыки презентации и работы в команде → +${improvement}%`);
   }
   
-  if (data.englishLevel && data.englishLevel < 3 && data.faculty === 'ИТ') {
-    recommendations.push('Английский язык на уровне B2+ существенно увеличит возможности в IT-секторе');
+  if (data.englishLevel !== undefined && data.englishLevel < 3 && data.faculty === 'ИТ') {
+    recommendations.push('Английский B2+ (Upper-Intermediate): для IT открывает доступ к международным компаниям → +15-20%');
   }
 
-  // GPA-based recommendations
+  // 2. Академические факторы
   if (data.gpa < 7) {
-    recommendations.push('Повышение среднего балла (цель: 8+) увеличит шансы на 8-12%');
+    const targetGpa = 8;
+    recommendations.push(`Средний балл: поднимите с ${data.gpa.toFixed(1)} до ${targetGpa}+ → +8-12%`);
   }
 
-  // Experience-based recommendations
+  // 3. Опыт и практика
   if (data.experience < 1) {
-    recommendations.push('Стажировка или проектный опыт критически важны для трудоустройства');
+    recommendations.push('Опыт работы:完成 3-6 месяцев стажировки → +12-18%');
   }
 
-  // Projects and practical experience
   if (!data.projects || data.projects < 2) {
-    recommendations.push('Создайте портфолио с 2-3 реальными проектами для повышения привлекательности');
+    recommendations.push('Портфолио: создайте 2-3 значимых проекта → +5-8% (особенно для IT и дизайна)');
   }
 
-  // City-based recommendations
+  // 4. География
   if (data.city !== 'Минск' && probability < 0.85) {
-    recommendations.push('Поиск работы в Минске увеличит шансы на 15-20%');
+    recommendations.push('Локация: переезд в Минск увеличит шансы на 15-20% из-за большего числа вакансий');
   }
 
-  // Faculty-specific recommendations
+  // 5. Отраслевые тренды
   if (industryTrend) {
     const topSkill = industryTrend.skillsEvolution[0];
-    recommendations.push(`В сфере ${data.faculty} развивайте навыки: ${topSkill}`);
+    const growth = industryTrend.baseGrowth * 100;
+    recommendations.push(`Отрасль "${data.faculty}": развивайте "${topSkill}" (рост спроса +${growth.toFixed(0)}% в год)`);
   }
 
-  // Additional qualifications
+  // 6. Доп. образование
   if (!data.internships || data.internships === 0) {
-    recommendations.push('Прохождение стажировки повысит вероятность трудоустройства на 12-18%');
+    recommendations.push('Стажировка: минимум 1 relevancy стажировка → +12-18% к трудоустройству');
   }
 
   if (!data.certificates || data.certificates === 0) {
-    recommendations.push('Профессиональные сертификаты добавят 5-8% к вероятности трудоустройства');
+    const boost = data.faculty === 'ИТ' ? '8-12%' : '5-8%';
+    recommendations.push(`Сертификаты: получите 1-2 профессиональных сертификата → +${boost}`);
   }
 
-   // Limit to top 5 recommendations (increased from 4 due to new skill factors)
-   return recommendations.slice(0, 5);
- }
+  // 7. ВУЗ-специализация
+  const uniMatch = calculateFacultyUniversityMatch(data.faculty, data.university);
+  if (uniMatch < 1.0) {
+    recommendations.push(`Вуз: ${data.university} не является профильным для ${data.faculty}. Рассмотрите более специализированные вузы.`);
+  }
+
+  // Берем топ-5 самых важных
+  return recommendations.slice(0, 5);
+}
 
 /**
  * Get model performance metrics
@@ -187,14 +200,38 @@ export function predictBatch(graduates: GraduateFeatures[]): PredictionResult[] 
 export function getFeatureContributions(
   data: GraduateFeatures
 ): { feature: string; contribution: number }[] {
-  const { numericFeatures, featureNames } = engineerFeatures(data);
-  const importance = getFeatureImportance();
+   const { numericFeatures, featureNames } = engineerFeatures(data);
+   const importance = getFeatureImportance();
 
-  return featureNames.map((name, idx) => {
-    const importanceScore = importance.find(i => i.name === name)?.importance || 0;
-    return {
-      feature: name,
-      contribution: numericFeatures[idx] * importanceScore
-    };
-  }).sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
+   // Маппинг английских ключей на русские названия
+   const factorNamesRu: Record<string, string> = {
+     'faculty_employment_rate': 'Трудоустройство по факультету',
+     'gpa_normalized': 'Средний балл',
+     'experience_normalized': 'Опыт работы',
+     'hard_skills_normalized': 'Hard Skills',
+     'combined_skills_score': 'Общий уровень навыков',
+     'soft_skills_normalized': 'Soft Skills',
+     'city_economic_factor': 'Экономика города',
+     'university_prestige': 'Престиж вуза',
+     'industry_growth_rate': 'Рост отрасли',
+     'english_level_normalized': 'Английский язык',
+     'composite_academic_score': 'Академический балл',
+     'skills_experience_interaction': 'Навыки × Опыт',
+     'skills_gpa_interaction': 'Навыки × Балл',
+     'gpa_experience_interaction': 'Балл × Опыт',
+     'internships_normalized': 'Стажировки',
+     'certificates_normalized': 'Сертификаты',
+     'projects_normalized': 'Проекты',
+     'faculty_university_match': 'Соответствие вуз-факультет',
+     'vacancies_growth': 'Рост вакансий'
+   };
+
+   return featureNames.map((name, idx) => {
+     const importanceScore = importance.find(i => i.name === name)?.importance || 0;
+     const contribution = Math.round(numericFeatures[idx] * importanceScore * 100) / 100;
+     return {
+       feature: factorNamesRu[name] || name,
+       contribution
+     };
+   }).sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
 }

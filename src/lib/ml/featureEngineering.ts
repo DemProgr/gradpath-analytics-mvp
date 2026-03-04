@@ -1,24 +1,70 @@
 /**
- * Feature Engineering Module
- * Based on Python advanced_feature_engineer.py
- * Creates features for ML models based on graduate data
+ * Модуль инженерии признаков для ML моделей
+ * Создает числовые признаки на основе данных выпускника
  */
 
 import { SALARY_RANGES, FACULTY_STATS, CITY_STATS, ECONOMIC_INDICATORS, INDUSTRY_GROWTH } from '@/data/belarusData';
 
+// Русские названия факторов для отображения пользователю
+export const FACTOR_NAMES_RU: Record<string, string> = {
+  // Академические факторы
+  'gpa_normalized': 'Средний балл (норм.)',
+  'gpa_squared': 'Средний балл (квадрат)',
+  'composite_academic_score': 'Академический балл',
+  
+  // Опыт
+  'experience_normalized': 'Опыт работы (норм.)',
+  
+  // Взаимодействия
+  'gpa_experience_interaction': 'Балл × Опыт',
+  'skills_experience_interaction': 'Навыки × Опыт',
+  'skills_gpa_interaction': 'Навыки × Балл',
+  
+  // Факультет
+  'faculty_employment_rate': 'Трудоустройство по факультету',
+  'faculty_salary_potential': 'Зарплатный потенциал факультета',
+  'faculty_university_match': 'Соответствие факультета вузу',
+  
+  // ВУЗ
+  'university_prestige': 'Престиж вуза',
+  
+  // Город
+  'city_economic_factor': 'Экономический фактор города',
+  'city_employment_rate': 'Трудоустройство в городе',
+  
+  // Рынок труда
+  'industry_growth_rate': 'Рост отрасли',
+  'vacancies_growth': 'Рост вакансий',
+  
+  // Практический опыт
+  'internships_normalized': 'Стажировки',
+  'projects_normalized': 'Проекты',
+  'certificates_normalized': 'Сертификаты',
+  
+  // Навыки (НОВОЕ)
+  'hard_skills_normalized': 'Hard Skills (технические)',
+  'soft_skills_normalized': 'Soft Skills (гибкие)',
+  'english_level_normalized': 'Английский язык',
+  'combined_skills_score': 'Общий уровень навыков',
+  
+  // Композитные
+  'composite_market_score': 'Рыночный потенциал',
+  'overall_potential_score': 'Общий потенциал'
+};
+
 export interface GraduateFeatures {
-  gpa: number;
-  experience: number;
-  faculty: string;
-  university: string;
-  city: string;
-  graduationYear?: number;
-  internships?: number;
-  projects?: number;
-  certificates?: number;
-  hardSkills?: number; // 1-10 scale
-  softSkills?: number; // 1-10 scale
-  englishLevel?: number; // 1-5 scale
+  gpa: number;                    // Средний балл (4-10)
+  experience: number;             // Опыт работы (лет)
+  faculty: string;                // Факультет (ИТ, Медицина, etc.)
+  university: string;             // ВУЗ
+  city: string;                   // Город
+  graduationYear?: number;        // Год выпуска
+  internships?: number;           // Количество стажировок
+  projects?: number;              // Количество проектов
+  certificates?: number;          // Количество сертификатов
+  hardSkills?: number;            // Hard Skills (1-10)
+  softSkills?: number;            // Soft Skills (1-10)
+  englishLevel?: number;          // Английский (1-5 шкала)
 }
 
 export interface ProcessedFeatures {
@@ -185,17 +231,45 @@ export function engineerFeatures(data: GraduateFeatures): ProcessedFeatures {
    features.push(overallScore);
    featureNames.push('overall_potential_score');
 
-  return {
-    numericFeatures: features,
-    featureNames
-  };
+   return {
+     numericFeatures: features,
+     featureNames
+   };
+ }
+
+/**
+ * Получить важность признаков (feature importance)
+ * Основано на весах обученной модели
+ */
+export function getFeatureImportance(): { name: string; importance: number }[] {
+  return [
+    { name: 'faculty_employment_rate', importance: 0.155 },
+    { name: 'gpa_normalized', importance: 0.125 },
+    { name: 'experience_normalized', importance: 0.110 },
+    { name: 'hard_skills_normalized', importance: 0.110 },
+    { name: 'combined_skills_score', importance: 0.095 },
+    { name: 'soft_skills_normalized', importance: 0.085 },
+    { name: 'city_economic_factor', importance: 0.080 },
+    { name: 'university_prestige', importance: 0.065 },
+    { name: 'industry_growth_rate', importance: 0.060 },
+    { name: 'english_level_normalized', importance: 0.055 },
+    { name: 'composite_academic_score', importance: 0.052 },
+    { name: 'skills_experience_interaction', importance: 0.042 },
+    { name: 'skills_gpa_interaction', importance: 0.035 },
+    { name: 'gpa_experience_interaction', importance: 0.032 },
+    { name: 'internships_normalized', importance: 0.030 },
+    { name: 'certificates_normalized', importance: 0.028 },
+    { name: 'projects_normalized', importance: 0.025 },
+    { name: 'faculty_university_match', importance: 0.022 },
+    { name: 'vacancies_growth', importance: 0.020 }
+  ];
 }
 
 /**
  * Calculate how well a faculty matches with a university
  * Based on Belarus university specializations
  */
-function calculateFacultyUniversityMatch(faculty: string, university: string): number {
+export function calculateFacultyUniversityMatch(faculty: string, university: string): number {
   const universitySpecializations: Record<string, string[]> = {
     'БГУ': ['ИТ', 'Экономика', 'Юриспруденция'],
     'БГУИР': ['ИТ', 'Инженерия'],
@@ -220,29 +294,48 @@ function calculateFacultyUniversityMatch(faculty: string, university: string): n
 }
 
 /**
- * Get feature importance rankings
- * Based on trained model weights (updated with skills features)
+ * Получить важность признаков с русскими названиями и описаниями
  */
-export function getFeatureImportance(): { name: string; importance: number }[] {
-  return [
-    { name: 'faculty_employment_rate', importance: 0.155 },
-    { name: 'gpa_normalized', importance: 0.125 },
-    { name: 'experience_normalized', importance: 0.110 },
-    { name: 'hard_skills_normalized', importance: 0.110 },
-    { name: 'combined_skills_score', importance: 0.095 },
-    { name: 'soft_skills_normalized', importance: 0.085 },
-    { name: 'city_economic_factor', importance: 0.080 },
-    { name: 'university_prestige', importance: 0.065 },
-    { name: 'industry_growth_rate', importance: 0.060 },
-    { name: 'english_level_normalized', importance: 0.055 },
-    { name: 'composite_academic_score', importance: 0.052 },
-    { name: 'skills_experience_interaction', importance: 0.042 },
-    { name: 'skills_gpa_interaction', importance: 0.035 },
-    { name: 'gpa_experience_interaction', importance: 0.032 },
-    { name: 'internships_normalized', importance: 0.030 },
-    { name: 'certificates_normalized', importance: 0.028 },
-    { name: 'projects_normalized', importance: 0.025 },
-    { name: 'faculty_university_match', importance: 0.022 },
-    { name: 'vacancies_growth', importance: 0.020 }
-  ];
+export function getFeatureImportanceWithNames(): { name: string; importance: number; description: string }[] {
+  const raw = getFeatureImportance();
+  
+  const descriptions: Record<string, string> = {
+    'faculty_employment_rate': 'Процент трудоустройства выпускников вашего факультета',
+    'gpa_normalized': 'Ваш средний балл (от 4 до 10)',
+    'experience_normalized': 'Опыт работы после учебы',
+    'hard_skills_normalized': 'Технические/профессиональные навыки',
+    'combined_skills_score': 'Общий уровень профессиональных навыков',
+    'soft_skills_normalized': 'Гибкие навыки (коммуникация, команда)',
+    'city_economic_factor': 'Экономический потенциал города',
+    'university_prestige': 'Престиж и репутация вуза',
+    'industry_growth_rate': 'Темпы роста спроса в отрасли',
+    'english_level_normalized': 'Уровень владения английским',
+    'composite_academic_score': 'Общая академическая успеваемость',
+    'skills_experience_interaction': 'Синергия: навыки усиливаются опытом',
+    'skills_gpa_interaction': 'Связь учебы с практическими навыками',
+    'gpa_experience_interaction': 'Связь академических знаний с опытом',
+    'internships_normalized': 'Количество завершённых стажировок',
+    'certificates_normalized': 'Профессиональные сертификаты',
+    'projects_normalized': 'Количество реализованных проектов',
+    'faculty_university_match': 'Специализация вуза в вашем направлении',
+    'vacancies_growth': 'Динамика роста вакансий в отрасли'
+  };
+
+  return raw.map(item => ({
+    name: item.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    importance: item.importance,
+    description: descriptions[item.name] || item.name
+  })).sort((a, b) => b.importance - a.importance);
+}
+
+/**
+ * Получить простой список важных факторов для отображения
+ */
+export function getTopFactors(limit: number = 5): { name: string; importance: number }[] {
+  return getFeatureImportance()
+    .slice(0, limit)
+    .map(item => ({
+      name: item.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      importance: Math.round(item.importance * 100)
+    }));
 }

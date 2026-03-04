@@ -66,7 +66,7 @@ const MAX_GROWTH_LIMITS: Record<string, number> = {
 
 /**
  * Predict current expected salary based on features
- * Uses gradient boosting regression concepts
+ * Uses gradient boosting regression concepts with skills integration
  */
 export function predictSalary(data: GraduateFeatures): number {
   const { numericFeatures, featureNames } = engineerFeatures(data);
@@ -108,6 +108,25 @@ export function predictSalary(data: GraduateFeatures): number {
     'ПГУ': 0.87
   };
   baseSalary *= prestigeAdjustments[data.university] || 1.0;
+
+  // Skills-based adjustments (NEW: critical factors for salary)
+  if (data.hardSkills) {
+    // Hard skills have strong impact on technical positions
+    const hardSkillsMultiplier = 1 + (data.hardSkills - 5) * 0.04;
+    baseSalary *= Math.max(0.9, hardSkillsMultiplier);
+  }
+  
+  if (data.softSkills) {
+    // Soft skills impact negotiation and management potential
+    const softSkillsMultiplier = 1 + (data.softSkills - 5) * 0.02;
+    baseSalary *= Math.max(0.95, softSkillsMultiplier);
+  }
+  
+  if (data.englishLevel) {
+    // English proficiency adds premium, especially in IT
+    const englishMultiplier = 1 + (data.englishLevel - 3) * 0.03;
+    baseSalary *= Math.max(0.95, englishMultiplier);
+  }
 
   // Additional features adjustment
   if (data.internships && data.internships > 0) {

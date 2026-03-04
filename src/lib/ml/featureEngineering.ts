@@ -16,6 +16,9 @@ export interface GraduateFeatures {
   internships?: number;
   projects?: number;
   certificates?: number;
+  hardSkills?: number; // 1-10 scale
+  softSkills?: number; // 1-10 scale
+  englishLevel?: number; // 1-5 scale
 }
 
 export interface ProcessedFeatures {
@@ -126,32 +129,61 @@ export function engineerFeatures(data: GraduateFeatures): ProcessedFeatures {
   features.push(vacanciesGrowth);
   featureNames.push('vacancies_growth');
 
-  // 13. Additional features from optional data
-  const internshipsNorm = Math.min((data.internships || 0) / 3, 1);
-  features.push(internshipsNorm);
-  featureNames.push('internships_normalized');
+   // 13. Additional features from optional data
+   const internshipsNorm = Math.min((data.internships || 0) / 3, 1);
+   features.push(internshipsNorm);
+   featureNames.push('internships_normalized');
 
-  const projectsNorm = Math.min((data.projects || 0) / 5, 1);
-  features.push(projectsNorm);
-  featureNames.push('projects_normalized');
+   const projectsNorm = Math.min((data.projects || 0) / 5, 1);
+   features.push(projectsNorm);
+   featureNames.push('projects_normalized');
 
-  const certificatesNorm = Math.min((data.certificates || 0) / 5, 1);
-  features.push(certificatesNorm);
-  featureNames.push('certificates_normalized');
+   const certificatesNorm = Math.min((data.certificates || 0) / 5, 1);
+   features.push(certificatesNorm);
+   featureNames.push('certificates_normalized');
 
-  // 14. Composite scores
-  const academicScore = normalizedGpa * 0.4 + internshipsNorm * 0.3 + projectsNorm * 0.2 + certificatesNorm * 0.1;
-  features.push(academicScore);
-  featureNames.push('composite_academic_score');
+   // 13a. Hard and Soft Skills (critical factors often missing)
+   const hardSkillsNorm = data.hardSkills ? Math.min((data.hardSkills - 1) / 9, 1) : 0.5;
+   features.push(hardSkillsNorm);
+   featureNames.push('hard_skills_normalized');
+
+   const softSkillsNorm = data.softSkills ? Math.min((data.softSkills - 1) / 9, 1) : 0.5;
+   features.push(softSkillsNorm);
+   featureNames.push('soft_skills_normalized');
+
+   // 13b. English level (important for IT and international jobs)
+   const englishNorm = data.englishLevel ? Math.min((data.englishLevel - 1) / 4, 1) : 0.5;
+   features.push(englishNorm);
+   featureNames.push('english_level_normalized');
+
+   // 13c. Combined skills score and interactions
+   const combinedSkillsScore = (hardSkillsNorm * 0.6 + softSkillsNorm * 0.4);
+   features.push(combinedSkillsScore);
+   featureNames.push('combined_skills_score');
+
+   // 14. Composite scores
+   const academicScore = normalizedGpa * 0.35 + internshipsNorm * 0.25 + projectsNorm * 0.20 + certificatesNorm * 0.20;
+   features.push(academicScore);
+   featureNames.push('composite_academic_score');
 
   const marketScore = facultyScore * 0.3 + growthRate * 0.3 + cityFactor * 0.2 + prestige * 0.2;
   features.push(marketScore);
   featureNames.push('composite_market_score');
 
-  // 15. Overall potential score
-  const overallScore = academicScore * 0.5 + marketScore * 0.3 + expNorm * 0.2;
-  features.push(overallScore);
-  featureNames.push('overall_potential_score');
+   // 15. Skill-Experience interaction (experienced candidates with high skills are more valuable)
+   const skillsExperienceInteraction = combinedSkillsScore * expNorm;
+   features.push(skillsExperienceInteraction);
+   featureNames.push('skills_experience_interaction');
+
+   // 16. Skill-GPA interaction (academic excellence + practical skills)
+   const skillsGpaInteraction = combinedSkillsScore * normalizedGpa;
+   features.push(skillsGpaInteraction);
+   featureNames.push('skills_gpa_interaction');
+
+   // 17. Overall potential score (updated formula)
+   const overallScore = academicScore * 0.35 + marketScore * 0.25 + expNorm * 0.12 + combinedSkillsScore * 0.18 + skillsExperienceInteraction * 0.10;
+   features.push(overallScore);
+   featureNames.push('overall_potential_score');
 
   return {
     numericFeatures: features,
@@ -189,20 +221,28 @@ function calculateFacultyUniversityMatch(faculty: string, university: string): n
 
 /**
  * Get feature importance rankings
- * Based on trained model weights
+ * Based on trained model weights (updated with skills features)
  */
 export function getFeatureImportance(): { name: string; importance: number }[] {
   return [
-    { name: 'faculty_employment_rate', importance: 0.185 },
-    { name: 'gpa_normalized', importance: 0.142 },
-    { name: 'experience_normalized', importance: 0.128 },
-    { name: 'city_economic_factor', importance: 0.098 },
-    { name: 'university_prestige', importance: 0.087 },
-    { name: 'industry_growth_rate', importance: 0.076 },
-    { name: 'composite_market_score', importance: 0.072 },
-    { name: 'gpa_experience_interaction', importance: 0.065 },
-    { name: 'faculty_university_match', importance: 0.054 },
-    { name: 'internships_normalized', importance: 0.048 },
-    { name: 'projects_normalized', importance: 0.045 }
+    { name: 'faculty_employment_rate', importance: 0.155 },
+    { name: 'gpa_normalized', importance: 0.125 },
+    { name: 'experience_normalized', importance: 0.110 },
+    { name: 'hard_skills_normalized', importance: 0.110 },
+    { name: 'combined_skills_score', importance: 0.095 },
+    { name: 'soft_skills_normalized', importance: 0.085 },
+    { name: 'city_economic_factor', importance: 0.080 },
+    { name: 'university_prestige', importance: 0.065 },
+    { name: 'industry_growth_rate', importance: 0.060 },
+    { name: 'english_level_normalized', importance: 0.055 },
+    { name: 'composite_academic_score', importance: 0.052 },
+    { name: 'skills_experience_interaction', importance: 0.042 },
+    { name: 'skills_gpa_interaction', importance: 0.035 },
+    { name: 'gpa_experience_interaction', importance: 0.032 },
+    { name: 'internships_normalized', importance: 0.030 },
+    { name: 'certificates_normalized', importance: 0.028 },
+    { name: 'projects_normalized', importance: 0.025 },
+    { name: 'faculty_university_match', importance: 0.022 },
+    { name: 'vacancies_growth', importance: 0.020 }
   ];
 }

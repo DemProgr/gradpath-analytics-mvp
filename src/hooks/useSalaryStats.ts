@@ -140,10 +140,18 @@ export function useSalaryStats() {
 
         totalSalary += avgSalary * data.count;
         totalCount += data.count;
+        
+        // Log ALL categories with final values
+        console.log('[DEBUG] Category:', category, '→ avgSalary:', avgSalary, '| cap:', cap, '| vacancies:', data.count);
       });
 
       // Sort by salary descending
       categories.sort((a, b) => b.avgSalary - a.avgSalary);
+      
+      console.log('[DEBUG] FINAL CATEGORIES (sorted):');
+      categories.forEach(cat => {
+        console.log(`  ${cat.category}: ${cat.avgSalary} BYN (cap applied: ${cat.avgSalary <= (maxCaps[cat.category] || 5000) ? '✓' : '✗'})`);
+      });
 
       return {
         categories,

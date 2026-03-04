@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,7 +14,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { 
+  ExternalLink, Search, ChevronLeft, ChevronRight, 
+  SlidersHorizontal, X, MapPin, Building, Calendar 
+} from 'lucide-react';
 
 interface Vacancy {
   id: string;
@@ -36,8 +48,40 @@ export function AllVacanciesTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter state
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCity, setSelectedCity] = useState<string>('all');
+  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 100000]);
+  const [dateRange, setDateRange] = useState<{from: string; to: string}>({from: '', to: ''});
+  
   const itemsPerPage = 50;
 
+  // Fetch distinct categories and cities for filters
+  useEffect(() => {
+    async function fetchFilterOptions() {
+      try {
+        const [catRes, cityRes] = await Promise.all([
+          supabase.from('vacancies').select('category').not('category', 'is', null),
+          supabase.from('vacancies').select('city').not('city', 'is', null),
+        ]);
+        
+        const uniqueCategories = Array.from(new Set((catRes.data || []).map(v => v.category).filter(Boolean)));
+        const uniqueCities = Array.from(new Set((cityRes.data || []).map(v => v.city).filter(Boolean)));
+        
+        setCategories(uniqueCategories.sort());
+        setCities(uniqueCities.sort());
+      } catch (err) {
+        console.error('Error fetching filter options:', err);
+      }
+    }
+    fetchFilterOptions();
+  }, []);
+
+  // Fetch vacancies with pagination
   useEffect(() => {
     fetchVacancies();
   }, [currentPage]);
@@ -70,24 +114,56 @@ export function AllVacanciesTable() {
     }
   }
 
-  // Filter by search term
-  const filteredVacancies = vacancies.filter(v => 
-    v.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (v.company && v.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (v.city && v.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (v.category && v.category.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Apply filters on current page data
+  const filteredVacancies = useMemo(() => {
+    let result = vacancies;
+    
+    // Search (title, company, city, category)
+    if (searchTerm.trim()) {
+      const query = searchTerm.toLowerCase();
+      result = result.filter(v => 
+        v.title.toLowerCase().includes(query) ||
+        (v.company && v.company.toLowerCase().includes(query)) ||
+        (v.city && v.city.toLowerCase().includes(query)) ||
+        (v.category && v.category.toLowerCase().includes(query))
+      );
+    }
+    
+    // Category filter
+    if (selectedCategory !== 'all') {
+      result = result.filter(v => v.category === selectedCategory);
+    }
+    
+    // City filter
+    if (selectedCity !== 'all') {
+      result = result.filter(v => v.city === selectedCity);
+    }
+    
+    // Salary range filter
+    const [minSalary, maxSalary] = salaryRange;
+    result = result.filter(v => {
+      if (!v.salary_min && !v.salary_max) return true; // keep ones without salary if they match other filters
+      const avg = (v.salary_min || 0 + v.salary_max || 0) / 2;
+      return avg >= minSalary && avg <= maxSalary;
+    });
+    
+    // Date range filter
+    if (dateRange.from) {
+      result = result.filter(v => new Date(v.parsed_at) >= new Date(dateRange.from));
+    }
+    if (dateRange.to) {
+      result = result.filter(v => new Date(v.parsed_at) <= new Date(dateRange.to + 'T23:59:59'));
+    }
+    
+    return result;
+  }, [vacancies, searchTerm, selectedCategory, selectedCity, salaryRange, dateRange]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedCity, salaryRange, dateRange]);
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-[500px]" />
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -95,6 +171,121 @@ export function AllVacanciesTable() {
       animate={{ y: 0, opacity: 1 }}
       className="space-y-4"
     >
+      {/* Filters Bar */}
+      <div className="flex flex-col gap-4 p-4 bg-card rounded-xl border border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Фильтры</span>
+            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                Активны
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+                setSelectedCity('all');
+                setSalaryRange([0, 100000]);
+                setDateRange({from: '', to: ''});
+              }}
+            >
+              <X className="w-3 h-3 mr-1" />
+              Сбросить
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? 'Скрыть' : 'Показать'}
+            </Button>
+          </div>
+        </div>
+        
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-4 pt-4 border-t border-border"
+          >
+            {/* Category and City */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Категория</Label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все категории" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все категории</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat} value={cat}>{translateCategory(cat, language)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Город</Label>
+                <Select value={selectedCity} onValueChange={setSelectedCity}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Все города" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Все города</SelectItem>
+                    {cities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {/* Salary Range */}
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground flex justify-between">
+                <span>Диапазон зарплаты</span>
+                <span className="text-foreground">{salaryRange[0].toLocaleString()} - {salaryRange[1].toLocaleString()} BYN</span>
+              </Label>
+              <Slider
+                value={salaryRange}
+                onValueChange={(value) => setSalaryRange([value[0], value[1]])}
+                min={0}
+                max={100000}
+                step={1000}
+                minStepsBetweenThumbs={2}
+              />
+            </div>
+            
+            {/* Date Range */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Дата публикации с</Label>
+                <Input
+                  type="date"
+                  value={dateRange.from}
+                  onChange={(e) => setDateRange({...dateRange, from: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">по</Label>
+                <Input
+                  type="date"
+                  value={dateRange.to}
+                  onChange={(e) => setDateRange({...dateRange, to: e.target.value})}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
       {/* Search and stats */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative flex-1 w-full max-w-md">
@@ -105,11 +296,21 @@ export function AllVacanciesTable() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
+          {searchTerm && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={() => setSearchTerm('')}
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          )}
         </div>
         <div className="text-sm text-muted-foreground">
           Всего в базе: <span className="font-semibold text-foreground">{totalCount}</span> вакансий
-          {searchTerm && (
-            <> • Найдено: <span className="font-semibold text-foreground">{filteredVacancies.length}</span></>
+          {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+            <> • Отфильтровано: <span className="font-semibold text-foreground">{filteredVacancies.length}</span></>
           )}
         </div>
       </div>
@@ -129,10 +330,33 @@ export function AllVacanciesTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredVacancies.length === 0 ? (
+              {loading ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : filteredVacancies.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                    {searchTerm ? t('stats.noSearchResults') : t('stats.noData')}
+                    {searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000 ? 
+                      'Нет вакансий, соответствующих фильтрам' : 
+                      'Нет данных о вакансиях'}
+                    {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+                      <div className="mt-4">
+                        <Button variant="link" onClick={() => {
+                          setSearchTerm('');
+                          setSelectedCategory('all');
+                          setSelectedCity('all');
+                          setSalaryRange([0, 100000]);
+                          setDateRange({from: '', to: ''});
+                        }}>
+                          Сбросить все фильтры
+                        </Button>
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -202,6 +426,9 @@ export function AllVacanciesTable() {
         <div className="flex items-center justify-between p-4 border-t border-border/50">
           <div className="text-sm text-muted-foreground">
             Страница {currentPage} из {totalPages}
+            {(searchTerm || selectedCategory !== 'all' || selectedCity !== 'all' || dateRange.from || dateRange.to || salaryRange[0] > 0 || salaryRange[1] < 100000) && (
+              <> • Показано: <span className="font-semibold text-foreground">{filteredVacancies.length}</span> из <span className="font-semibold text-foreground">{totalCount}</span></>
+            )}
           </div>
           <div className="flex gap-2">
             <Button

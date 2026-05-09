@@ -89,15 +89,15 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center pt-20 pb-8 sm:pb-12 px-4">
-      <div className="w-full max-w-7xl mx-auto">
+    <section className="min-h-screen flex flex-col justify-center pt-20 pb-12 px-0">
+      <div className="w-full">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="w-full"
         >
-          <div className="relative w-full" style={{ height: '40vw', minHeight: '200px', maxHeight: '500px' }}>
+          <div className="relative w-full" style={{ height: '100vh' }}>
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentImageIndex}
@@ -117,9 +117,9 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-8"
         >
-          <h1 className="font-serif text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-medium text-foreground leading-tight mb-2 sm:mb-4">
+          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium text-foreground leading-tight mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>
@@ -128,7 +128,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="max-w-xl mx-auto mb-6 sm:mb-10 relative"
+          className="max-w-xl mx-auto mb-10 relative"
         >
           <form onSubmit={handleSearch}>
             <div className="relative">
@@ -142,7 +142,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                   setShowResults(true);
                 }}
                 onFocus={() => setShowResults(true)}
-                className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 rounded-xl border border-border bg-background text-foreground text-sm sm:text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full pl-12 pr-4 py-4 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
           </form>
@@ -181,12 +181,12 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="flex items-center justify-center gap-6 sm:gap-10 md:gap-12 mb-6 sm:mb-10"
+          className="flex items-center justify-center gap-8 sm:gap-12 mb-10"
         >
           {quickStats.map((stat, index) => (
             <div key={stat.label} className="text-center">
-              <p className="text-xl sm:text-2xl md:text-3xl font-serif font-semibold text-foreground">{stat.value}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-2xl sm:text-3xl font-serif font-semibold text-foreground">{stat.value}</p>
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -195,31 +195,31 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <button 
             onClick={() => onNavigate('universities')}
-            className="btn-primary flex items-center justify-center gap-2 text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3 w-full sm:w-auto">
+            className="btn-primary flex items-center gap-2">
             <GraduationCap className="w-4 h-4" />
             {t('hero.chooseUni')}
             <ArrowUpRight className="w-4 h-4" />
           </button>
           <a 
             href="/applicants"
-            className="btn-outline flex items-center justify-center gap-2 text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3 w-full sm:w-auto">
+            className="btn-outline flex items-center gap-2">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="btn-outline flex items-center justify-center gap-2 text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3 w-full sm:w-auto">
+            className="btn-outline flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>
           {!user && (
             <a 
               href="/register"
-              className="btn-secondary flex items-center justify-center gap-2 text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3 w-full sm:w-auto">
+              className="btn-secondary flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               {t('hero.register')}
             </a>
@@ -230,7 +230,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="text-center text-[10px] xs:text-xs text-muted-foreground mt-6 sm:mt-8"
+          className="text-center text-xs text-muted-foreground mt-8"
         >
           {t('hero.dataNotice')}
         </motion.p>

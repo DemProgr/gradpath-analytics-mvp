@@ -78,7 +78,7 @@ const App = () => (
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
-            <BrowserRouter>
+<BrowserRouter basename="/gradpath-analytics-mvp">
               <AppContent />
             </BrowserRouter>
           </TooltipProvider>

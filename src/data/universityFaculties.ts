@@ -1,6 +1,8 @@
 // Данные о факультетах и специальностях для всех университетов Беларуси
 // Источники: официальные сайты университетов
-// БГУ: 83 специальности согласно https://abiturient.bsu.by/obuchenie-v-bgu/fakultety
+// БГУ: 83+ специальности согласно https://kudapostupat.by/zavedenie/id/40 и https://adukar.com/by/company/2 (актуально на 2026г.)
+// БГУИР: согласно https://abitur.bsuir.by/fakultety-i-spetsialnosti, https://www.bsuir.by/ru/spetsialnosti-bguir (актуально на 2026г.)
+// БНТУ: согласно https://bntu.by/faculties, http://priem.bntu.by/ru/pk/specialty/ (актуально на 2026г.)
 
 export interface Faculty {
   id: string;
@@ -20,6 +22,11 @@ export interface Specialty {
   code?: string;
   faculty_id?: string;
   institute_id?: string;
+  faculty_name?: string;
+  university_id?: number;
+  passing_score_budget?: number;
+  passing_score_paid?: number;
+  year?: number;
 }
 
 export interface UniversityFaculties {
@@ -53,8 +60,7 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
     institutes: [
       { id: 'bsu-i1', name: 'Институт бизнеса БГУ', code: 'ИБ' },
       { id: 'bsu-i2', name: 'Институт теологии имени святых Мефодия и Кирилла', code: 'ИТ' },
-      { id: 'bsu-i3', name: 'Международный государственный экологический институт им. А.Д.Сахарова', code: 'МГЭИ' },
-      { id: 'bsu-i4', name: 'Совместный институт БГУ и Даляньского политехнического университета', code: 'СИБД' }
+      { id: 'bsu-i4', name: 'Совместный институт БГУ и Даляньского политехнического университета (Китай)', code: 'СИБД' }
     ],
     specialties: [
       // Факультет прикладной математики и информатики - 4 специальности
@@ -63,10 +69,11 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s3', name: 'Информатика', code: '1-31 03 09', faculty_id: 'bsu-1' },
       { id: 'bsu-s4', name: 'Кибербезопасность', code: '1-31 03 10', faculty_id: 'bsu-1' },
       
-      // ФРКТ - 3 специальности
+      // ФРКТ - 4 специальности
       { id: 'bsu-s5', name: 'Радиофизика и информационные технологии', code: '1-31 03 01', faculty_id: 'bsu-2' },
       { id: 'bsu-s6', name: 'Кибербезопасность', code: '1-31 03 02', faculty_id: 'bsu-2' },
       { id: 'bsu-s7', name: 'Прикладная информатика', code: '1-31 03 03', faculty_id: 'bsu-2' },
+      { id: 'bsu-s106', name: 'Интеллектуальная электроника', code: '1-31 03 04', faculty_id: 'bsu-2' },
       
       // Экономический факультет - 7 специальностей
       { id: 'bsu-s8', name: 'Международная экономика и торговля (с углубленным изучением китайского языка)', code: '1-25 01 01', faculty_id: 'bsu-3' },
@@ -120,7 +127,7 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s44', name: 'Фундаментальная и прикладная биотехнология', code: '1-31 01 06', faculty_id: 'bsu-9' },
       { id: 'bsu-s45', name: 'Биотехнология', code: '1-31 01 07', faculty_id: 'bsu-9' },
       
-      // ФМО - 9 специальностей (согласно новым кодам 2025)
+      // Факультет международных отношений - 10 специальностей
       { id: 'bsu-s46', name: 'Международные отношения', code: '6-05-0312-02', faculty_id: 'bsu-10' },
       { id: 'bsu-s100', name: 'Востоковедение', code: '6-05-0312-03', faculty_id: 'bsu-10' },
       { id: 'bsu-s101', name: 'Международная конфликтология', code: '6-05-0312-04', faculty_id: 'bsu-10' },
@@ -130,7 +137,6 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s48', name: 'Таможенное дело', code: '1-25 01 13', faculty_id: 'bsu-10' },
       { id: 'bsu-s104', name: 'Международная логистика', code: '6-05-1036-04', faculty_id: 'bsu-10' },
       { id: 'bsu-s105', name: 'Африканистика', code: '6-05-0312-05', faculty_id: 'bsu-10' },
-      { id: 'bsu-s49', name: 'Экономическая дипломатия', code: '1-25 01 14', faculty_id: 'bsu-10' },
       
       // Факультет социокультурных коммуникаций - 8 специальностей
       { id: 'bsu-s50', name: 'Современные иностранные языки (с указанием языков)', code: '1-21 04 01', faculty_id: 'bsu-11' },
@@ -142,11 +148,9 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s56', name: 'Графический дизайн и мультимедиадизайн', code: '1-21 04 07', faculty_id: 'bsu-11' },
       { id: 'bsu-s57', name: 'Дизайн предметно-пространственной среды (сокращенная форма)', code: '1-21 04 08', faculty_id: 'bsu-11' },
       
-      // Журналистики - 4 специальности
+      // Факультет журналистики - 2 специальности
       { id: 'bsu-s58', name: 'Журналистика', code: '1-21 03 01', faculty_id: 'bsu-12' },
-      { id: 'bsu-s59', name: 'Реклама и связи с общественностью', code: '1-21 03 02', faculty_id: 'bsu-12' },
-      { id: 'bsu-s60', name: 'Издательское дело', code: '1-21 03 03', faculty_id: 'bsu-12' },
-      { id: 'bsu-s61', name: 'Медиакоммуникации', code: '1-21 03 04', faculty_id: 'bsu-12' },
+      { id: 'bsu-s59', name: 'Информация и коммуникация', code: '1-21 03 02', faculty_id: 'bsu-12' },
       
       // Факультет географии и геоинформатики - 8 специальностей
       { id: 'bsu-s62', name: 'География', code: '1-31 02 01', faculty_id: 'bsu-13' },
@@ -164,12 +168,14 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s72', name: 'Психология', code: '1-21 05 03', faculty_id: 'bsu-14' },
       { id: 'bsu-s73', name: 'Социальные коммуникации', code: '1-21 05 04', faculty_id: 'bsu-14' },
       
-      // Военный факультет - 5 специальностей
-      { id: 'bsu-s74', name: 'Геоинформационные системы (геоинформационные системы специальные)', code: '1-95 01 01', faculty_id: 'bsu-15' },
+      // Военный факультет - 7 специальностей (включая специализации для юношей и девушек)
+      { id: 'bsu-s74', name: 'Геоинформационные системы (направление - специальные)', code: '1-95 01 01', faculty_id: 'bsu-15' },
       { id: 'bsu-s75', name: 'Правоведение (юрисконсультская работа в военной сфере)', code: '1-95 01 02', faculty_id: 'bsu-15' },
-      { id: 'bsu-s76', name: 'Радиационная, химическая и биологическая защита', code: '1-95 01 03', faculty_id: 'bsu-15' },
+      { id: 'bsu-s76', name: 'Химия (радиационная, химическая и биологическая защита)', code: '1-95 01 03', faculty_id: 'bsu-15' },
       { id: 'bsu-s77', name: 'Международные отношения (международные отношения в военной сфере)', code: '1-95 01 04', faculty_id: 'bsu-15' },
       { id: 'bsu-s78', name: 'Международные отношения (международные отношения в информационной сфере)', code: '1-95 01 05', faculty_id: 'bsu-15' },
+      { id: 'bsu-s107', name: 'Мировая экономика', code: '1-95 01 06', faculty_id: 'bsu-15' },
+      { id: 'bsu-s108', name: 'Прикладная физика', code: '1-95 01 07', faculty_id: 'bsu-15' },
       
       // Механико-математический факультет - 4 специальности
       { id: 'bsu-s79', name: 'Математика', code: '1-31 03 04', faculty_id: 'bsu-16' },
@@ -177,25 +183,10 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsu-s81', name: 'Математика и компьютерные науки', code: '1-31 03 06', faculty_id: 'bsu-16' },
       { id: 'bsu-s82', name: 'Компьютерная математика и системный анализ', code: '1-31 03 07', faculty_id: 'bsu-16' },
       
-      // Институт бизнеса БГУ - 4 специальности
-      { id: 'bsu-s83', name: 'Бизнес-администрирование', code: '1-26 02 01', institute_id: 'bsu-i1' },
-      { id: 'bsu-s84', name: 'Логистика', code: '1-26 02 02', institute_id: 'bsu-i1' },
-      { id: 'bsu-s85', name: 'Управление информационными ресурсами', code: '1-26 02 03', institute_id: 'bsu-i1' },
-      { id: 'bsu-s86', name: 'Маркетинг', code: '1-26 02 04', institute_id: 'bsu-i1' },
-      
-      // Институт теологии имени святых Мефодия и Кирилла - 1 специальность
+      // Институт теологии имени святых Мефодия и Кирилла - 1 специальность (дневная и заочная)
       { id: 'bsu-s87', name: 'Теология', code: '1-21 06 01', institute_id: 'bsu-i2' },
       
-      // Международный государственный экологический институт им. А.Д.Сахарова - 7 специальностей
-      { id: 'bsu-s88', name: 'Медико-биологическое дело', code: '1-31 05 06', institute_id: 'bsu-i3' },
-      { id: 'bsu-s89', name: 'Экология', code: '1-31 01 08', institute_id: 'bsu-i3' },
-      { id: 'bsu-s90', name: 'Медицинская физика', code: '1-31 04 06', institute_id: 'bsu-i3' },
-      { id: 'bsu-s91', name: 'Информационные системы и технологии', code: '1-40 02 01', institute_id: 'bsu-i3' },
-      { id: 'bsu-s92', name: 'Природоохранная деятельность', code: '1-33 01 01', institute_id: 'bsu-i3' },
-      { id: 'bsu-s93', name: 'Ядерная и радиационная безопасность', code: '1-33 01 02', institute_id: 'bsu-i3' },
-      { id: 'bsu-s94', name: 'Теплоэнергетика и теплотехника', code: '1-43 01 01', institute_id: 'bsu-i3' },
-      
-      // Совместный институт БГУ и Даляньского политехнического университета - 3 специальности
+      // Совместный институт БГУ и Даляньского политехнического университета (Китай) - 3 специальности
       { id: 'bsu-s95', name: 'Прикладная физика', code: '1-31 04 07', institute_id: 'bsu-i4' },
       { id: 'bsu-s96', name: 'Мировая экономика', code: '1-25 01 15', institute_id: 'bsu-i4' },
       { id: 'bsu-s97', name: 'Механика и математическое моделирование', code: '1-31 03 08', institute_id: 'bsu-i4' }
@@ -210,6 +201,7 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bsuir-3', name: 'Факультет радиотехники и электроники', code: 'ФРЭ' },
       { id: 'bsuir-4', name: 'Факультет компьютерных систем и сетей', code: 'ФКСиС' },
       { id: 'bsuir-5', name: 'Факультет информационной безопасности', code: 'ФИБ' },
+      { id: 'bsuir-8', name: 'Факультет инфокоммуникаций', code: 'ФИ' },
       { id: 'bsuir-6', name: 'Инженерно-экономический факультет', code: 'ИЭФ' },
       { id: 'bsuir-7', name: 'Военный факультет', code: 'ВФ' },
       { id: 'bsuir-9', name: 'Факультет доуниверситетской подготовки и профессиональной ориентации', code: 'ФДПиПО' }
@@ -219,54 +211,58 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
     ],
     specialties: [
       // Факультет компьютерного проектирования (ФКП)
-      { id: 'bsuir-s1', name: 'Информационные системы и технологии', code: '1-40 01 01', faculty_id: 'bsuir-1' },
-      { id: 'bsuir-s2', name: 'Компьютерная инженерия', code: '1-40 01 02', faculty_id: 'bsuir-1' },
-      { id: 'bsuir-s3', name: 'Программная инженерия', code: '1-40 01 03', faculty_id: 'bsuir-1' },
-      { id: 'bsuir-s4', name: 'Электронные системы и технологии', code: '1-40 01 04', faculty_id: 'bsuir-1' },
-      { id: 'bsuir-s5', name: 'Электронное машиностроение', code: '1-40 01 05', faculty_id: 'bsuir-1' },
+      { id: 'bsuir-s1', name: 'Информационные системы и технологии', code: '6-05-0611-01', faculty_id: 'bsuir-1', passing_score_budget: 168, year: 2025 },
+      { id: 'bsuir-s2', name: 'Компьютерная инженерия', code: '6-05-0611-05', faculty_id: 'bsuir-1', passing_score_budget: 367, year: 2025 },
+      { id: 'bsuir-s3', name: 'Программная инженерия', code: '6-05-0612-01', faculty_id: 'bsuir-1', passing_score_budget: 161, year: 2025 },
+      { id: 'bsuir-s4', name: 'Электронные системы и технологии', code: '6-05-0713-02', faculty_id: 'bsuir-1', passing_score_budget: 131, year: 2025 },
 
       // Факультет информационных технологий и управления (ФИТУ)
-      { id: 'bsuir-s6', name: 'Информационные системы и технологии', code: '1-40 02 01', faculty_id: 'bsuir-2' },
-      { id: 'bsuir-s7', name: 'Искусственный интеллект', code: '1-40 02 02', faculty_id: 'bsuir-2' },
-      { id: 'bsuir-s8', name: 'Киберфизические системы', code: '1-40 02 03', faculty_id: 'bsuir-2' },
-      { id: 'bsuir-s9', name: 'Системы управления информацией', code: '1-40 02 04', faculty_id: 'bsuir-2' },
-      { id: 'bsuir-s10', name: 'Электронные системы и технологии', code: '1-40 02 05', faculty_id: 'bsuir-2' },
+      { id: 'bsuir-s6', name: 'Информационные системы и технологии', code: '6-05-0611-01', faculty_id: 'bsuir-2', passing_score_budget: 168, year: 2025 },
+      { id: 'bsuir-s7', name: 'Искусственный интеллект', code: '6-05-0611-03', faculty_id: 'bsuir-2', passing_score_budget: 133, year: 2025 },
+      { id: 'bsuir-s8', name: 'Киберфизические системы', code: '6-05-0611-08', faculty_id: 'bsuir-2', passing_score_budget: 358, year: 2025 },
+      { id: 'bsuir-s9', name: 'Системы управления информацией', code: '6-05-0612-03', faculty_id: 'bsuir-2', passing_score_budget: 122, year: 2025 },
+      { id: 'bsuir-s10', name: 'Электронные системы и технологии', code: '6-05-0713-02', faculty_id: 'bsuir-2', passing_score_budget: 368, year: 2025 },
 
       // Факультет радиотехники и электроники (ФРЭ)
-      { id: 'bsuir-s11', name: 'Информационные и управляющие системы физических установок', code: '1-40 03 01', faculty_id: 'bsuir-3' },
-      { id: 'bsuir-s12', name: 'Инженерно-педагогическая деятельность', code: '1-40 03 02', faculty_id: 'bsuir-3' },
-      { id: 'bsuir-s13', name: 'Микро- и наноэлектроника', code: '1-40 03 03', faculty_id: 'bsuir-3' },
-      { id: 'bsuir-s14', name: 'Нанотехнологии и наноматериалы', code: '1-40 03 04', faculty_id: 'bsuir-3' },
-      { id: 'bsuir-s15', name: 'Радиосистемы и радиотехнологии', code: '1-40 03 05', faculty_id: 'bsuir-3' },
+      { id: 'bsuir-s11', name: 'Радиотехника (по направлениям)', code: '1-39 01 01', faculty_id: 'bsuir-3' },
+      { id: 'bsuir-s12', name: 'Радиоэлектронные системы и комплексы', code: '1-39 01 02', faculty_id: 'bsuir-3' },
+      { id: 'bsuir-s13', name: 'Радиоинформатика', code: '1-39 01 03', faculty_id: 'bsuir-3' },
+      { id: 'bsuir-s14', name: 'Радиоэлектронная защита информации', code: '1-39 01 04', faculty_id: 'bsuir-3' },
+      { id: 'bsuir-s15', name: 'Микро- и наноэлектроника', code: '7-07-0713-02', faculty_id: 'bsuir-3', passing_score_budget: 155, year: 2025 },
+      { id: 'bsuir-s17', name: 'Нанотехнологии и наноматериалы', code: '6-05-0717-01', faculty_id: 'bsuir-3', passing_score_budget: 120, year: 2025 },
+      { id: 'bsuir-s18', name: 'Инженерно-педагогическая деятельность', code: '6-05-0719-01', faculty_id: 'bsuir-3', passing_score_budget: 260, year: 2025 },
+      { id: 'bsuir-s19', name: 'Радиосистемы и радиотехнологии', code: '6-05-0713-03', faculty_id: 'bsuir-3', passing_score_budget: 160, year: 2025 },
 
       // Факультет компьютерных систем и сетей (ФКСиС)
-      { id: 'bsuir-s16', name: 'Информатика и технологии программирования', code: '1-40 04 01', faculty_id: 'bsuir-4' },
-      { id: 'bsuir-s17', name: 'Компьютерная инженерия', code: '1-40 04 02', faculty_id: 'bsuir-4' },
-      { id: 'bsuir-s18', name: 'Программная инженерия', code: '1-40 04 03', faculty_id: 'bsuir-4' },
+      { id: 'bsuir-s20', name: 'Информатика и технологии программирования', code: '1-40 04 01', faculty_id: 'bsuir-4' },
+      { id: 'bsuir-s21', name: 'Компьютерная инженерия', code: '1-40 04 02', faculty_id: 'bsuir-4', passing_score_budget: 148, year: 2025 },
+      { id: 'bsuir-s22', name: 'Программная инженерия', code: '1-40 04 03', faculty_id: 'bsuir-4', passing_score_budget: 147, year: 2025 },
 
       // Факультет информационной безопасности (ФИБ)
-      { id: 'bsuir-s19', name: 'Информационная безопасность', code: '1-40 05 01', faculty_id: 'bsuir-5' },
-      { id: 'bsuir-s20', name: 'Системы и сети инфокоммуникаций', code: '1-40 05 02', faculty_id: 'bsuir-5' },
-      { id: 'bsuir-s21', name: 'Сверхвысокочастотные системы', code: '1-40 05 03', faculty_id: 'bsuir-5' },
+      { id: 'bsuir-s23', name: 'Информационная безопасность', code: '6-05-0611-02', faculty_id: 'bsuir-5', passing_score_budget: 143, year: 2025 },
+      { id: 'bsuir-s24', name: 'Системы и сети инфокоммуникаций', code: '6-05-0611-06', faculty_id: 'bsuir-5', passing_score_budget: 340, year: 2025 },
+      { id: 'bsuir-s25', name: 'Сверхвысокочастотные системы', code: '1-98 01 02', faculty_id: 'bsuir-5' },
+
+      // Факультет инфокоммуникаций (ФИ)
+      { id: 'bsuir-s801', name: 'Инфокоммуникационные технологии (по направлениям)', code: '1-45 01 01', faculty_id: 'bsuir-8' },
+      { id: 'bsuir-s802', name: 'Инфокоммуникационные системы (по направлениям)', code: '1-45 01 02', faculty_id: 'bsuir-8', passing_score_budget: 325, year: 2025 },
 
       // Инженерно-экономический факультет (ИЭФ)
-      { id: 'bsuir-s22', name: 'Информационные системы и технологии', code: '1-40 06 01', faculty_id: 'bsuir-6' },
-      { id: 'bsuir-s23', name: 'Цифровой маркетинг', code: '1-40 06 02', faculty_id: 'bsuir-6' },
-      { id: 'bsuir-s24', name: 'Электронная экономика', code: '1-40 06 03', faculty_id: 'bsuir-6' },
+      { id: 'bsuir-s30', name: 'Информационные системы и технологии', code: '1-40 05 01', faculty_id: 'bsuir-6', passing_score_budget: 161, year: 2025 },
+      { id: 'bsuir-s31', name: 'Цифровой маркетинг', code: '6-05-0611-07', faculty_id: 'bsuir-6', passing_score_budget: 390, year: 2025 },
+      { id: 'bsuir-s32', name: 'Электронная экономика', code: '6-05-0611-04', faculty_id: 'bsuir-6', passing_score_budget: 184, year: 2025 },
 
       // Военный факультет (ВФ)
-      { id: 'bsuir-s25', name: 'Радиосистемы и радиотехнологии', code: '1-40 07 01', faculty_id: 'bsuir-7' },
-      { id: 'bsuir-s26', name: 'Компьютерная инженерия', code: '1-40 07 02', faculty_id: 'bsuir-7' },
-      { id: 'bsuir-s27', name: 'Системы и сети инфокоммуникаций', code: '1-40 07 03', faculty_id: 'bsuir-7' },
-      { id: 'bsuir-s28', name: 'Информационная безопасность', code: '1-40 07 04', faculty_id: 'bsuir-7' },
+      { id: 'bsuir-s33', name: 'Радиосистемы и радиотехнологии', code: '6-05-0713-03', faculty_id: 'bsuir-7' },
+      { id: 'bsuir-s34', name: 'Компьютерная инженерия', code: '6-05-0611-05', faculty_id: 'bsuir-7' },
+      { id: 'bsuir-s35', name: 'Системы и сети инфокоммуникаций', code: '6-05-0611-06', faculty_id: 'bsuir-7' },
+      { id: 'bsuir-s36', name: 'Информационная безопасность', code: '6-05-0611-02', faculty_id: 'bsuir-7' },
 
-      // Институт информационных технологий (ИИТ)
-      { id: 'bsuir-s29', name: 'Программное обеспечение информационных технологий', code: '1-40 08 01', institute_id: 'bsuir-i1' },
-      { id: 'bsuir-s30', name: 'Информационные технологии и управление в технических системах', code: '1-40 08 02', institute_id: 'bsuir-i1' },
-      { id: 'bsuir-s31', name: 'Вычислительные машины, системы и сети', code: '1-40 08 03', institute_id: 'bsuir-i1' },
-      { id: 'bsuir-s32', name: 'Инженерно-психологическое обеспечение информационных технологий', code: '1-40 08 04', institute_id: 'bsuir-i1' },
-      { id: 'bsuir-s33', name: 'Искусственный интеллект', code: '1-40 08 05', institute_id: 'bsuir-i1' },
-      { id: 'bsuir-s34', name: 'Программная инженерия', code: '1-40 08 06', institute_id: 'bsuir-i1' }
+      // Институт информационных технологий (ИИТ) - Факультет компьютерных технологий (ФКТ)
+      { id: 'bsuir-s37', name: 'Программное обеспечение информационных технологий', code: '1-40 01 01', institute_id: 'bsuir-i1' },
+      { id: 'bsuir-s41', name: 'Искусственный интеллект', code: '6-05-0611-03', institute_id: 'bsuir-i1' },
+      { id: 'bsuir-s42', name: 'Программная инженерия', code: '6-05-0612-01', institute_id: 'bsuir-i1' },
+      { id: 'bsuir-s43', name: 'Компьютерная инженерия', code: '6-05-0611-05', institute_id: 'bsuir-i1' }
     ]
   },
 
@@ -297,12 +293,17 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
     specialties: [
       // Автотракторный факультет (АТФ)
       { id: 'bntu-s1', name: 'Промышленный дизайн. Дизайн транспортных средств', code: '6-05-0714-08', faculty_id: 'bntu-1' },
-      { id: 'bntu-s2', name: 'Автомобили, тракторы, мобильные и технологические комплексы', code: '6-05-0715-03', faculty_id: 'bntu-1' },
-      { id: 'bntu-s3', name: 'Гидропневмосистемы мобильных и технологических машин и оборудования', code: '6-05-0715-04', faculty_id: 'bntu-1' },
+      { id: 'bntu-s2', name: 'Автомобили, тракторы, мобильные и технологические комплексы (Колесные машины и специализированное транспортно-технологическое оборудование)', code: '6-05-0715-03', faculty_id: 'bntu-1' },
+      { id: 'bntu-s211', name: 'Автомобили, тракторы, мобильные и технологические комплексы (Автоматизированное проектирование автомобилей)', code: '6-05-0715-03', faculty_id: 'bntu-1' },
+      { id: 'bntu-s212', name: 'Автомобили, тракторы, мобильные и технологические комплексы (Грузовые и легковые автомобили)', code: '6-05-0715-03', faculty_id: 'bntu-1' },
+      { id: 'bntu-s213', name: 'Автомобили, тракторы, мобильные и технологические комплексы (Тракторы и мобильные комплексы)', code: '6-05-0715-03', faculty_id: 'bntu-1' },
+      { id: 'bntu-s214', name: 'Автомобили, тракторы, мобильные и технологические комплексы (Электрические и автономные транспортные средства)', code: '6-05-0715-03', faculty_id: 'bntu-1' },
+      { id: 'bntu-s3', name: 'Гидропневмосистемы мобильных и технологических машин и оборудования (Инжиниринг гидравлических и пневматических систем)', code: '6-05-0715-04', faculty_id: 'bntu-1' },
       { id: 'bntu-s4', name: 'Силовые установки', code: '6-05-0715-05', faculty_id: 'bntu-1' },
       { id: 'bntu-s5', name: 'Водные транспортные средства', code: '6-05-0715-06', faculty_id: 'bntu-1' },
       { id: 'bntu-s6', name: 'Эксплуатация наземных транспортных и технологических машин и комплексов', code: '6-05-0715-07', faculty_id: 'bntu-1' },
-      { id: 'bntu-s7', name: 'Технологии транспортных процессов', code: '6-05-0715-10', faculty_id: 'bntu-1' },
+      { id: 'bntu-s61', name: 'Эксплуатация наземных транспортных и технологических машин и комплексов (Техническая эксплуатация автомобилей и автосервис)', code: '6-05-0715-07', faculty_id: 'bntu-1' },
+      { id: 'bntu-s7', name: 'Технологии транспортных процессов (Организация перевозок и управление на автомобильном и городском транспорте)', code: '6-05-0715-10', faculty_id: 'bntu-1' },
       { id: 'bntu-s8', name: 'Эксплуатация дорожно-транспортной инфраструктуры', code: '6-05-0715-12', faculty_id: 'bntu-1' },
       { id: 'bntu-s9', name: 'Организация дорожного движения и транспортное планирование', code: '6-05-1041-01', faculty_id: 'bntu-1' },
       { id: 'bntu-s10', name: 'Транспортная логистика', code: '6-05-1042-01', faculty_id: 'bntu-1' },
@@ -314,14 +315,16 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bntu-s14', name: 'Экологический аудит и обеспечение качества окружающей среды', code: '6-05-0716-10', faculty_id: 'bntu-2' },
 
       // Машиностроительный факультет (МСФ)
-      { id: 'bntu-s15', name: 'Автоматизация технологических процессов и производств', code: '6-05-0713-04', faculty_id: 'bntu-3' },
-      { id: 'bntu-s16', name: 'Технология машиностроения, металлорежущие станки и инструменты', code: '6-05-0714-02', faculty_id: 'bntu-3' },
+      { id: 'bntu-s15', name: 'Автоматизация технологических процессов и производств (Машиностроение и приборостроение)', code: '6-05-0713-04', faculty_id: 'bntu-3' },
+      { id: 'bntu-s16', name: 'Технология машиностроения, металлорежущие станки и инструменты (Технологическое обеспечение машиностроительного производства)', code: '6-05-0714-02', faculty_id: 'bntu-3' },
+      { id: 'bntu-s161', name: 'Технология машиностроения, металлорежущие станки и инструменты (Инжиниринг технологического оборудования)', code: '6-05-0714-02', faculty_id: 'bntu-3' },
       { id: 'bntu-s17', name: 'Инженерная экономика (Бизнес-процессы промышленных предприятий)', code: '6-05-0718-01', faculty_id: 'bntu-3' },
       { id: 'bntu-s18', name: 'Инженерная экономика (Цифровое производство)', code: '6-05-0718-01', faculty_id: 'bntu-3' },
 
       // Механико-технологический факультет (МТФ)
       { id: 'bntu-s19', name: 'Технологии высокотемпературной обработки металлов', code: '6-05-0714-01', faculty_id: 'bntu-4' },
       { id: 'bntu-s20', name: 'Инженерно-техническое проектирование и производство материалов и изделий из них', code: '6-05-0714-03', faculty_id: 'bntu-4' },
+      { id: 'bntu-s201', name: 'Инженерно-техническое проектирование и производство материалов и изделий из них (Оборудование и технологии высокоэффективных процессов обработки материалов)', code: '6-05-0714-03', faculty_id: 'bntu-4' },
 
       // Факультет маркетинга, менеджмента, предпринимательства (ФММП)
       { id: 'bntu-s21', name: 'Экономика и управление', code: '6-05-0311-02', faculty_id: 'bntu-5' },
@@ -334,16 +337,22 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bntu-s28', name: 'Инженерная экономика (Управление дизайн-проектами на промышленном предприятии)', code: '6-05-0718-01', faculty_id: 'bntu-5' },
 
       // Энергетический факультет (ЭнФ)
-      { id: 'bntu-s29', name: 'Электроэнергетика и электротехника', code: '7-07-0712-01', faculty_id: 'bntu-6' },
-      { id: 'bntu-s30', name: 'Теплоэнергетика и теплотехника', code: '7-07-0712-02', faculty_id: 'bntu-6' },
+      { id: 'bntu-s29', name: 'Электроэнергетика и электротехника (Электрические станции)', code: '7-07-0712-01', faculty_id: 'bntu-6' },
+      { id: 'bntu-s291', name: 'Электроэнергетика и электротехника (Электроэнергетические системы и сети)', code: '7-07-0712-01', faculty_id: 'bntu-6' },
+      { id: 'bntu-s292', name: 'Электроэнергетика и электротехника (Электроснабжение)', code: '7-07-0712-01', faculty_id: 'bntu-6' },
+      { id: 'bntu-s30', name: 'Теплоэнергетика и теплотехника (Тепловые электрические станции)', code: '7-07-0712-02', faculty_id: 'bntu-6' },
+      { id: 'bntu-s301', name: 'Теплоэнергетика и теплотехника (Промышленная теплоэнергетика)', code: '7-07-0712-02', faculty_id: 'bntu-6' },
+      { id: 'bntu-s302', name: 'Теплоэнергетика и теплотехника (Автоматизация и управление теплоэнергетическими процессами)', code: '7-07-0712-02', faculty_id: 'bntu-6' },
       { id: 'bntu-s31', name: 'Проектирование и эксплуатация атомных электрических станций', code: '7-07-0712-03', faculty_id: 'bntu-6' },
       { id: 'bntu-s32', name: 'Инженерная экономика (Электроэнергетика и теплоэнергетика)', code: '6-05-0718-01', faculty_id: 'bntu-6' },
 
       // Факультет информационных технологий и робототехники (ФИТР)
-      { id: 'bntu-s33', name: 'Информационные системы и технологии', code: '6-05-0611-01', faculty_id: 'bntu-7' },
+      { id: 'bntu-s33', name: 'Информационные системы и технологии (в проектировании и производстве)', code: '6-05-0611-01', faculty_id: 'bntu-7' },
       { id: 'bntu-s34', name: 'Программная инженерия', code: '6-05-0612-01', faculty_id: 'bntu-7' },
-      { id: 'bntu-s35', name: 'Автоматизация технологических процессов и производств', code: '6-05-0713-04', faculty_id: 'bntu-7' },
-      { id: 'bntu-s36', name: 'Робототехнические системы', code: '6-05-0713-05', faculty_id: 'bntu-7' },
+      { id: 'bntu-s35', name: 'Автоматизация технологических процессов и производств (в энергетике)', code: '6-05-0713-04', faculty_id: 'bntu-7' },
+      { id: 'bntu-s351', name: 'Автоматизация технологических процессов и производств (в приборостроении и радиоэлектронике)', code: '6-05-0713-04', faculty_id: 'bntu-7' },
+      { id: 'bntu-s352', name: 'Автоматизация технологических процессов и производств (Автоматизированные электроприводы)', code: '6-05-0713-04', faculty_id: 'bntu-7' },
+      { id: 'bntu-s36', name: 'Робототехнические системы (Промышленные роботы и робототехнические комплексы)', code: '6-05-0713-05', faculty_id: 'bntu-7' },
 
       // Факультет технологий управления и гуманитаризации (ФТУГ)
       { id: 'bntu-s37', name: 'Экономика и управление', code: '6-05-0311-02', faculty_id: 'bntu-8' },
@@ -369,8 +378,10 @@ export const UNIVERSITIES_FACULTIES_DATA: Record<string, UniversityFaculties> = 
       { id: 'bntu-s51', name: 'Архитектурный дизайн', code: '7-07-0731-02', faculty_id: 'bntu-11' },
 
       // Строительный факультет (СФ)
-      { id: 'bntu-s52', name: 'Строительство зданий и сооружений', code: '7-07-0732-01', faculty_id: 'bntu-12' },
+      { id: 'bntu-s52', name: 'Строительство зданий и сооружений (Промышленное и гражданское строительство)', code: '7-07-0732-01', faculty_id: 'bntu-12' },
+      { id: 'bntu-s521', name: 'Строительство зданий и сооружений (Производство строительных изделий и конструкций)', code: '7-07-0732-01', faculty_id: 'bntu-12' },
       { id: 'bntu-s53', name: 'Экспертиза и управление недвижимостью', code: '6-05-0732-02', faculty_id: 'bntu-12' },
+      { id: 'bntu-s531', name: 'Техническая эксплуатация зданий и сооружений', code: '6-05-0732-01', faculty_id: 'bntu-12' },
       { id: 'bntu-s54', name: 'Инженерная экономика (Архитектура, строительство и экономика недвижимости)', code: '6-05-0718-01', faculty_id: 'bntu-12' },
 
       // Приборостроительный факультет (ПСФ)

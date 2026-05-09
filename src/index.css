@@ -56,8 +56,8 @@
     --card-foreground: 210 20% 95%;
     --popover: 220 20% 12%;
     --popover-foreground: 210 20% 95%;
-    --primary: 200 80% 50%;
-    --primary-foreground: 220 25% 8%;
+    --primary: 75 35% 35%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 220 15% 18%;
     --secondary-foreground: 210 20% 90%;
     --muted: 220 15% 20%;
@@ -110,6 +110,29 @@
 }
 
 @layer utilities {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

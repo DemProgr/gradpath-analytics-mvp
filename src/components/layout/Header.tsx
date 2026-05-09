@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowUpRight, User, LogOut, LogIn, Shield, UserCircle } from 'lucide-react';
+import { Menu, X, ArrowUpRight, User, LogOut, LogIn, Shield, UserCircle, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,6 +24,7 @@ interface HeaderProps {
 
 export function Header({ activeSection, onSectionChange, chatOpen = false }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,12 +32,38 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const navItems = [
-    { id: '/', label: t('nav.home'), isRoute: true },
-    { id: '/applicants', label: t('nav.applicants'), isRoute: true },
-    { id: '/students', label: t('nav.students'), isRoute: true },
-    { id: '/statistics', label: t('nav.analytics'), isRoute: true },
-    { id: '/admission-stats', label: t('nav.admission'), isRoute: true },
+const navItems = [
+    { 
+      id: '/about', 
+      label: 'О проекте', 
+      isRoute: false,
+      isStub: true,
+      dropdownItems: [
+        { id: '/about', label: 'О проекте', isRoute: true },
+        { id: '/contact', label: 'Связаться', isRoute: true },
+      ]
+    },
+    { 
+      id: '/services', 
+      label: 'Наши услуги', 
+      isRoute: false,
+      isStub: true,
+      dropdownItems: [
+        { id: '/career-quiz', label: 'Карьерный тест', isRoute: true },
+        { id: '/profession-selection', label: 'Подбор профессии', isRoute: true },
+        { id: '/admission-help', label: 'Помощь при поступлении', isRoute: false, isStub: true },
+      ]
+    },
+    { 
+      id: '/data', 
+      label: 'Наши данные', 
+      isRoute: false,
+      isStub: true,
+      dropdownItems: [
+        { id: '/statistics', label: 'Аналитика', isRoute: true },
+        { id: '/admission-stats', label: 'Статистика поступления', isRoute: true },
+      ]
+    },
   ];
 
   const handleNavClick = (section: string) => {
@@ -61,48 +88,45 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
     navigate('/login');
   };
 
-  return (
+return (
     <header 
       className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border transition-all duration-300"
       style={{ marginRight: chatOpen ? '450px' : '0px' }}
+      onMouseEnter={() => setIsHeaderHovered(true)}
+      onMouseLeave={() => setIsHeaderHovered(false)}
     >
+      {/* Base header - always visible at top */}
       <div className="section-container">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link to="/">
             <motion.div 
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer -ml-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-<span className="font-serif text-xl sm:text-2xl font-semibold text-foreground">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+                <img src="/favicon.png" alt="GradPath" className="w-6 h-6 object-contain" />
+              </div>
+              <span className="font-serif text-xl sm:text-2xl font-semibold text-foreground">
                 GradPath Analytics
               </span>
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
+{/* Desktop Navigation */}
           {!isMobile && (
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-6">
               {navItems.map((item) => (
-                <Link
+                <span
                   key={item.id}
-                  to={item.id}
                   className={cn(
-                    "text-sm font-medium transition-colors relative py-2",
-                    isActiveRoute(item.id)
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                    "text-sm font-medium transition-colors relative py-2 flex items-center gap-1 cursor-pointer",
+                    "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {item.label}
-                  {isActiveRoute(item.id) && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className="absolute -bottom-px left-0 right-0 h-0.5 bg-primary"
-                    />
-                  )}
-                </Link>
+                </span>
               ))}
             </nav>
           )}
@@ -165,16 +189,23 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
 
               {/* CTA Button - hidden when chat is open */}
               {!chatOpen && (
-                <Link to="/applicants">
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="btn-primary flex items-center gap-2 text-sm"
-                  >
-                    Выбрать профессию
-                    <ArrowUpRight className="w-4 h-4" />
-                  </motion.button>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link to="/search">
+                    <Button variant="ghost" size="icon" className="w-9 h-9">
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/universities">
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="btn-primary flex items-center gap-2 text-sm"
+                    >
+                      Университеты
+                      <ArrowUpRight className="w-4 h-4" />
+                    </motion.button>
+                  </Link>
+                </div>
               )}
             </div>
           )}
@@ -190,6 +221,48 @@ export function Header({ activeSection, onSectionChange, chatOpen = false }: Hea
           )}
         </div>
       </div>
+
+      {/* Expanded dropdown - appears below */}
+      <AnimatePresence mode="wait">
+        {isHeaderHovered ? (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="section-container py-3 border-t border-border">
+              <div className="flex items-start justify-between">
+                <div className="grid grid-cols-3 gap-12">
+                  {navItems.map((item) => (
+                    <div key={item.id} className="space-y-2">
+                      <Link to={item.id} className="text-sm font-semibold text-foreground hover:text-primary">
+                        {item.label}
+                      </Link>
+                      <div className="space-y-1">
+                        {item.dropdownItems?.map((dropdownItem) => (
+                          <Link
+                            key={dropdownItem.id}
+                            to={dropdownItem.isRoute ? dropdownItem.id : '#'}
+                            className={cn(
+                              "block text-sm py-1 hover:text-primary transition-colors",
+                              dropdownItem.isStub ? "text-muted-foreground opacity-60 cursor-not-allowed" : "text-muted-foreground"
+                            )}
+                          >
+                            {dropdownItem.label}
+                            {dropdownItem.isStub && <span className="text-xs ml-1">(скоро)</span>}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {/* Mobile Menu */}
       <AnimatePresence>

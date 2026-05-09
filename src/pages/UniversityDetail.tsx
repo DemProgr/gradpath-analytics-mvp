@@ -5,8 +5,9 @@ import { Header } from '@/components/layout/Header';
 import { FooterSection } from '@/components/sections/FooterSection';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, MapPin, Globe, GraduationCap, Users, TrendingUp, BookOpen, Award, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
-import { getUniversityByShortName } from '@/data/universityMarks';
+import { getUniversityByShortName, ALL_UNIVERSITIES } from '@/data/universityMarks';
 import { getUniversityFacultiesData, getTotalFacultiesCount, getTotalSpecialtiesCount, Faculty, Specialty, Institute } from '@/data/universityFaculties';
+import { useUniversity } from '@/hooks/useUniversities';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -43,12 +44,14 @@ interface University {
 interface AdmissionStat {
   id: string;
   year: number;
-  min_score: number | null;
-  avg_score: number | null;
-  budget_places: number | null;
-  paid_places: number | null;
+  min_score?: number | null;
+  avg_score?: number | null;
+  budget_places?: number | null;
+  paid_places?: number | null;
   paid_min_score?: number | null;
-  specialty_id: string;
+  passing_score_budget?: number | null;
+  passing_score_paid?: number | null;
+  specialty_id: number | string;
   specialty: { name: string; code: string | null } | null;
 }
 
@@ -138,33 +141,36 @@ const UniversityDetail = () => {
             .select('*')
             .eq('university_id', universityData.id);
 
-          if (!facultiesError && facultiesData) {
-            setFaculties(facultiesData);
-          }
-
-          // Load institutes
-          const { data: institutesData, error: institutesError } = await supabase
-            .from('institutes')
-            .select('*')
-            .eq('university_id', universityData.id);
-
-          if (!institutesError && institutesData) {
-            setInstitutes(institutesData as unknown as Institute[]);
-          }
-
-          // Load specialties
+          // Load specialties by university_id (real schema: no faculty_id/institute_id columns)
           const { data: specialtiesData, error: specialtiesError } = await supabase
             .from('specialties')
             .select('*')
-            .or(`faculty_id.in.(${(facultiesData || []).map(f => f.id).join(',')}),institute_id.in.(${(institutesData || []).map(i => i.id).join(',')})`);
+            .eq('university_id', universityData.id);
 
-          if (!specialtiesError && specialtiesData) {
-            setSpecialties(specialtiesData);
+          // Use static data if no data in Supabase, otherwise use Supabase data
+          const useStaticData = !facultiesData || facultiesData.length === 0;
+          
+          if (useStaticData) {
+            loadStaticData();
+          } else {
+            const split = facultiesData.reduce((acc, f) => {
+              if (f.id && f.id.includes('-i')) {
+                acc.institutes.push(f);
+              } else {
+                acc.faculties.push(f);
+              }
+              return acc;
+            }, { faculties: [] as any[], institutes: [] as any[] });
+            setFaculties(split.faculties);
+            setInstitutes(split.institutes);
+            
+            if (specialtiesData && specialtiesData.length > 0) {
+              setSpecialties(specialtiesData);
+            }
           }
 
           // Load admission stats
           const facultyIds = (facultiesData || []).map(f => f.id);
-          const instituteIds = (institutesData || []).map(i => i.id);
           const specialtyIds = (specialtiesData || []).map(s => s.id);
           
           if (specialtyIds.length > 0) {
@@ -199,13 +205,21 @@ const UniversityDetail = () => {
       setLoading(false);
     }
 
-    function loadStaticData() {
+    async function loadStaticData() {
       const staticData = getUniversityFacultiesData(decodedShortName);
       const staticUniversity = getUniversityByShortName(decodedShortName);
 
       if (staticData) {
-        setFaculties(staticData.faculties);
-        setInstitutes(staticData.institutes || []);
+        const split = (staticData.faculties as any[]).reduce((acc: any, f: any) => {
+          if (f.id && f.id.includes('-i')) {
+            acc.institutes.push(f);
+          } else {
+            acc.faculties.push(f);
+          }
+          return acc;
+        }, { faculties: [], institutes: [] });
+        setFaculties(split.faculties as Faculty[]);
+        setInstitutes(split.institutes as Institute[]);
         setSpecialties(staticData.specialties);
       }
 
@@ -223,23 +237,64 @@ const UniversityDetail = () => {
       // Load admission stats from Supabase using static specialty IDs
       if (staticData && staticData.specialties.length > 0) {
         const specialtyIds = staticData.specialties.map(s => s.id);
-        supabase
+        
+        // First, get Supabase data
+        const { data: supabaseData } = await supabase
           .from('admission_stats')
           .select('*')
           .in('specialty_id', specialtyIds)
-          .order('year', { ascending: false })
-          .then(({ data }) => {
-            if (data) {
-              const admissionWithSpecialty = data.map(stat => {
-                const specialty = staticData.specialties.find(s => s.id === stat.specialty_id);
-                return {
-                  ...stat,
-                  specialty: specialty ? { name: specialty.name, code: specialty.code } : null
-                };
-              });
-              setAdmissionStats(admissionWithSpecialty);
+          .order('year', { ascending: false });
+
+        // Create static specialty map
+        const staticSpecialtyMap = new Map(staticData.specialties.map(s => [s.id, s]));
+
+        // Convert static passing scores to admission stats format
+        const staticStats = staticData.specialties
+          .filter(s => s.passing_score_budget && s.year)
+          .map(s => ({
+            id: `${s.id}-${s.year}`,
+            specialty_id: s.id,
+            year: s.year,
+            min_score: s.passing_score_budget,
+            passing_score_budget: s.passing_score_budget,
+            specialty: {
+              name: s.name,
+              code: s.code,
+              faculty_id: s.faculty_id,
+              institute_id: s.institute_id
             }
+          }));
+
+        // Merge Supabase data with static data
+        let mergedStats: any[] = [];
+        
+        if (supabaseData) {
+          const supabaseStats = supabaseData.map(stat => {
+            const staticSpecialty = staticSpecialtyMap.get(stat.specialty_id);
+            return {
+              ...stat,
+              specialty: staticSpecialty ? { 
+                name: staticSpecialty.name, 
+                code: staticSpecialty.code,
+                faculty_id: staticSpecialty.faculty_id,
+                institute_id: staticSpecialty.institute_id
+              } : null
+            };
           });
+          mergedStats = supabaseStats;
+        }
+
+        // Add static stats (2025) if not already present from Supabase
+        const existingYears = new Set(mergedStats.map(s => s.year));
+        staticStats.forEach(stat => {
+          if (!existingYears.has(stat.year)) {
+            mergedStats.push(stat);
+          }
+        });
+
+        // Sort by year descending
+        mergedStats.sort((a, b) => (b.year || 0) - (a.year || 0));
+        setAdmissionStats(mergedStats);
       }
     }
 
@@ -364,22 +419,17 @@ const UniversityDetail = () => {
                 </a>
               )}
               
-              <Badge variant="outline" className="px-4 py-2">
+<Badge variant="outline" className="px-4 py-2 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => document.getElementById('faculties')?.scrollIntoView({ behavior: 'smooth' })}>
                 <GraduationCap className="w-4 h-4 mr-2" />
-                {faculties.length} {t('uni.faculties')}
+                <Link to="#faculties" className="hover:underline">{faculties.length} {t('uni.faculties')}</Link>
               </Badge>
               
-              {institutes.length > 0 && (
-                <Badge variant="outline" className="px-4 py-2">
+              {specialties.length > 0 && (
+                <Badge variant="outline" className="px-4 py-2 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => document.getElementById('faculties')?.scrollIntoView({ behavior: 'smooth' })}>
                   <BookOpen className="w-4 h-4 mr-2" />
-                  {institutes.length} {t('uni.institutes')}
+                  <Link to="#faculties" className="hover:underline">{specialties.length} {t('uni.specialties')}</Link>
                 </Badge>
               )}
-              
-              <Badge variant="outline" className="px-4 py-2">
-                <BookOpen className="w-4 h-4 mr-2" />
-                {specialties.length} {t('uni.specialties')}
-              </Badge>
             </div>
 
             {/* Description */}
@@ -396,7 +446,7 @@ const UniversityDetail = () => {
 
             {/* Faculties */}
             {faculties.length > 0 && (
-              <Card className="mb-8">
+              <Card className="mb-8" id="faculties">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="w-5 h-5" />
@@ -406,7 +456,7 @@ const UniversityDetail = () => {
                 <CardContent>
                   <div className="space-y-3">
                     {faculties.map(faculty => {
-                      const facultySpecialties = specialties.filter(s => s.faculty_id === faculty.id);
+                      const facultySpecialties = specialties.filter(s => s.faculty_id === faculty.id || s.faculty_name === faculty.name);
                       const isExpanded = expandedFaculty === faculty.id;
                       
                       return (
@@ -499,7 +549,7 @@ const UniversityDetail = () => {
                 <CardContent>
                   <div className="space-y-3">
                     {institutes.map(institute => {
-                      const instituteSpecialties = specialties.filter(s => s.institute_id === institute.id);
+                      const instituteSpecialties = specialties.filter(s => s.institute_id === institute.id || s.faculty_name === institute.name);
                       const isExpanded = expandedFaculty === institute.id;
                       
                       return (
@@ -629,7 +679,7 @@ const UniversityDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="w-5 h-5" />
-                    Проходные баллы (2022-2025)
+                    Проходные баллы {university?.short_name || decodedShortName} 2025
                   </CardTitle>
                   <p className="text-sm text-muted-foreground mt-2">
                     <span className="font-medium">Мин. балл</span> — минимальный балл для поступления; 
@@ -648,7 +698,7 @@ const UniversityDetail = () => {
                         <SelectContent>
                           <SelectItem value="all">Все годы</SelectItem>
                           {[2025, 2024, 2023, 2022].map(year => (
-                            <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                            <SelectItem key={year} value={year.toString()}>{year} {year === 2025 ? '(актуально)' : ''}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -690,9 +740,15 @@ const UniversityDetail = () => {
                           <SelectContent>
                             <SelectItem value="all">Все специальности</SelectItem>
                             {specialties
-                              .filter(s => s.faculty_id === selectedFaculty || s.institute_id === selectedFaculty)
+                              .filter(s => {
+                                if (!selectedFaculty) return true;
+                                // Filter by faculty_id or institute_id
+                                return s.faculty_id === selectedFaculty || s.institute_id === selectedFaculty;
+                              })
                               .map(specialty => (
-                                <SelectItem key={specialty.id} value={specialty.id}>{specialty.name}</SelectItem>
+                                <SelectItem key={specialty.id} value={specialty.id}>
+                                  {specialty.name}
+                                </SelectItem>
                               ))}
                           </SelectContent>
                         </Select>
@@ -718,12 +774,12 @@ const UniversityDetail = () => {
                             {specialties.find(s => s.id === selectedSpecialty)?.name}
                           </span>
                           <div className="text-xs text-muted-foreground mt-1">
-                            {specialties.find(s => s.id === selectedSpecialty)?.faculty_id && 
-                              `Факультет: ${faculties.find(f => f.id === specialties.find(s => s.id === selectedSpecialty)?.faculty_id)?.name}`
-                            }
-                            {specialties.find(s => s.id === selectedSpecialty)?.institute_id && 
-                              `Институт: ${institutes.find(i => i.id === specialties.find(s => s.id === selectedSpecialty)?.institute_id)?.name}`
-                            }
+                            {(() => {
+                              const spec = specialties.find(s => s.id === selectedSpecialty);
+                              const fac = faculties.find(f => f.id === spec?.faculty_id);
+                              const inst = institutes.find(i => i.id === spec?.institute_id);
+                              return fac ? `Факультет: ${fac.name}` : inst ? `Институт: ${inst.name}` : '';
+                            })()}
                           </div>
                         </div>
                       )}
@@ -733,11 +789,22 @@ const UniversityDetail = () => {
                   {/* Chart */}
                   {(() => {
                     const filteredStats = admissionStats.filter(stat => {
-                      if (selectedYear && stat.year !== selectedYear) return false;
-                      if (selectedSpecialty && stat.specialty_id !== selectedSpecialty) return false;
+if (selectedYear && stat.year !== selectedYear) return false;
+                            
+                            // Handle specialty filter - match by string comparison
+                            if (selectedSpecialty) {
+                              const statSpecialtyId = stat.specialty_id ? String(stat.specialty_id) : null;
+                              const matches = statSpecialtyId === selectedSpecialty || stat.specialty_id === Number(selectedSpecialty);
+                              if (!matches) return false;
+                            }
+                      
                       if (selectedFaculty) {
-                        const specialty = specialties.find(s => s.id === stat.specialty_id);
-                        if (specialty?.faculty_id !== selectedFaculty && specialty?.institute_id !== selectedFaculty) return false;
+                        const statFacultyId = String((stat.specialty as any)?.faculty_id || 
+                                              (stat.specialty as any)?.institute_id ||
+                                              stat.specialty_id);
+                        const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialty_id));
+                        const staticFacultyId = staticSpecialty?.faculty_id || staticSpecialty?.institute_id;
+                        if (statFacultyId !== selectedFaculty && staticFacultyId !== selectedFaculty) return false;
                       }
                       return true;
                     });
@@ -749,17 +816,17 @@ const UniversityDetail = () => {
                         .sort((a, b) => a.year - b.year)
                         .map(s => ({ 
                           year: s.year, 
-                          min: s.min_score ? Number(s.min_score) : null, 
+                          min: (s.min_score || s.passing_score_budget) ? Number(s.min_score || s.passing_score_budget) : null, 
                           avg: s.avg_score ? Number(s.avg_score) : null,
-                          paid: s.paid_min_score ? Number(s.paid_min_score) : null
+                          paid: (s.paid_min_score || s.passing_score_paid) ? Number(s.paid_min_score || s.passing_score_paid) : null
                         }));
                     } else if (filteredStats.length > 0) {
                       const grouped = filteredStats.reduce((acc, stat) => {
                         const key = stat.year;
                         if (!acc[key]) acc[key] = { year: stat.year, minSum: 0, avgSum: 0, paidSum: 0, minCount: 0, avgCount: 0, paidCount: 0 };
-                        if (stat.min_score) { acc[key].minSum += Number(stat.min_score); acc[key].minCount += 1; }
+                        if (stat.min_score || stat.passing_score_budget) { acc[key].minSum += Number(stat.min_score || stat.passing_score_budget); acc[key].minCount += 1; }
                         if (stat.avg_score) { acc[key].avgSum += Number(stat.avg_score); acc[key].avgCount += 1; }
-                        if (stat.paid_min_score) { acc[key].paidSum += Number(stat.paid_min_score); acc[key].paidCount += 1; }
+                        if (stat.paid_min_score || stat.passing_score_paid) { acc[key].paidSum += Number(stat.paid_min_score || stat.passing_score_paid); acc[key].paidCount += 1; }
                         return acc;
                       }, {} as Record<number, { year: number; minSum: number; avgSum: number; paidSum: number; minCount: number; avgCount: number; paidCount: number }>);
                       
@@ -825,22 +892,39 @@ const UniversityDetail = () => {
                           <TableHead className="text-right">Бюджет</TableHead>
                           <TableHead className="text-right">Платное</TableHead>
                           <TableHead className="text-right">Ср. балл</TableHead>
-                          <TableHead className="text-right">Мест</TableHead>
+                          <TableHead className="text-right">Мест (бюдж/платн)</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {admissionStats
                           .filter(stat => {
                             if (selectedYear && stat.year !== selectedYear) return false;
-                            if (selectedSpecialty && stat.specialty_id !== selectedSpecialty) return false;
+                            
+                            // Handle specialty filter - match by string comparison
+                            if (selectedSpecialty) {
+                              const statSpecialtyId = stat.specialty_id ? String(stat.specialty_id) : null;
+                              const matches = statSpecialtyId === selectedSpecialty || stat.specialty_id === Number(selectedSpecialty);
+                              if (!matches) return false;
+                            }
+                            
                             if (selectedFaculty) {
-                              const specialty = specialties.find(s => s.id === stat.specialty_id);
-                              if (specialty?.faculty_id !== selectedFaculty && specialty?.institute_id !== selectedFaculty) return false;
+                              const statFacultyId = String((stat.specialty as any)?.faculty_id || 
+                                                    (stat.specialty as any)?.institute_id ||
+                                                    stat.specialty_id);
+                              const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialty_id));
+                              const staticFacultyId = staticSpecialty?.faculty_id || staticSpecialty?.institute_id;
+                              if (statFacultyId !== selectedFaculty && staticFacultyId !== selectedFaculty) return false;
                             }
                             return true;
                           })
-                          .map(stat => (
-                          <TableRow key={stat.id}>
+                          .reduce((acc, stat) => {
+                            if (!acc.some(s => s.specialty_id === stat.specialty_id)) {
+                              acc.push(stat);
+                            }
+                            return acc;
+                          }, [] as typeof admissionStats)
+                          .map((stat, index) => (
+                          <TableRow key={`${stat.id}-${index}`}>
                             <TableCell className="font-medium">
                               {stat.specialty?.name || 'Н/Д'}
                               {stat.specialty?.code && (
@@ -853,15 +937,15 @@ const UniversityDetail = () => {
                               <Badge variant="outline">{stat.year}</Badge>
                             </TableCell>
                             <TableCell className="text-right font-medium text-green-700">
-                              {stat.min_score ? Number(stat.min_score).toFixed(0) : '—'}
+                              {stat.min_score || stat.passing_score_budget ? Number(stat.min_score || stat.passing_score_budget).toFixed(0) : '—'}
                             </TableCell>
                             <TableCell className="text-right font-medium text-blue-700">
-                              {stat.paid_min_score ? Number(stat.paid_min_score).toFixed(0) : '—'}
+                              {stat.paid_min_score || stat.passing_score_paid ? Number(stat.paid_min_score || stat.passing_score_paid).toFixed(0) : '—'}
                             </TableCell>
                             <TableCell className="text-right">
                               {stat.avg_score ? Number(stat.avg_score).toFixed(0) : '—'}
                             </TableCell>
-                            <TableCell className="text-right">{stat.budget_places || '—'}</TableCell>
+                            <TableCell className="text-right">{stat.budget_places || '—'}/{stat.paid_places || '—'}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

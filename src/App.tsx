@@ -20,6 +20,12 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Team from "./pages/Team";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
+import SearchPage from "./pages/Search";
+import UniversitiesPage from "./pages/Universities";
 import { AIChat } from "@/components/AIChat";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -45,11 +51,17 @@ const AppContent = () => {
           </ProtectedRoute>
         } />
         <Route path="/admission-stats" element={<AdmissionStats isChatOpen={isChatOpen} onChatToggle={setIsChatOpen} />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/universities" element={<UniversitiesPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/team" element={<Team />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <AnimatePresence>

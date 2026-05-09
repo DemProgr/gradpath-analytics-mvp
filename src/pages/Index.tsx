@@ -142,8 +142,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Услуги</p>
-                      <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Мир услуг для тех, кто учится, и для тех, кто заканчивает обучение</h2>
-                      <p className="text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ориентация, обучение, рынок труда и руководство по образованию в Беларуси: все услуги, доступные для абитуриентов, студентов и выпускников.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Мир услуг для тех, кто учится, и для тех, кто заканчивает обучение</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ориентация, обучение, рынок труда и руководство по образованию в Беларуси: все услуги, доступные для абитуриентов, студентов и выпускников.</p>
                       <a href="/applicants" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Узнать больше
@@ -170,8 +170,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Данные</p>
-                      <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Актуальные и надёжные данные</h2>
-                      <p className="text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Данные о проходных баллах и специальностях с 2020 года. Простота в использовании данных. Надёжность и качественность.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Актуальные и надёжные данные</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Данные о проходных баллах и специальностях с 2020 года. Простота в использовании данных. Надёжность и качественность.</p>
                       <a href="/statistics" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Узнать больше
@@ -198,8 +198,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Анкета</p>
-                      <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Пройдите анкету</h2>
-                      <p className="text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ваше мнение важно: примите участие в масштабном опросе об университетах и работе в Беларуси.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Пройдите анкету</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ваше мнение важно: примите участие в масштабном опросе об университетах и работе в Беларуси.</p>
                       <a href="#" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Заполните анкету
@@ -287,7 +287,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
             </div>
           </section>
 
-<section className="py-20 px-4 sm:px-6 lg:px-8">
+          <section className="py-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                 <div>

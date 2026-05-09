@@ -157,7 +157,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/design/students.jpg" 
+                        src="/design.png" 
                         alt="Студенты" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -185,7 +185,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/design/data.jpg" 
+                        src="/bntu.png" 
                         alt="Данные" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -213,7 +213,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/design/anket.jpg" 
+                        src="/bntu2.png" 
                         alt="Анкета" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -240,7 +240,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="relative group">
                 <img 
-                  src="/design/way.jpg" 
+                  src="/grodnoimage2.png" 
                   alt="Путь" 
                   className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
                 />
@@ -263,7 +263,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
               </div>
               <div className="relative group">
                 <img 
-                  src="/design/anket2.jpg" 
+                  src="/design.png" 
                   alt="Анкета" 
                   className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
                 />

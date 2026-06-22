@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 
 export function useSpecialties(universityId?: number) {
   const [specialties, setSpecialties] = useState<any[]>([]);
@@ -9,18 +9,9 @@ export function useSpecialties(universityId?: number) {
   useEffect(() => {
     async function fetchSpecialties() {
       try {
-        let query = supabase
-          .from('specialties')
-          .select('*')
-          .order('name');
-
-        if (universityId) {
-          query = query.eq('university_id', universityId);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
+        const params = new URLSearchParams();
+        if (universityId) params.set('university_id', String(universityId));
+        const data = await api.get<any[]>(`/api/specialties?${params}`);
         setSpecialties(data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch specialties');
@@ -43,17 +34,9 @@ export function useSpecialtiesWithUniversity(universityShortName?: string) {
   useEffect(() => {
     async function fetchSpecialties() {
       try {
-        let query = supabase
-          .from('specialties')
-          .select('*, universities!inner(short_name, city)');
-
-        if (universityShortName) {
-          query = query.eq('universities.short_name', universityShortName);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
+        const params = new URLSearchParams();
+        if (universityShortName) params.set('university_short_name', universityShortName);
+        const data = await api.get<any[]>(`/api/specialties?${params}`);
         setSpecialties(data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch specialties');

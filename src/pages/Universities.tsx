@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { UniversitiesSection } from '@/components/sections/UniversitiesSection';
 
 const UniversitiesPage = () => {
@@ -14,7 +13,6 @@ const UniversitiesPage = () => {
         <UniversitiesSection />
       </div>
 
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

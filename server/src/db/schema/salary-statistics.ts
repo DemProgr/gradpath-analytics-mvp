@@ -1,0 +1,26 @@
+import { pgTable, serial, text, integer, doublePrecision, timestamp, date } from 'drizzle-orm/pg-core';
+
+export const salaryStatistics = pgTable('salary_statistics', {
+  id: serial('id').primaryKey(),
+  year: integer('year').notNull(),
+  month: integer('month'),
+  quarter: integer('quarter'),
+  regionType: text('region_type').notNull(),
+  regionName: text('region_name').notNull(),
+  industryCode: text('industry_code'),
+  industryName: text('industry_name').notNull(),
+  industryCategory: text('industry_category'),
+  avgSalary: doublePrecision('avg_salary'),
+  medianSalary: doublePrecision('median_salary'),
+  minSalary: doublePrecision('min_salary'),
+  maxSalary: doublePrecision('max_salary'),
+  vacanciesCount: integer('vacancies_count'),
+  employeesCount: integer('employees_count'),
+  growthRate: doublePrecision('growth_rate'),
+  source: text('source'),
+  sourceUrl: text('source_url'),
+  dataDate: date('data_date'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});

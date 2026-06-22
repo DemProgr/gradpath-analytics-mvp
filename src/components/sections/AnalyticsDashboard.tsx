@@ -1,27 +1,23 @@
 import { motion } from 'framer-motion';
 import { GraduationCap, BarChart3, Users, TrendingUp, PieChart, ArrowUpRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { Card, CardContent } from '@/components/ui/card';
 
 export function AnalyticsDashboard() {
   const { data: universityCount } = useQuery({
     queryKey: ['university-count-dashboard'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('universities')
-        .select('*', { count: 'exact', head: true });
-      return count || 41;
+      const data = await api.get<any[]>('/api/universities');
+      return data.length || 41;
     }
   });
 
   const { data: vacancyCount } = useQuery({
     queryKey: ['vacancy-count-dashboard'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('vacancies')
-        .select('*', { count: 'exact', head: true });
-      return count || 10538;
+      const data = await api.get<{ count: number }>('/api/vacancies/count');
+      return data.count || 10538;
     }
   });
 

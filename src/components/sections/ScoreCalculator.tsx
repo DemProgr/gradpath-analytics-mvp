@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { 
   CT_SUBJECTS, 
   CT_REQUIREMENTS, 
@@ -55,22 +55,13 @@ export function ScoreCalculator() {
   useEffect(() => {
     async function fetchPassingScores() {
       try {
-        const { data: statsData, error } = await supabase
-          .from('admission_stats')
-          .select('min_score, specialty_id')
-          .eq('year', 2025)
-          .like('specialty_id', 'bsu-%');
-
-        if (error) {
-          console.error('Error fetching stats:', error);
-          setLoadingScores(false);
-          return;
-        }
+        const allStats = await api.get<any[]>('/api/admission-stats?year=2025');
+        const statsData = allStats?.filter(s => s.specialtyId && String(s.specialtyId).startsWith('bsu-')) || [];
 
         const scoresMap: PassingScoreData = {};
-        statsData?.forEach(stat => {
-          if (stat.specialty_id && stat.min_score) {
-            scoresMap[stat.specialty_id] = stat.min_score;
+        statsData.forEach(stat => {
+          if (stat.specialtyId && stat.minScore) {
+            scoresMap[stat.specialtyId] = stat.minScore;
           }
         });
         setPassingScores(scoresMap);

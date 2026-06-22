@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { UniversitiesSection } from '@/components/sections/UniversitiesSection';
 import { SpecialtiesComparisonTable } from '@/components/tables/SpecialtiesComparisonTable';
 import { SimplePassingScoreCalculator } from '@/components/sections/SimplePassingScoreCalculator';
@@ -221,7 +220,6 @@ const Applicants = ({ isChatOpen = false }: ApplicantsProps) => {
         </div>
       </motion.main>
 
-      <FooterSection onNavigate={handleNavigate} />
     </div>
   );
 };

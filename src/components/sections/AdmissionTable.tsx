@@ -11,7 +11,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { ArrowUpDown, Search, Loader2, GraduationCap, Users, TrendingUp, Download, FileSpreadsheet } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { exportToCSV, exportToExcel } from '@/utils/exportUtils';
@@ -63,29 +63,40 @@ export function AdmissionTable() {
 
   const fetchAdmissionData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('admission_stats')
-        .select(`
-          *,
-          specialties:specialty_id (
-            name,
-            code,
-            faculty_id,
-            faculties:faculty_id (
-              name,
-              universities:university_id (
-                short_name,
-                city
-              )
-            )
-          )
-        `)
-        .eq('year', 2025)
-        .order('min_score', { ascending: false });
+      const [stats, specialties, faculties, universities] = await Promise.all([
+        api.get<any[]>('/api/admission-stats?year=2025'),
+        api.get<any[]>('/api/specialties'),
+        api.get<any[]>('/api/faculties'),
+        api.get<any[]>('/api/universities'),
+      ]);
 
-      if (data) {
-        setAdmissionData(data);
-      }
+      const specialtyMap = new Map(specialties.map(s => [s.id, s]));
+      const facultyMap = new Map(faculties.map(f => [f.id, f]));
+      const universityMap = new Map(universities.map(u => [u.id, u]));
+
+      const joined = (stats || []).map(stat => {
+        const specialty = specialtyMap.get(stat.specialtyId);
+        const faculty = specialty ? facultyMap.get(specialty.facultyId) : null;
+        const university = faculty ? universityMap.get(faculty.universityId) : null;
+        
+        return {
+          ...stat,
+          specialty: specialty ? {
+            name: specialty.name,
+            code: specialty.code,
+            faculty_id: specialty.facultyId,
+            faculties: faculty ? {
+              name: faculty.name,
+              universities: university ? {
+                short_name: university.shortName,
+                city: university.city,
+              } : undefined,
+            } : undefined,
+          } : undefined,
+        };
+      });
+
+      setAdmissionData(joined);
     } catch (error) {
       console.error('Error fetching admission data:', error);
     } finally {

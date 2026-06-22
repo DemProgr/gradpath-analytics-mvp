@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { ChevronRight, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,10 +22,8 @@ export function CareerPathsSection() {
 
   useEffect(() => {
     async function fetchPaths() {
-      const { data, error } = await supabase
-        .from('career_paths')
-        .select('*')
-        .order('level_order', { ascending: true });
+      const rawData = await api.get<any[]>('/api/career-paths');
+      const data = rawData.sort((a, b) => a.level_order - b.level_order);
 
       if (data) {
         setPaths(data);

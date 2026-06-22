@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -29,12 +28,7 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
   const { data: universities } = useQuery({
     queryKey: ['universities'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('universities')
-        .select('id, short_name, short_name_en, short_name_be, full_name, full_name_en, full_name_be')
-        .order('short_name');
-      if (error) throw error;
-      return data;
+      return api.get<any[]>('/api/universities');
     }
   });
 
@@ -42,18 +36,10 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
   const { data: faculties } = useQuery({
     queryKey: ['faculties', selectedUniversity],
     queryFn: async () => {
-      let query = supabase
-        .from('faculties')
-        .select('id, name, name_en, name_be, university_id')
-        .order('name');
-      
-      if (selectedUniversity !== 'all') {
-        query = query.eq('university_id', selectedUniversity);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
+      const url = selectedUniversity !== 'all' 
+        ? `/api/faculties?universityId=${selectedUniversity}`
+        : '/api/faculties';
+      return api.get<any[]>(url);
     }
   });
 
@@ -61,54 +47,63 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
   const { data: admissionStats, isLoading } = useQuery({
     queryKey: ['admission-stats', selectedUniversity, selectedYear, selectedFaculty],
     queryFn: async () => {
-      let query = supabase
-        .from('admission_stats')
-        .select(`
-          *,
-          specialties:specialty_id (
-            name,
-            code,
-            faculties:faculty_id (
-              name,
-              name_en,
-              name_be,
-              universities:university_id (
-                id,
-                short_name,
-                short_name_en,
-                short_name_be,
-                full_name,
-                full_name_en,
-                full_name_be
-              )
-            )
-          )
-        `)
-        .order('year', { ascending: false });
+      const yearParam = selectedYear !== 'all' ? `?year=${selectedYear}` : '';
+      const [stats, specialties, allFaculties, universities] = await Promise.all([
+        api.get<any[]>(`/api/admission-stats${yearParam}`),
+        api.get<any[]>('/api/specialties'),
+        api.get<any[]>('/api/faculties'),
+        api.get<any[]>('/api/universities'),
+      ]);
 
-      if (selectedYear !== 'all') {
-        query = query.eq('year', parseInt(selectedYear));
-      }
+      // Create lookup maps (server uses camelCase)
+      const specialtyMap = new Map(specialties.map(s => [s.id, s]));
+      const facultyMap = new Map(allFaculties.map(f => [f.id, f]));
+      const universityMap = new Map(universities.map(u => [u.id, u]));
 
-      const { data, error } = await query;
-      if (error) throw error;
-      
+      // Join data
+      let joined = (stats || []).map(stat => {
+        const specialty = specialtyMap.get(stat.specialtyId);
+        const faculty = specialty ? facultyMap.get(specialty.facultyId) : null;
+        const university = faculty ? universityMap.get(faculty.universityId) : null;
+        
+        return {
+          ...stat,
+          specialties: specialty ? {
+            name: specialty.name,
+            code: specialty.code,
+            faculties: faculty ? {
+              name: faculty.name,
+              name_en: faculty.nameEn,
+              name_be: faculty.nameBe,
+              universities: university ? {
+                id: university.id,
+                short_name: university.shortName,
+                short_name_en: university.shortNameEn,
+                short_name_be: university.shortNameBe,
+                full_name: university.fullName,
+                full_name_en: university.fullNameEn,
+                full_name_be: university.fullNameBe,
+              } : undefined,
+            } : undefined,
+          } : undefined,
+        };
+      });
+
       // Filter by university and faculty
-      let filtered = data;
       if (selectedUniversity !== 'all') {
-        filtered = filtered?.filter(stat => 
+        joined = joined?.filter(stat => 
           stat.specialties?.faculties?.universities?.id === selectedUniversity
         );
       }
       
       if (selectedFaculty !== 'all') {
-        filtered = filtered?.filter(stat => 
+        joined = joined?.filter(stat => 
           (stat.specialties as any)?.faculties?.id === selectedFaculty || 
           faculties?.find(f => f.id === selectedFaculty && stat.specialties?.faculties?.name === f.name)
         );
       }
       
-      return filtered;
+      return joined;
     }
   });
 
@@ -619,7 +614,6 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
         </div>
       </motion.main>
 
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { ArrowUpDown, TrendingUp, TrendingDown, Minus, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,15 +31,12 @@ export function SpecialtiesComparisonTable() {
 
   useEffect(() => {
     async function fetchStats() {
-      const { data, error } = await supabase
-        .from('salary_stats')
-        .select('*')
-        .eq('year', 2025)
-        .order('avg_salary', { ascending: false });
+      const allData = await api.get<any[]>('/api/salaries/stats');
+      const data = allData
+        .filter((s: any) => s.year === 2025)
+        .sort((a: any, b: any) => (b.avg_salary ?? 0) - (a.avg_salary ?? 0));
 
-      if (data) {
-        setStats(data);
-      }
+      setStats(data);
       setLoading(false);
     }
 

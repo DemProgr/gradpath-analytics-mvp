@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, GraduationCap, Briefcase, BarChart3, Search, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUniversities } from '@/hooks/useUniversities';
@@ -33,20 +33,16 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   const { data: universityCount } = useQuery({
     queryKey: ['university-count'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('universities')
-        .select('*', { count: 'exact', head: true });
-      return count || 0;
+      const universities = await api.get<unknown[]>('/api/universities');
+      return universities.length;
     }
   });
 
   const { data: vacancyCount } = useQuery({
     queryKey: ['vacancy-count-hero'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('vacancies')
-        .select('*', { count: 'exact', head: true });
-      return count || 0;
+      const { count } = await api.get<{ count: number }>('/api/vacancies/count');
+      return count;
     }
   });
 

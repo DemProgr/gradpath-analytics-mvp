@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { VacancyAnalyticsSection } from '@/components/sections/VacancyAnalyticsSection';
 import { SalaryStatisticsSection } from '@/components/sections/SalaryStatisticsSection';
 import { MarketSection } from '@/components/sections/MarketSection';
@@ -102,7 +101,6 @@ const Statistics = ({ isChatOpen = false }: StatisticsProps) => {
         </div>
       </motion.main>
 
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

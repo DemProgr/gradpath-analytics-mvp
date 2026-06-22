@@ -52,6 +52,10 @@ const navItems = [
         { id: '/career-quiz', label: 'Карьерный тест', isRoute: true },
         { id: '/profession-selection', label: 'Подбор профессии', isRoute: true },
         { id: '/admission-help', label: 'Помощь при поступлении', isRoute: false, isStub: true },
+        { id: '/internships', label: 'Стажировки', isRoute: true },
+        { id: '/events', label: 'Мероприятия', isRoute: true },
+        { id: '/career-map', label: 'Карта карьер', isRoute: true },
+        { id: '/blog', label: 'Блог', isRoute: true },
       ]
     },
     { 
@@ -61,6 +65,7 @@ const navItems = [
       isStub: true,
       dropdownItems: [
         { id: '/statistics', label: 'Аналитика', isRoute: true },
+        { id: '/analytics/specialties', label: 'Аналитика поступления', isRoute: true },
         { id: '/admission-stats', label: 'Статистика поступления', isRoute: true },
       ]
     },

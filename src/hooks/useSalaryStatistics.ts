@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 
 export interface SalaryStat {
   id: number;
@@ -29,7 +29,7 @@ export function useSalaryStatistics() {
   const [data, setData] = useState<SalaryStat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [filters, setFilters] = useState<SalaryFilters>({
     year: null,
     region: null,
@@ -37,24 +37,12 @@ export function useSalaryStatistics() {
     category: null,
   });
 
-  // Fetch all data on mount
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        
-        const { data: stats, error: fetchError } = await supabase
-          .from('salary_statistics' as any)
-          .select('*')
-          .order('year', { ascending: false })
-          .order('region_name', { ascending: true })
-          .order('industry_name', { ascending: true });
-        
-        if (fetchError) {
-          throw fetchError;
-        }
-        
-        setData((stats || []) as any);
+        const stats = await api.get<any[]>('/api/salaries/statistics');
+        setData(stats || []);
       } catch (err) {
         console.error('Error fetching salary statistics:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -62,32 +50,30 @@ export function useSalaryStatistics() {
         setLoading(false);
       }
     }
-    
+
     fetchData();
   }, []);
 
-  // Get unique values for filter dropdowns
-  const years = useMemo(() => 
+  const years = useMemo(() =>
     [...new Set(data.map(d => d.year))].sort((a, b) => b - a),
     [data]
   );
-  
-  const regions = useMemo(() => 
+
+  const regions = useMemo(() =>
     [...new Set(data.map(d => d.region_name))].sort(),
     [data]
   );
-  
-  const industries = useMemo(() => 
+
+  const industries = useMemo(() =>
     [...new Set(data.filter(d => d.industry_name).map(d => d.industry_name))].sort(),
     [data]
   );
-  
-  const categories = useMemo(() => 
+
+  const categories = useMemo(() =>
     [...new Set(data.filter(d => d.industry_category).map(d => d.industry_category))].sort(),
     [data]
   );
 
-  // Filter data based on current filters
   const filteredData = useMemo(() => {
     return data.filter(item => {
       if (filters.year && item.year !== filters.year) return false;
@@ -98,21 +84,12 @@ export function useSalaryStatistics() {
     });
   }, [data, filters]);
 
-  // Calculate summary statistics
   const summary = useMemo(() => {
     const validData = filteredData.filter(d => d.avg_salary !== null);
-    
     if (validData.length === 0) {
-      return {
-        count: 0,
-        avgSalary: 0,
-        maxSalary: 0,
-        minSalary: 0,
-      };
+      return { count: 0, avgSalary: 0, maxSalary: 0, minSalary: 0 };
     }
-    
     const salaries = validData.map(d => d.avg_salary as number);
-    
     return {
       count: validData.length,
       avgSalary: Math.round(salaries.reduce((a, b) => a + b, 0) / salaries.length),
@@ -122,19 +99,11 @@ export function useSalaryStatistics() {
   }, [filteredData]);
 
   const setFilter = (key: keyof SalaryFilters, value: string | number | null) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value === '' ? null : value,
-    }));
+    setFilters(prev => ({ ...prev, [key]: value === '' ? null : value }));
   };
 
   const clearFilters = () => {
-    setFilters({
-      year: null,
-      region: null,
-      industry: null,
-      category: null,
-    });
+    setFilters({ year: null, region: null, industry: null, category: null });
   };
 
   return {

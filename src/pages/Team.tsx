@@ -1,9 +1,6 @@
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 
 const Team = () => {
-  const handleNavigate = () => {};
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -16,7 +13,6 @@ const Team = () => {
           </div>
         </section>
       </main>
-      <FooterSection onNavigate={handleNavigate} />
     </div>
   );
 };

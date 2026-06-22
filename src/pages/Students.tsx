@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { MarketSection } from '@/components/sections/MarketSection';
 import { AnalysisSection } from '@/components/sections/AnalysisSection';
 import { CareerPathsSection } from '@/components/sections/CareerPathsSection';
@@ -1421,7 +1420,6 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
          </section>
        </motion.main>
 
-       <FooterSection onNavigate={() => {}} />
      </div>
    );
  };

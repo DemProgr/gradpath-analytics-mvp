@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 
 export interface ParseResult {
   success: boolean;
@@ -9,24 +9,20 @@ export interface ParseResult {
 
 export const parsingApi = {
   async parseRabota(category?: string): Promise<ParseResult> {
-    const { data, error } = await supabase.functions.invoke('parse-rabota', {
-      body: { category },
-    });
-
-    if (error) {
-      return { success: false, error: error.message };
+    try {
+      const data = await api.post('/api/parse/rabota', { category });
+      return data as ParseResult;
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-    return data;
   },
 
   async parseUniversity(universityUrl: string, universityName?: string): Promise<ParseResult> {
-    const { data, error } = await supabase.functions.invoke('parse-university', {
-      body: { universityUrl, universityName },
-    });
-
-    if (error) {
-      return { success: false, error: error.message };
+    try {
+      const data = await api.post('/api/parse/university', { universityUrl, universityName });
+      return data as ParseResult;
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-    return data;
   },
 };

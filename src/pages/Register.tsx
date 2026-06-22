@@ -53,12 +53,9 @@ export default function Register() {
     } else {
       toast({
         title: 'Регистрация успешна!',
-        description: 'Проверьте вашу почту для подтверждения аккаунта.',
+        description: 'Теперь заполните информацию о себе.',
       });
-      // Очищаем форму
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+      navigate('/onboarding');
     }
 
     setIsLoading(false);

@@ -2,18 +2,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Play, RefreshCw, Database, Globe, CheckCircle2, XCircle, Clock, Shield, LogOut, BarChart3, Square } from 'lucide-react';
-import { parsingApi, stopParsing } from '@/lib/parsing-client';
+import { Loader2, Play, RefreshCw, Database, Globe, CheckCircle2, XCircle, Clock, Shield, LogOut, BarChart3, Square, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { parsingApi } from '@/lib/api/parsing';
+import { api } from '@/lib/api/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ParseLog {
   id: string;
@@ -69,19 +68,13 @@ const Admin = () => {
   // Poll for progress updates
   const pollProgress = useCallback(async (sessionId: number) => {
     try {
-      const { data, error } = await supabase
-        .from('parsing_sessions')
-        .select('*')
-        .eq('id', sessionId)
-        .single();
-
-      if (error || !data) return;
+      const data = await api.get<any>(`/api/parsing-sessions/${sessionId}`);
 
       // Calculate ETA
       let eta = '';
-      if (data.status === 'running' && data.current_page > 0) {
-        const avgTimePerPage = 3.5; // seconds (3s delay + 0.5s processing)
-        const remainingPages = Math.max(0, 100 - data.current_page);
+      if (data.status === 'running' && data.currentPage > 0) {
+        const avgTimePerPage = 3.5;
+        const remainingPages = Math.max(0, 100 - data.currentPage);
         const remainingSeconds = remainingPages * avgTimePerPage;
         const minutes = Math.floor(remainingSeconds / 60);
         const seconds = Math.floor(remainingSeconds % 60);
@@ -90,11 +83,11 @@ const Admin = () => {
 
       setProgress({
         sessionId,
-        currentPage: data.current_page || 0,
-        totalPages: data.total_pages || 100,
-        totalFound: data.total_found || 0,
-        newVacancies: data.new_vacancies || 0,
-        duplicatesSkipped: data.duplicates_skipped || 0,
+        currentPage: data.currentPage || 0,
+        totalPages: data.totalPages || 100,
+        totalFound: data.totalFound || 0,
+        newVacancies: data.newVacancies || 0,
+        duplicatesSkipped: data.duplicatesSkipped || 0,
         status: data.status as ParsingProgress['status'],
         eta
       });
@@ -139,8 +132,8 @@ const Admin = () => {
   };
 
   const handleStopParsing = async () => {
-    stopParsing();
     setIsParsingRabota(false);
+    resetProgress();
     
     addLog({
       type: 'rabota',
@@ -185,15 +178,15 @@ const Admin = () => {
     try {
       const result = await parsingApi.parseRabota(selectedCategory);
       
-      if (result.success && result.data?.session_id) {
+      if (result.success && result.data?.sessionId) {
         // Start polling for progress
-        setProgress(prev => ({ ...prev, sessionId: result.data.session_id, status: 'running' }));
-        pollProgress(result.data.session_id);
+        setProgress(prev => ({ ...prev, sessionId: result.data.sessionId, status: 'running' }));
+        pollProgress(result.data.sessionId);
         
         addLog({
           type: 'rabota',
           status: 'success',
-          message: result.message || `Парсинг запущен (сессия #${result.data.session_id})`,
+          message: result.message || `Парсинг запущен (сессия #${result.data.sessionId})`,
           data: result.data
         });
         
@@ -318,16 +311,16 @@ const Admin = () => {
   // Check if parsing is still running when component mounts
   useEffect(() => {
     const checkRunningSessions = async () => {
-      const { data } = await supabase
-        .from('parsing_sessions')
-        .select('*')
-        .eq('status', 'running')
-        .order('started_at', { ascending: false })
-        .limit(1);
+      try {
+        const sessions = await api.get<any[]>('/api/parsing-sessions');
+        const running = sessions?.find(s => s.status === 'running');
 
-      if (data && data.length > 0) {
-        setIsParsingRabota(true);
-        pollProgress(data[0].id);
+        if (running) {
+          setIsParsingRabota(true);
+          pollProgress(running.id);
+        }
+      } catch (error) {
+        console.error('Error checking running sessions:', error);
       }
     };
 
@@ -335,6 +328,56 @@ const Admin = () => {
       checkRunningSessions();
     }
   }, [isAdmin, pollProgress]);
+
+  // Verification documents
+  const [pendingDocs, setPendingDocs] = useState<any[]>([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [approvingId, setApprovingId] = useState<number | null>(null);
+
+  const fetchPendingDocs = useCallback(async () => {
+    if (!isAdmin) return;
+    setLoadingDocs(true);
+    try {
+      const docs = await api.get<any[]>('/api/profile/admin/verifications');
+      setPendingDocs(docs || []);
+    } catch {
+      setPendingDocs([]);
+    } finally {
+      setLoadingDocs(false);
+    }
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (isAdmin) fetchPendingDocs();
+  }, [isAdmin, fetchPendingDocs]);
+
+  const handleApproveDoc = async (id: number) => {
+    setApprovingId(id);
+    try {
+      await api.post(`/api/profile/admin/verifications/${id}/approve`);
+      toast({ title: 'Документ одобрен', description: 'Верификация пользователя подтверждена' });
+      fetchPendingDocs();
+    } catch (err: any) {
+      toast({ title: 'Ошибка', description: err.message, variant: 'destructive' });
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleRejectDoc = async (id: number) => {
+    const reason = prompt('Причина отклонения:');
+    if (!reason) return;
+    setApprovingId(id);
+    try {
+      await api.post(`/api/profile/admin/verifications/${id}/reject`, { reason });
+      toast({ title: 'Документ отклонён', description: 'Причина указана' });
+      fetchPendingDocs();
+    } catch (err: any) {
+      toast({ title: 'Ошибка', description: err.message, variant: 'destructive' });
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   // Watch for progress completion
   useEffect(() => {
@@ -590,6 +633,76 @@ const Admin = () => {
             </Card>
           </div>
 
+          {/* Document Verifications */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Верификация документов
+              </CardTitle>
+              <CardDescription>
+                Заявки на подтверждение университета через студенческие документы
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingDocs ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : pendingDocs.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  Нет ожидающих заявок на верификацию
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {pendingDocs.map((doc: any) => (
+                    <div key={doc.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                      <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{doc.fileName || 'Документ'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Пользователь #{doc.userId} &middot; {new Date(doc.createdAt).toLocaleString()}
+                        </p>
+                        {doc.fileUrl && (
+                          <a
+                            href={doc.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline inline-block mt-1"
+                          >
+                            Просмотреть документ
+                          </a>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          onClick={() => handleApproveDoc(doc.id)}
+                          disabled={approvingId === doc.id}
+                        >
+                          {approvingId === doc.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <ThumbsUp className="w-3 h-3" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleRejectDoc(doc.id)}
+                          disabled={approvingId === doc.id}
+                        >
+                          <ThumbsDown className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Parse Logs */}
           <Card>
             <CardHeader>
@@ -651,8 +764,6 @@ const Admin = () => {
           </Card>
         </div>
       </main>
-
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

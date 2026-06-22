@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage, translateCategory } from '@/hooks/useLanguage';
 import { 
@@ -63,13 +63,10 @@ export function AllVacanciesTable() {
   useEffect(() => {
     async function fetchFilterOptions() {
       try {
-        const [catRes, cityRes] = await Promise.all([
-          supabase.from('vacancies').select('category').not('category', 'is', null),
-          supabase.from('vacancies').select('city').not('city', 'is', null),
-        ]);
+        const data = await api.get<any[]>('/api/vacancies?limit=10000');
         
-        const uniqueCategories = Array.from(new Set((catRes.data || []).map(v => v.category).filter(Boolean)));
-        const uniqueCities = Array.from(new Set((cityRes.data || []).map(v => v.city).filter(Boolean)));
+        const uniqueCategories = Array.from(new Set((data || []).map(v => v.category).filter(Boolean)));
+        const uniqueCities = Array.from(new Set((data || []).map(v => v.city).filter(Boolean)));
         
         setCategories(uniqueCategories.sort());
         setCities(uniqueCities.sort());
@@ -89,22 +86,10 @@ export function AllVacanciesTable() {
     try {
       setLoading(true);
       
-      // Get total count
-      const { count } = await supabase
-        .from('vacancies')
-        .select('*', { count: 'exact', head: true });
-      
+      const { count } = await api.get<{ count: number }>('/api/vacancies/count');
       setTotalCount(count || 0);
       
-      // Get paginated data
-      const { data, error } = await supabase
-        .from('vacancies')
-        .select('*')
-        .order('parsed_at', { ascending: false })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
-      
-      if (error) throw error;
-      
+      const data = await api.get<any[]>(`/api/vacancies?limit=${itemsPerPage}&offset=${(currentPage - 1) * itemsPerPage}`);
       setVacancies(data || []);
     } catch (err) {
       console.error('Error fetching vacancies:', err);

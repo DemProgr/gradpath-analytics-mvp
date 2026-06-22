@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -127,7 +126,6 @@ const SearchPage = () => {
 
       <div className="h-32"></div>
 
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

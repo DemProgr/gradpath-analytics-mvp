@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { CT_SUBJECTS, getSubjectNameById } from '@/data/ctSubjects';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { getExamRequirementsByFaculty } from '@/data/examRequirementsByFaculty';
 
 interface SpecialtyWithFaculty {
@@ -66,58 +66,31 @@ export function SimplePassingScoreCalculator() {
   useEffect(() => {
     async function init() {
       try {
-        const { data: facultiesData } = await supabase
-          .from('faculties')
-          .select('id, name, university_id')
-          .limit(500);
-
-        const { data: institutesData } = await supabase
-          .from('institutes')
-          .select('id, name, university_id')
-          .limit(500);
-
-        const { data: specialtiesData } = await supabase
-          .from('specialties')
-          .select('id, name, code, faculty_id, institute_id')
-          .limit(1000);
-
-        const { data: universitiesData } = await supabase
-          .from('universities')
-          .select('id, short_name')
-          .limit(100);
+        const facultiesData = await api.get<any[]>('/api/faculties');
+        const institutesData: any[] = [];
+        const specialtiesData = await api.get<any[]>('/api/specialties');
+        const universitiesData = await api.get<any[]>('/api/universities');
 
         const facultyMap = new Map<string, { name: string; university: string }>();
         const instituteMap = new Map<string, { name: string; university: string }>();
         
         facultiesData?.forEach(f => {
-          const uni = universitiesData?.find(u => u.id === f.university_id);
-          facultyMap.set(f.id, { name: f.name, university: uni?.short_name || '' });
+          const uni = universitiesData?.find(u => u.id === f.universityId);
+          facultyMap.set(f.id, { name: f.name, university: uni?.shortName || '' });
         });
         
         institutesData?.forEach(i => {
-          const uni = universitiesData?.find(u => u.id === i.university_id);
-          instituteMap.set(i.id, { name: i.name, university: uni?.short_name || '' });
+          const uni = universitiesData?.find(u => u.id === i.universityId);
+          instituteMap.set(i.id, { name: i.name, university: uni?.shortName || '' });
         });
 
         // Get stats first to determine budget/paid availability
         let statsData: any[] = [];
         try {
-          const result = await supabase
-            .from('admission_stats')
-            .select('min_score, paid_min_score, specialty_id')
-            .eq('year', 2025);
-          statsData = result.data || [];
+          const statsResult = await api.get<any[]>('/api/admission-stats?year=2025');
+          statsData = statsResult || [];
         } catch (e) {
-          // Try without paid_min_score if column doesn't exist
-          try {
-            const result = await supabase
-              .from('admission_stats')
-              .select('min_score, specialty_id')
-              .eq('year', 2025);
-            statsData = result.data || [];
-          } catch (e2) {
-            statsData = [];
-          }
+          statsData = [];
         }
 
         // Build scores maps
@@ -127,14 +100,14 @@ export function SimplePassingScoreCalculator() {
         const hasPaidMap: Record<string, boolean> = {};
         
         statsData.forEach((stat: any) => {
-          if (stat.specialty_id) {
-            if (stat.min_score !== null && stat.min_score !== undefined) {
-              budgetScoresMap[stat.specialty_id] = Number(stat.min_score);
-              hasBudgetMap[stat.specialty_id] = true;
+          if (stat.specialtyId) {
+            if (stat.minScore !== null && stat.minScore !== undefined) {
+              budgetScoresMap[stat.specialtyId] = Number(stat.minScore);
+              hasBudgetMap[stat.specialtyId] = true;
             }
-            if (stat.paid_min_score !== null && stat.paid_min_score !== undefined) {
-              paidScoresMap[stat.specialty_id] = Number(stat.paid_min_score);
-              hasPaidMap[stat.specialty_id] = true;
+            if (stat.paidMinScore !== null && stat.paidMinScore !== undefined) {
+              paidScoresMap[stat.specialtyId] = Number(stat.paidMinScore);
+              hasPaidMap[stat.specialtyId] = true;
             }
           }
         });
@@ -144,10 +117,10 @@ export function SimplePassingScoreCalculator() {
 
         // Now build specialties with correct hasBudget/hasPaid
         const enrichedSpecialties: SpecialtyWithFaculty[] = (specialtiesData || [])
-          .filter(s => s.faculty_id || s.institute_id)
+          .filter(s => s.facultyId || s.instituteId)
           .map(s => {
-            const faculty = s.faculty_id ? facultyMap.get(s.faculty_id) : null;
-            const institute = s.institute_id ? instituteMap.get(s.institute_id) : null;
+            const faculty = s.facultyId ? facultyMap.get(s.facultyId) : null;
+            const institute = s.instituteId ? instituteMap.get(s.instituteId) : null;
             const parent = faculty || institute;
             
             // Determine hasBudget/hasPaid based on actual data from DB

@@ -34,7 +34,7 @@ export default function Login() {
         title: 'Добро пожаловать!',
         description: 'Вы успешно вошли в систему.',
       });
-      navigate('/admin');
+      navigate('/profile');
     }
 
     setIsLoading(false);

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 
 export interface CategorySalaryStats {
   category: string;
@@ -20,22 +20,17 @@ export function useSalaryStats() {
   return useQuery({
     queryKey: ['salary-stats'],
     queryFn: async (): Promise<SalaryStats> => {
-      const { data: vacancies, error } = await supabase
-        .from('vacancies')
-        .select('category, salary_min, salary_max, parsed_at')
-        .limit(50000);
+      const vacancies = await api.get<any[]>('/api/vacancies?limit=50000');
 
-      if (error) throw error;
-
-      const categoryMap = new Map<string, { 
-        salaryMins: number[]; 
-        salaryMaxs: number[]; 
+      const categoryMap = new Map<string, {
+        salaryMins: number[];
+        salaryMaxs: number[];
         count: number;
       }>();
 
       let lastParsed: string | null = null;
 
-      vacancies?.forEach(v => {
+      vacancies.forEach(v => {
         if (!categoryMap.has(v.category)) {
           categoryMap.set(v.category, { salaryMins: [], salaryMaxs: [], count: 0 });
         }
@@ -43,47 +38,26 @@ export function useSalaryStats() {
         if (v.salary_min) cat.salaryMins.push(v.salary_min);
         if (v.salary_max) cat.salaryMaxs.push(v.salary_max);
         cat.count++;
-        
+
         if (!lastParsed || v.parsed_at > lastParsed) {
           lastParsed = v.parsed_at;
         }
       });
 
-      const categories: CategorySalaryStats[] = [];
-      let totalSalary = 0;
-      let totalCount = 0;
-
-      // Salary caps and floors by category (realistic Belarus market rates)
       const maxCaps: Record<string, number> = {
-        'ИТ': 8000,
-        'Информационные технологии': 8000,
-        'Финансы': 7000,
-        'Экономика': 3400,
-        'Экономика и финансы': 3400,
-        'Медицина': 6000,
-        'Право': 6000,
-        'Педагогика': 4000,
-        'Инженерия': 3200,
-        'Инженерные специальности': 3200,
-        'Строительство': 3200,
-        'Промышленность': 3200,
-        'Торговля': 4500,
-        'Образование': 3500,
-        'Здравоохранение': 5500,
-        'Логистика': 4500,
-        'Engineering': 3200,
+        'ИТ': 8000, 'Информационные технологии': 8000, 'Финансы': 7000,
+        'Экономика': 3400, 'Экономика и финансы': 3400, 'Медицина': 6000,
+        'Право': 6000, 'Педагогика': 4000, 'Инженерия': 3200,
+        'Инженерные специальности': 3200, 'Строительство': 3200,
+        'Промышленность': 3200, 'Торговля': 4500, 'Образование': 3500,
+        'Здравоохранение': 5500, 'Логистика': 4500, 'Engineering': 3200,
         'Engineer': 3200,
       };
 
       const minFloors: Record<string, number> = {
-        'Экономика': 3100,
-        'Экономика и финансы': 3100,
-        'Инженерия': 3200,
-        'Инженерные специальности': 3200,
-        'Строительство': 3200,
-        'Промышленность': 3200,
-        'Engineering': 3200,
-        'Engineer': 3200,
+        'Экономика': 3100, 'Экономика и финансы': 3100, 'Инженерия': 3200,
+        'Инженерные специальности': 3200, 'Строительство': 3200,
+        'Промышленность': 3200, 'Engineering': 3200, 'Engineer': 3200,
       };
 
       const getCap = (cat: string): number => {
@@ -110,64 +84,50 @@ export function useSalaryStats() {
         return floor;
       };
 
+      const median = (arr: number[]): number => {
+        if (arr.length === 0) return 0;
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0
+          ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+          : sorted[mid];
+      };
+
+      const categories: CategorySalaryStats[] = [];
+      let totalSalary = 0;
+      let totalCount = 0;
+
       categoryMap.forEach((data, category) => {
         const cap = getCap(category);
         const floor = getFloor(category);
 
-        // Median calculator
-        const median = (arr: number[]): number => {
-          if (arr.length === 0) return 0;
-          const sorted = [...arr].sort((a, b) => a - b);
-          const mid = Math.floor(sorted.length / 2);
-          return sorted.length % 2 === 0 
-            ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
-            : sorted[mid];
-        };
-
-        // Filter valid salaries (min 500) before computing median
         const validMins = data.salaryMins.filter(v => v >= 500);
         const validMaxs = data.salaryMaxs.filter(v => v >= 500);
 
         const avgMin = validMins.length > 0 ? median(validMins) : 0;
         const avgMax = validMaxs.length > 0 ? median(validMaxs) : 0;
-        
+
         const fallbackMin = validMins.length > 0 ? Math.round(validMins.reduce((a, b) => a + b) / validMins.length) : 0;
         const fallbackMax = validMaxs.length > 0 ? Math.round(validMaxs.reduce((a, b) => a + b) / validMaxs.length) : 0;
-        
+
         let finalAvgMin = avgMin > 0 ? avgMin : fallbackMin;
         let finalAvgMax = avgMax > 0 ? avgMax : fallbackMax;
         let avgSalary = Math.round((finalAvgMin + finalAvgMax) / 2);
-        
-        // Apply floor and cap
+
         avgSalary = Math.max(floor, Math.min(avgSalary, cap));
         finalAvgMin = Math.max(floor, Math.min(finalAvgMin, cap));
         finalAvgMax = Math.max(floor, Math.min(finalAvgMax, cap));
 
-        // Debug all
-        if (category.includes('Инжен') || category.includes('Engineer') || category.includes('Эконом')) {
-          console.log('[useSalaryStats]', category, '| raw:', avgSalary, '→ floor:', floor, 'cap:', cap, '| final:', avgSalary);
-        }
-
-        categories.push({
-          category,
-          avgSalaryMin: finalAvgMin,
-          avgSalaryMax: finalAvgMax,
-          avgSalary,
-          vacancyCount: data.count,
-        });
-
+        categories.push({ category, avgSalaryMin: finalAvgMin, avgSalaryMax: finalAvgMax, avgSalary, vacancyCount: data.count });
         totalSalary += avgSalary * data.count;
         totalCount += data.count;
       });
 
-      // Sort by salary descending
       categories.sort((a, b) => b.avgSalary - a.avgSalary);
-
-      console.log('[useSalaryStats] FINAL:', categories.map(c => `${c.category}: ${c.avgSalary} BYN`).join(', '));
 
       return {
         categories,
-        totalVacancies: vacancies?.length || 0,
+        totalVacancies: vacancies.length || 0,
         overallAvgSalary: totalCount > 0 ? Math.round(totalSalary / totalCount) : 0,
         lastUpdated: lastParsed,
       };

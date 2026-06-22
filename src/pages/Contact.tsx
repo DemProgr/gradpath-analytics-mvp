@@ -1,11 +1,9 @@
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { Link } from 'react-router-dom';
 import { FileText, Phone, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
-  const handleNavigate = () => {};
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,7 +61,6 @@ const Contact = () => {
             </section>
           </motion.div>
       </main>
-      <FooterSection onNavigate={handleNavigate} />
     </div>
   );
 };

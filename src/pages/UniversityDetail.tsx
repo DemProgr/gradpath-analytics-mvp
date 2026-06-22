@@ -2,8 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 import { ArrowLeft, MapPin, Globe, GraduationCap, Users, TrendingUp, BookOpen, Award, ChevronDown, ChevronUp, BarChart3 } from 'lucide-react';
 import { getUniversityByShortName, ALL_UNIVERSITIES } from '@/data/universityMarks';
 import { getUniversityFacultiesData, getTotalFacultiesCount, getTotalSpecialtiesCount, Faculty, Specialty, Institute } from '@/data/universityFaculties';
@@ -34,8 +33,8 @@ import {
 
 interface University {
   id: string;
-  short_name: string;
-  full_name: string;
+  shortName: string;
+  fullName: string;
   city: string;
   website: string | null;
   description: string | null;
@@ -51,7 +50,7 @@ interface AdmissionStat {
   paid_min_score?: number | null;
   passing_score_budget?: number | null;
   passing_score_paid?: number | null;
-  specialty_id: number | string;
+  specialtyId: number | string;
   specialty: { name: string; code: string | null } | null;
 }
 
@@ -118,36 +117,26 @@ const UniversityDetail = () => {
       if (!decodedShortName) return;
 
       try {
-        // Try to load from Supabase first
-        const { data: universityData, error: universityError } = await supabase
-          .from('universities')
-          .select('*')
-          .eq('short_name', decodedShortName)
-          .single();
-
-        if (universityError) {
-          console.error('Error loading university from Supabase:', universityError);
-          // Fallback to static data
-          loadStaticData();
-          return;
-        }
+        const universities = await api.get<any[]>('/api/universities');
+        const universityData = universities.find(u => u.shortName === decodedShortName);
 
         if (universityData) {
-          setUniversity(universityData);
+          setUniversity({
+            id: universityData.id,
+            shortName: universityData.shortName,
+            fullName: universityData.fullName,
+            city: universityData.city,
+            website: universityData.website || null,
+            description: universityData.description || null
+          });
 
           // Load faculties
-          const { data: facultiesData, error: facultiesError } = await supabase
-            .from('faculties')
-            .select('*')
-            .eq('university_id', universityData.id);
+          const facultiesData = await api.get<any[]>(`/api/faculties?universityId=${universityData.id}`);
 
-          // Load specialties by university_id (real schema: no faculty_id/institute_id columns)
-          const { data: specialtiesData, error: specialtiesError } = await supabase
-            .from('specialties')
-            .select('*')
-            .eq('university_id', universityData.id);
+          // Load specialties
+          const specialtiesData = await api.get<any[]>(`/api/specialties?universityId=${universityData.id}`);
 
-          // Use static data if no data in Supabase, otherwise use Supabase data
+          // Use static data if no data from API, otherwise use API data
           const useStaticData = !facultiesData || facultiesData.length === 0;
           
           if (useStaticData) {
@@ -170,20 +159,17 @@ const UniversityDetail = () => {
           }
 
           // Load admission stats
-          const facultyIds = (facultiesData || []).map(f => f.id);
           const specialtyIds = (specialtiesData || []).map(s => s.id);
           
           if (specialtyIds.length > 0) {
-            const { data: admissionData, error: admissionError } = await supabase
-              .from('admission_stats')
-              .select('*')
-              .in('specialty_id', specialtyIds)
-              .order('year', { ascending: false });
+            const allStats = await api.get<any[]>('/api/admission-stats');
+            const admissionData = allStats.filter(s => specialtyIds.includes(s.specialtyId));
+            admissionData.sort((a, b) => (b.year || 0) - (a.year || 0));
 
-            if (!admissionError && admissionData) {
+            if (admissionData.length > 0) {
               // Join with specialty names
               const admissionWithSpecialty = admissionData.map(stat => {
-                const specialty = specialtiesData?.find(s => s.id === stat.specialty_id);
+                const specialty = specialtiesData?.find(s => s.id === stat.specialtyId);
                 return {
                   ...stat,
                   specialty: specialty ? { name: specialty.name, code: specialty.code } : null
@@ -197,7 +183,7 @@ const UniversityDetail = () => {
           loadStaticData();
         }
       } catch (error) {
-        console.error('Error fetching from Supabase:', error);
+        console.error('Error fetching from API:', error);
         // Fallback to static data
         loadStaticData();
       }
@@ -226,24 +212,21 @@ const UniversityDetail = () => {
       if (staticUniversity) {
         setUniversity({
           id: staticUniversity.id,
-          short_name: staticUniversity.short_name,
-          full_name: staticUniversity.full_name,
+          shortName: staticUniversity.short_name,
+          fullName: staticUniversity.full_name,
           city: staticUniversity.city,
           website: staticUniversity.website || null,
           description: null
         });
       }
 
-      // Load admission stats from Supabase using static specialty IDs
+      // Load admission stats from API using static specialty IDs
       if (staticData && staticData.specialties.length > 0) {
         const specialtyIds = staticData.specialties.map(s => s.id);
         
-        // First, get Supabase data
-        const { data: supabaseData } = await supabase
-          .from('admission_stats')
-          .select('*')
-          .in('specialty_id', specialtyIds)
-          .order('year', { ascending: false });
+        const allStats = await api.get<any[]>('/api/admission-stats');
+        const apiData = allStats.filter(s => specialtyIds.includes(s.specialtyId));
+        apiData.sort((a, b) => (b.year || 0) - (a.year || 0));
 
         // Create static specialty map
         const staticSpecialtyMap = new Map(staticData.specialties.map(s => [s.id, s]));
@@ -253,7 +236,7 @@ const UniversityDetail = () => {
           .filter(s => s.passing_score_budget && s.year)
           .map(s => ({
             id: `${s.id}-${s.year}`,
-            specialty_id: s.id,
+            specialtyId: s.id,
             year: s.year,
             min_score: s.passing_score_budget,
             passing_score_budget: s.passing_score_budget,
@@ -265,12 +248,12 @@ const UniversityDetail = () => {
             }
           }));
 
-        // Merge Supabase data with static data
+        // Merge API data with static data
         let mergedStats: any[] = [];
         
-        if (supabaseData) {
-          const supabaseStats = supabaseData.map(stat => {
-            const staticSpecialty = staticSpecialtyMap.get(stat.specialty_id);
+        if (apiData.length > 0) {
+          const apiStats = apiData.map(stat => {
+            const staticSpecialty = staticSpecialtyMap.get(stat.specialtyId);
             return {
               ...stat,
               specialty: staticSpecialty ? { 
@@ -281,10 +264,10 @@ const UniversityDetail = () => {
               } : null
             };
           });
-          mergedStats = supabaseStats;
+          mergedStats = apiStats;
         }
 
-        // Add static stats (2025) if not already present from Supabase
+        // Add static stats (2025) if not already present from API
         const existingYears = new Set(mergedStats.map(s => s.year));
         staticStats.forEach(stat => {
           if (!existingYears.has(stat.year)) {
@@ -301,8 +284,8 @@ const UniversityDetail = () => {
     fetchUniversity();
   }, [decodedShortName]);
 
-  const heroImage = university ? universityImages[university.short_name] || universityImages['БГУ'] : '';
-  const extendedDescription = university ? universityDescriptions[university.short_name] : '';
+  const heroImage = university ? universityImages[university.shortName] || universityImages['БГУ'] : '';
+  const extendedDescription = university ? universityDescriptions[university.shortName] : '';
 
   if (loading) {
     return (
@@ -356,7 +339,7 @@ const UniversityDetail = () => {
         <div className="relative w-full h-[250px] md:h-[350px] overflow-hidden bg-gray-200">
           <img 
             src={heroImage} 
-            alt={university.full_name}
+            alt={university.fullName}
             className="w-full h-full object-cover object-center"
             onError={(e) => {
               // Fallback to local image or placeholder if external image fails
@@ -375,10 +358,10 @@ const UniversityDetail = () => {
                 {t('uni.backToList')}
               </Link>
               <h1 className="text-3xl md:text-5xl font-display font-bold text-green-900 mb-2">
-                {university.short_name}
+                {university.shortName}
               </h1>
               <p className="text-lg md:text-xl text-green-900">
-                {university.full_name}
+                {university.fullName}
               </p>
             </div>
           </div>
@@ -679,7 +662,7 @@ const UniversityDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="w-5 h-5" />
-                    Проходные баллы {university?.short_name || decodedShortName} 2025
+                    Проходные баллы {university?.shortName || decodedShortName} 2025
                   </CardTitle>
                   <p className="text-sm text-muted-foreground mt-2">
                     <span className="font-medium">Мин. балл</span> — минимальный балл для поступления; 
@@ -793,16 +776,16 @@ if (selectedYear && stat.year !== selectedYear) return false;
                             
                             // Handle specialty filter - match by string comparison
                             if (selectedSpecialty) {
-                              const statSpecialtyId = stat.specialty_id ? String(stat.specialty_id) : null;
-                              const matches = statSpecialtyId === selectedSpecialty || stat.specialty_id === Number(selectedSpecialty);
+                              const statSpecialtyId = stat.specialtyId ? String(stat.specialtyId) : null;
+                              const matches = statSpecialtyId === selectedSpecialty || stat.specialtyId === Number(selectedSpecialty);
                               if (!matches) return false;
                             }
                       
                       if (selectedFaculty) {
                         const statFacultyId = String((stat.specialty as any)?.faculty_id || 
                                               (stat.specialty as any)?.institute_id ||
-                                              stat.specialty_id);
-                        const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialty_id));
+                                              stat.specialtyId);
+                        const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialtyId));
                         const staticFacultyId = staticSpecialty?.faculty_id || staticSpecialty?.institute_id;
                         if (statFacultyId !== selectedFaculty && staticFacultyId !== selectedFaculty) return false;
                       }
@@ -902,23 +885,23 @@ if (selectedYear && stat.year !== selectedYear) return false;
                             
                             // Handle specialty filter - match by string comparison
                             if (selectedSpecialty) {
-                              const statSpecialtyId = stat.specialty_id ? String(stat.specialty_id) : null;
-                              const matches = statSpecialtyId === selectedSpecialty || stat.specialty_id === Number(selectedSpecialty);
+                              const statSpecialtyId = stat.specialtyId ? String(stat.specialtyId) : null;
+                              const matches = statSpecialtyId === selectedSpecialty || stat.specialtyId === Number(selectedSpecialty);
                               if (!matches) return false;
                             }
                             
                             if (selectedFaculty) {
                               const statFacultyId = String((stat.specialty as any)?.faculty_id || 
                                                     (stat.specialty as any)?.institute_id ||
-                                                    stat.specialty_id);
-                              const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialty_id));
+                                                    stat.specialtyId);
+                              const staticSpecialty = specialties.find(s => String(s.id) === String(stat.specialtyId));
                               const staticFacultyId = staticSpecialty?.faculty_id || staticSpecialty?.institute_id;
                               if (statFacultyId !== selectedFaculty && staticFacultyId !== selectedFaculty) return false;
                             }
                             return true;
                           })
                           .reduce((acc, stat) => {
-                            if (!acc.some(s => s.specialty_id === stat.specialty_id)) {
+                            if (!acc.some(s => s.specialtyId === stat.specialtyId)) {
                               acc.push(stat);
                             }
                             return acc;
@@ -970,8 +953,6 @@ if (selectedYear && stat.year !== selectedYear) return false;
           </motion.div>
         </div>
       </main>
-
-      <FooterSection onNavigate={() => {}} />
     </div>
   );
 };

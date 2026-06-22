@@ -1,9 +1,7 @@
 import { Header } from '@/components/layout/Header';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { FileText, Download } from 'lucide-react';
 
 const About = () => {
-  const handleNavigate = () => {};
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,7 +45,6 @@ const About = () => {
           </div>
         </div>
       </main>
-      <FooterSection onNavigate={handleNavigate} />
     </div>
   );
 };

@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
+  const token = localStorage.getItem('auth_token');
 
   if (isLoading) {
     return (
@@ -21,8 +22,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user) {
-    // Сохраняем текущий путь, чтобы вернуться после авторизации
+  if (!user || !token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

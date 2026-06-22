@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { HeroSection } from '@/components/sections/HeroSection';
-import { FooterSection } from '@/components/sections/FooterSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, GraduationCap, Users, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -157,7 +156,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/design.png" 
+                        src="/students.jpg" 
                         alt="Студенты" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -185,7 +184,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/bntu.png" 
+                        src="/data.jpg" 
                         alt="Данные" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -213,7 +212,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/bntu2.png" 
+                        src="/anket2.jpg" 
                         alt="Анкета" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -239,11 +238,11 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
           <section className="py-12 section-container">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="relative group">
-                <img 
-                  src="/grodnoimage2.png" 
-                  alt="Путь" 
-                  className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
-                />
+                  <img 
+                    src="/way.jpg" 
+                    alt="Путь" 
+                    className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
+                  />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-blue-950/90 px-12 py-8 rounded-lg text-center max-w-md min-h-[350px] flex flex-col justify-center">
                     <h3 className="text-white text-2xl sm:text-3xl font-medium mb-3">Выбираете направление обучения?</h3>
@@ -262,11 +261,11 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                 </div>
               </div>
               <div className="relative group">
-                <img 
-                  src="/design.png" 
-                  alt="Анкета" 
-                  className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
-                />
+                  <img 
+                    src="/anket.jpg" 
+                    alt="Анкета" 
+                    className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
+                  />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-blue-950/90 px-12 py-8 rounded-lg text-center max-w-md min-h-[350px] flex flex-col justify-center">
                     <h3 className="text-white text-2xl sm:text-3xl font-medium mb-3">Анкета по окончании курса</h3>
@@ -337,7 +336,6 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
 {/* Universities */}
       </motion.main>
 
-      <FooterSection onNavigate={handleNavigate} />
     </div>
   );
 };

@@ -287,9 +287,9 @@ export function AllVacanciesTable() {
             <TableBody>
               {loading ? (
                 Array.from({ length: 10 }).map((_, i) => (
-                  <TableRow key={i}>
+                  <TableRow key={'skel-row-' + i}>
                     {Array.from({ length: 6 }).map((_, j) => (
-                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                      <TableCell key={'skel-cell-' + j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))

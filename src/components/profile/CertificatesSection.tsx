@@ -8,8 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { useDigitalProfile, Certificate } from '@/hooks/useDigitalProfile';
 import { useToast } from '@/hooks/use-toast';
 import { ReorderableList } from './ReorderableList';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function CertificatesSection() {
+  const { t, language } = useLanguage();
   const { certificates, addCertificate, updateCertificate, deleteCertificate, reorderCertificates } = useDigitalProfile();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -38,11 +40,11 @@ export function CertificatesSection() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите название сертификата', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('profile.certNameRequired'), variant: 'destructive' });
       return;
     }
     if (!issuer.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите организацию', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('profile.certIssuerRequired'), variant: 'destructive' });
       return;
     }
 
@@ -58,27 +60,27 @@ export function CertificatesSection() {
       ? await updateCertificate(editing.id, data)
       : await addCertificate(data);
 
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else { toast({ title: editing ? 'Сертификат обновлён' : 'Сертификат добавлен' }); setDialogOpen(false); }
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else { toast({ title: editing ? t('profile.certUpdated') : t('profile.certAdded') }); setDialogOpen(false); }
   };
 
   const handleDelete = async (id: number) => {
     const { error } = await deleteCertificate(id);
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else toast({ title: 'Сертификат удалён' });
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else toast({ title: t('profile.certDeleted') });
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">Сертификаты</h4>
+        <h4 className="text-sm font-medium">{t('profile.certificates')}</h4>
         <Button variant="ghost" size="sm" onClick={openAdd}>
-          <Plus className="w-4 h-4 mr-1" /> Добавить
+          <Plus className="w-4 h-4 mr-1" /> {t('profile.add')}
         </Button>
       </div>
 
       {certificates.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-4">Сертификаты не добавлены.</p>
+        <p className="text-sm text-muted-foreground text-center py-4">{t('profile.certificatesEmpty')}</p>
       ) : (
         <ReorderableList items={certificates} onReorder={reorderCertificates}>
           {(cert) => (
@@ -96,7 +98,7 @@ export function CertificatesSection() {
                   )}
                   {cert.url && (
                     <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1">
-                      <ExternalLink className="w-3 h-3" /> Подтвердить
+                      <ExternalLink className="w-3 h-3" /> {t('profile.verify')}
                     </a>
                   )}
                 </div>
@@ -117,35 +119,35 @@ export function CertificatesSection() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Редактировать сертификат' : 'Добавить сертификат'}</DialogTitle>
+            <DialogTitle>{editing ? t('profile.editCertificate') : t('profile.addCertificate')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Название *</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="SQL для анализа данных" />
+              <Label>{t('profile.certName')}</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="SQL for Data Analysis" />
             </div>
             <div className="space-y-2">
-              <Label>Организация *</Label>
+              <Label>{t('profile.certIssuer')}</Label>
               <Input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder="Coursera" />
             </div>
             <div className="space-y-2">
-              <Label>Ссылка</Label>
+              <Label>{t('profile.certUrl')}</Label>
               <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://coursera.org/..." />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label>Дата выдачи</Label>
+                <Label>{t('profile.certIssueDate')}</Label>
                 <Input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Срок действия</Label>
+                <Label>{t('profile.certExpiryDate')}</Label>
                 <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Отмена</Button>
-            <Button onClick={handleSave}>{editing ? 'Сохранить' : 'Добавить'}</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSave}>{editing ? t('common.save') : t('profile.add')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

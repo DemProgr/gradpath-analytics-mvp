@@ -76,9 +76,13 @@ router.put('/:id', authMiddleware, async (c) => {
       .where(and(eq(projects.id, id), eq(projects.userId, authUser.id)));
     if (!existing) return c.json({ error: 'Project not found' }, 404);
 
-    const updateData: any = { ...parsed.data, updatedAt: new Date() };
-    if (parsed.data.startDate !== undefined) updateData.startDate = parsed.data.startDate ? new Date(parsed.data.startDate) : null;
-    if (parsed.data.endDate !== undefined) updateData.endDate = parsed.data.endDate ? new Date(parsed.data.endDate) : null;
+    const { startDate, endDate, ...restData } = parsed.data;
+    const updateData: Partial<typeof projects.$inferInsert> = {
+      ...restData,
+      updatedAt: new Date(),
+      startDate: startDate !== undefined ? (startDate ? new Date(startDate) : null) : undefined,
+      endDate: endDate !== undefined ? (endDate ? new Date(endDate) : null) : undefined,
+    };
 
     const [updated] = await db.update(projects)
       .set(updateData)

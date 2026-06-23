@@ -118,7 +118,7 @@ export const ALL_UNIVERSITIES: University[] = [
   { id: 'ggu', short_name: 'ГГУ', full_name: 'Гомельский государственный университет имени Франциска Скорины', city: 'Гомель', website: 'https://www.ggu.gomel.by', average_mark: UNIVERSITY_AVERAGE_MARKS['ГГУ'] },
   { id: 'gstu', short_name: 'ГГТУ', full_name: 'Гомельский государственный технический университет им. П.О. Сухого', city: 'Гомель', website: 'https://www.ggtu.gomel.by', average_mark: UNIVERSITY_AVERAGE_MARKS['ГГТУ'] },
   { id: 'ggmu', short_name: 'ГГМУ', full_name: 'Гомельский государственный медицинский университет', city: 'Гомель', website: 'https://www.ggmu.gomel.by', average_mark: UNIVERSITY_AVERAGE_MARKS['ГГМУ'] },
-  { id: 'bgtu', short_name: 'БГУТ', full_name: 'Белорусский государственный университет транспорта', city: 'Гомель', website: 'https://www.bstu.by', average_mark: UNIVERSITY_AVERAGE_MARKS['БГУТ'] },
+  { id: 'bgtu', short_name: 'БГУТ', full_name: 'Белорусский государственный университет транспорта', city: 'Гомель', website: 'https://www.bsut.by', average_mark: UNIVERSITY_AVERAGE_MARKS['БГУТ'] },
   { id: 'btec', short_name: 'БТЭУ', full_name: 'Белорусский торгово-экономический университет потребительской кооперации', city: 'Гомель', website: 'https://www.btec.by', average_mark: UNIVERSITY_AVERAGE_MARKS['БТЭУ'] },
   { id: 'mgpu', short_name: 'МГПУ', full_name: 'Мозырский государственный педагогический университет им. И.П. Шамякина', city: 'Мозырь', website: 'https://www.mgpu.by', average_mark: UNIVERSITY_AVERAGE_MARKS['МГПУ'] },
 

@@ -176,7 +176,7 @@ function CompletionHints({ data }: { data: ResumeData }) {
           <div className="space-y-1">
             <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Рекомендации по заполнению</p>
             {hints.map((hint, i) => (
-              <p key={i} className={`text-sm ${hint.type === 'warning' ? 'text-amber-700 dark:text-amber-400' : 'text-amber-600 dark:text-amber-400'}`}>
+              <p key={'hint-' + i} className={`text-sm ${hint.type === 'warning' ? 'text-amber-700 dark:text-amber-400' : 'text-amber-600 dark:text-amber-400'}`}>
                 {hint.type === 'warning' ? '⚠ ' : '• '}{hint.text}
               </p>
             ))}

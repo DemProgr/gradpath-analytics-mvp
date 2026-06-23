@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { db } from '../db';
 import { internships } from '../db/schema/internships';
-import { eq, like, sql } from 'drizzle-orm';
+import { eq, like, sql, SQL } from 'drizzle-orm';
 import { authMiddleware } from '../middleware/auth';
 
 const router = new Hono();
@@ -35,8 +35,8 @@ router.get('/', async (c) => {
     const limit = parseInt(c.req.query('limit') || '50');
     const offset = (page - 1) * limit;
 
-    let query: any = db.select().from(internships);
-    const conditions: any[] = [];
+    const baseQuery = db.select().from(internships);
+    const conditions: SQL[] = [];
 
     if (category && category !== 'all') {
       conditions.push(eq(internships.category, category));
@@ -53,10 +53,9 @@ router.get('/', async (c) => {
       );
     }
 
-    if (conditions.length > 0) {
-      const whereClause = conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`;
-      query = query.where(whereClause);
-    }
+    const query = conditions.length > 0
+      ? baseQuery.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`)
+      : baseQuery;
 
     const results = await query
       .orderBy(internships.postedAt)
@@ -92,7 +91,7 @@ router.get('/categories', async (c) => {
     const result = await db.execute(sql`
       SELECT DISTINCT category FROM internships ORDER BY category
     `);
-    return c.json(result.rows.map((r: any) => r.category));
+    return c.json((result.rows as { category: string }[]).map((r) => r.category));
   } catch (err) {
     console.error('Error fetching categories:', err);
     return c.json({ error: 'Failed to fetch categories' }, 500);
@@ -104,7 +103,7 @@ router.get('/cities', async (c) => {
     const result = await db.execute(sql`
       SELECT DISTINCT city FROM internships WHERE city IS NOT NULL ORDER BY city
     `);
-    return c.json(result.rows.map((r: any) => r.city));
+    return c.json((result.rows as { city: string | null }[]).map((r) => r.city));
   } catch (err) {
     console.error('Error fetching cities:', err);
     return c.json({ error: 'Failed to fetch cities' }, 500);
@@ -117,7 +116,7 @@ router.post('/', authMiddleware, async (c) => {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten().fieldErrors }, 400);
 
-    const [item] = await db.insert(internships).values(parsed.data as any).returning();
+    const [item] = await db.insert(internships).values(parsed.data as typeof internships.$inferInsert).returning();
     return c.json(item, 201);
   } catch (err) {
     console.error('Error creating internship:', err);
@@ -138,7 +137,7 @@ router.put('/:id', authMiddleware, async (c) => {
     if (!existing) return c.json({ error: 'Not found' }, 404);
 
     const [updated] = await db.update(internships)
-      .set(parsed.data as any)
+      .set(parsed.data as typeof internships.$inferInsert)
       .where(eq(internships.id, id))
       .returning();
 

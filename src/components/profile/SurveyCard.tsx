@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -139,7 +139,7 @@ function TrajectoryTimeline({ surveys, graduationYear }: { surveys: Survey[]; gr
     <div className="space-y-3">
       {surveys.map((s, i) => {
         const year = s.year || (graduationYear ? graduationYear + Math.round(
-          s.milestone === '6months' ? 0.5 : s.milestone === '2years' ? 2 : 5
+          s.milestone === '6months' ? 0.5 : s.milestone === '12months' ? 1 : s.milestone === '2years' ? 2 : 4
         ) : null);
         return (
           <div key={s.id} className="relative pl-6 pb-3 border-l-2 border-primary/30 last:border-transparent">
@@ -156,7 +156,7 @@ function TrajectoryTimeline({ surveys, graduationYear }: { surveys: Survey[]; gr
               <p className="text-sm text-muted-foreground">{t('survey.notEmployed')}</p>
             )}
             <Badge variant="outline" className="text-[10px] mt-1">
-              {s.milestone === '6months' ? '+6 ' + t('survey.shortMonths') : s.milestone === '2years' ? '+2 ' + t('survey.shortYears') : '+5 ' + t('survey.shortYears')}
+              {s.milestone === '6months' ? '+6 ' + t('survey.shortMonths') : s.milestone === '12months' ? '+12 ' + t('survey.shortMonths') : s.milestone === '2years' ? '+2 ' + t('survey.shortYears') : '+4 ' + t('survey.shortYears')}
             </Badge>
           </div>
         );
@@ -166,16 +166,35 @@ function TrajectoryTimeline({ surveys, graduationYear }: { surveys: Survey[]; gr
 }
 
 export function SurveyCard() {
-  const { status, trajectory, isLoading } = useSurveys();
+  const { status, trajectory, isLoading, refresh } = useSurveys();
   const { t } = useLanguage();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<string>('6months');
+  const [debugYear, setDebugYear] = useState<string>('');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('debug_graduation_year');
+    if (stored) setDebugYear(stored);
+  }, []);
+
+  const setDebugMode = (year: string) => {
+    localStorage.setItem('debug_graduation_year', year);
+    setDebugYear(year);
+    refresh();
+  };
+
+  const clearDebugMode = () => {
+    localStorage.removeItem('debug_graduation_year');
+    setDebugYear('');
+    refresh();
+  };
 
   if (isLoading) return null;
 
   const hasTrajectory = trajectory.length > 0;
   const canFill = status?.canFill;
   const available = status?.availableMilestones || [];
+  const isDebugMode = status?.isDebugMode;
 
   return (
     <motion.div
@@ -237,6 +256,36 @@ export function SurveyCard() {
         onClose={() => setDialogOpen(false)}
         milestone={selectedMilestone}
       />
+
+      <div className="mt-4 pt-3 border-t border-border/50">
+        <details className="group">
+          <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors select-none">
+            {isDebugMode ? '🔧 Режим тестирования (вкл)' : '🔧 Режим тестирования'}
+          </summary>
+          <div className="mt-2 p-3 border rounded-lg bg-muted/30">
+            <p className="text-xs text-muted-foreground mb-2">
+              Установите год выпуска для тестирования опросов:
+            </p>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {['2019', '2020', '2022', '2024'].map((y) => (
+                <Button
+                  key={y}
+                  size="sm"
+                  variant={debugYear === y ? 'default' : 'outline'}
+                  onClick={() => setDebugMode(y)}
+                >
+                  {y}
+                </Button>
+              ))}
+            </div>
+            {debugYear && (
+              <Button size="sm" variant="ghost" onClick={clearDebugMode} className="text-xs">
+                Отключить тестовый режим
+              </Button>
+            )}
+          </div>
+        </details>
+      </div>
     </motion.div>
   );
 }

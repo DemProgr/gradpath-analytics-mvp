@@ -83,7 +83,7 @@ export function SalaryStatisticsSection() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Skeleton className="h-8 w-64 mb-8" />
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32" />)}
+            {[1, 2, 3, 4].map(i => <Skeleton key={'skeleton-' + i} className="h-32" />)}
           </div>
           <Skeleton className="h-[400px]" />
         </div>

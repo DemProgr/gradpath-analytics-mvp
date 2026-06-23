@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db';
 import { vacancies } from '../db/schema/vacancies';
-import { eq, ilike, sql } from 'drizzle-orm';
+import { eq, ilike, sql, SQL } from 'drizzle-orm';
 
 const router = new Hono();
 
@@ -13,8 +13,8 @@ router.get('/', async (c) => {
     const limit = parseInt(c.req.query('limit') || '100');
     const offset = (page - 1) * limit;
 
-    let query = db.select().from(vacancies);
-    const conditions: any[] = [];
+    const baseQuery = db.select().from(vacancies);
+    const conditions: SQL[] = [];
 
     if (category) {
       conditions.push(eq(vacancies.category, category));
@@ -23,12 +23,11 @@ router.get('/', async (c) => {
       conditions.push(eq(vacancies.city, city));
     }
 
-    if (conditions.length > 0) {
-      const whereClause = conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`;
-      query = query.where(whereClause) as any;
-    }
+    const query = conditions.length > 0
+      ? baseQuery.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`)
+      : baseQuery;
 
-    const results = await (query as any)
+    const results = await query
       .orderBy(vacancies.parsedAt)
       .limit(limit)
       .offset(offset);

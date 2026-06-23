@@ -174,7 +174,7 @@ export function exportFullReport(format: ExportFormat = 'xlsx'): void {
 /**
  * Helper function to download data
  */
-function downloadData(data: Record<string, any>[], filename: string, format: ExportFormat): void {
+function downloadData(data: Record<string, string | number | boolean | null | undefined>[], filename: string, format: ExportFormat): void {
   const timestamp = new Date().toISOString().split('T')[0];
   const fullFilename = `${filename}_${timestamp}`;
 

@@ -6,7 +6,7 @@ import { authMiddleware, adminMiddleware } from '../middleware/auth';
 
 const router = new Hono();
 
-router.get('/', async (c) => {
+router.get('/', authMiddleware, async (c) => {
   try {
     const results = await db
       .select()
@@ -20,9 +20,9 @@ router.get('/', async (c) => {
   }
 });
 
-router.get('/:id', async (c) => {
+router.get('/:id', authMiddleware, async (c) => {
   try {
-    const id = parseInt(c.req.param('id'));
+    const id = parseInt(c.req.param('id') || '0');
     const [result] = await db
       .select()
       .from(parsingSessions)

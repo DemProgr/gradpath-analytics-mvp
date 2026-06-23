@@ -7,6 +7,7 @@ const linkColumns = [
     title: 'footer.services',
     links: [
       { label: 'footer.careerQuiz', to: '/career-quiz' },
+      { label: 'footer.surveyLanding', to: '/survey' },
       { label: 'footer.professionSelection', to: '/profession-selection' },
       { label: 'footer.internships', to: '/internships' },
       { label: 'footer.events', to: '/events' },

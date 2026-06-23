@@ -118,7 +118,7 @@ export function MarketSection() {
         >
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="card-elevated p-5">
+              <div key={'skeleton-' + i} className="card-elevated p-5">
                 <Skeleton className="h-4 w-24 mb-3" />
                 <Skeleton className="h-8 w-32 mb-2" />
                 <Skeleton className="h-3 w-20 mb-2" />

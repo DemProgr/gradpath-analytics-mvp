@@ -9,6 +9,14 @@ export interface VacancyStats {
   avgSalary: number;
 }
 
+interface VacancyStatsRaw {
+  category: string;
+  count: number;
+  avg_salary_min: number;
+  avg_salary_max: number;
+  avg_salary: number;
+}
+
 export function useVacancyStats() {
   const [stats, setStats] = useState<VacancyStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +31,7 @@ export function useVacancyStats() {
         const countData = await api.get<{ count: number }>('/api/vacancies/count');
         setTotalCount(countData.count || 0);
 
-        const rpcData = await api.get<any[]>('/api/vacancies/stats');
+        const rpcData = await api.get<VacancyStatsRaw[]>('/api/vacancies/stats');
 
         if (!rpcData || rpcData.length === 0) {
           setStats([]);
@@ -70,7 +78,7 @@ export function useVacancyStats() {
           return floor;
         };
 
-        const formattedStats: VacancyStats[] = rpcData.map((row: any) => {
+        const formattedStats: VacancyStats[] = rpcData.map((row) => {
           const category = row.category;
           const cap = getCap(category);
           const floor = getFloor(category);

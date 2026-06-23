@@ -2,8 +2,17 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api/client';
 import { ALL_UNIVERSITIES } from '@/data/universityMarks';
 
+interface University {
+  id: number | string;
+  name: string;
+  short_name: string;
+  city: string;
+  website?: string;
+  description?: string;
+}
+
 export function useUniversities() {
-  const [universities, setUniversities] = useState<any[]>([]);
+  const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,7 +21,7 @@ export function useUniversities() {
 
     async function fetchUniversities() {
       try {
-        const data = await api.get<any[]>('/api/universities');
+        const data = await api.get<University[]>('/api/universities');
 
         if (isMounted) {
           if (!data || data.length === 0) {
@@ -27,7 +36,7 @@ export function useUniversities() {
             })));
           } else {
             const minskOrder = ['БГУ', 'БГУИР', 'БНТУ', 'БГЭУ', 'БГМУ', 'БГПУ', 'БГТУ', 'БГУКИ', 'БГУФК', 'БГАА', 'БГУИЯ', 'БГАМ', 'БГАИ', 'БГУТ', 'Академия управления', 'Академия МВД', 'Академия связи', 'ВА', 'УГЗ', 'ИПС', 'УНАНБ', 'МГЭИ', 'ИСЗ', 'МИУП', 'КБП', 'МИУ', 'БРУ', 'Филиал РГСУ', 'МГАК', 'БрГУ', 'БрГТУ', 'ПолесскийГУ', 'ВГУ', 'ВГМУ', 'ВГТУ', 'БГАВМ', 'ПолоцкийГУ', 'ГГУ', 'ГГТУ', 'ГГМУ', 'БТЭУ', 'МГПУ', 'ГрГУ', 'ГрГМУ', 'ГрКБП', 'МГУ', 'МИ МВД', 'БГСХА', 'БГАУ', 'СЭК'];
-            const sorted = data.sort((a: any, b: any) => {
+            const sorted = data.sort((a: University, b: University) => {
               const aMinsk = a.city === 'Минск' ? 0 : 1;
               const bMinsk = b.city === 'Минск' ? 0 : 1;
               if (aMinsk !== bMinsk) return aMinsk - bMinsk;
@@ -66,7 +75,7 @@ export function useUniversities() {
 }
 
 export function useUniversity(shortName: string) {
-  const [university, setUniversity] = useState<any | null>(null);
+  const [university, setUniversity] = useState<University | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,8 +84,8 @@ export function useUniversity(shortName: string) {
 
     async function fetchUniversity() {
       try {
-        const data = await api.get<any>('/api/universities?search=' + encodeURIComponent(shortName));
-        const found = Array.isArray(data) ? data.find((u: any) => u.short_name === shortName) : data;
+        const data = await api.get<University[]>('/api/universities?search=' + encodeURIComponent(shortName));
+        const found = data.find((u) => u.short_name === shortName);
 
         if (found) {
           setUniversity(found);

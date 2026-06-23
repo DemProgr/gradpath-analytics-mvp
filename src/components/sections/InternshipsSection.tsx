@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api/client';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Internship {
   id: number;
@@ -38,6 +39,7 @@ interface InternshipsSectionProps {
 }
 
 export function InternshipsSection({ className }: InternshipsSectionProps) {
+  const { t } = useLanguage();
   const [internships, setInternships] = useState<Internship[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
@@ -63,7 +65,7 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
         setCities(cts || []);
       })
       .catch((err) => {
-        setError(err.message || 'Не удалось загрузить стажировки');
+        setError(err.message || t('internships.loadError'));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -81,19 +83,19 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'paid':
-        return <Badge className="bg-green-500">Платно</Badge>;
+        return <Badge className="bg-green-500">{t('internships.badgePaid')}</Badge>;
       case 'unpaid':
-        return <Badge variant="outline">Без оплаты</Badge>;
+        return <Badge variant="outline">{t('internships.badgeUnpaid')}</Badge>;
       default:
-        return <Badge variant="secondary">Уточняется</Badge>;
+        return <Badge variant="secondary">{t('internships.badgeUnknown')}</Badge>;
     }
   };
 
   const formatSalary = (min: number | null, max: number | null, currency: string | null) => {
     if (min && max) return `${min}-${max} ${currency || 'BYN'}`;
-    if (min) return `от ${min} ${currency || 'BYN'}`;
-    if (max) return `до ${max} ${currency || 'BYN'}`;
-    return 'Не указана';
+    if (min) return `${t('internships.salaryFrom', { value: `${min} ${currency || 'BYN'}` })}`;
+    if (max) return `${t('internships.salaryTo', { value: `${max} ${currency || 'BYN'}` })}`;
+    return t('internships.salaryNotSpecified');
   };
 
   const formatDate = (dateStr: string) => {
@@ -101,9 +103,9 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'Сегодня';
-    if (diffDays === 1) return 'Вчера';
-    if (diffDays < 7) return `${diffDays} дня назад`;
+    if (diffDays === 0) return t('internships.today');
+    if (diffDays === 1) return t('internships.yesterday');
+    if (diffDays < 7) return t('internships.daysAgo', { days: diffDays });
     return date.toLocaleDateString('ru-RU');
   };
 
@@ -122,7 +124,7 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
       <section className={cn("py-16", className)}>
         <div className="section-container text-center py-20">
           <p className="text-destructive mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>Повторить</Button>
+          <Button onClick={() => window.location.reload()}>{t('internships.retry')}</Button>
         </div>
       </section>
     );
@@ -140,12 +142,11 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
           <div className="flex items-center gap-2 mb-4">
             <Briefcase className="w-6 h-6 text-primary" />
             <h2 className="text-3xl font-display font-bold text-foreground">
-              Стажировки для студентов
+              {t('internships.title')}
             </h2>
           </div>
           <p className="text-muted-foreground max-w-2xl">
-            Актуальные стажировки и вакансии для студентов и выпускников в Беларуси.
-            Начните свою карьеру уже во время учебы.
+            {t('internships.subtitle')}
           </p>
         </motion.div>
 
@@ -154,7 +155,7 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Поиск по названию или компании..."
+                placeholder={t('internships.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -163,10 +164,10 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Направление" />
+              <SelectValue placeholder={t('internships.filterDirection')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все направления</SelectItem>
+              <SelectItem value="all">{t('internships.allDirections')}</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -174,10 +175,10 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
           </Select>
           <Select value={cityFilter} onValueChange={setCityFilter}>
             <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Город" />
+              <SelectValue placeholder={t('internships.filterCity')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все города</SelectItem>
+              <SelectItem value="all">{t('internships.allCities')}</SelectItem>
               {cities.map(city => (
                 <SelectItem key={city} value={city}>{city}</SelectItem>
               ))}
@@ -185,13 +186,13 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
           </Select>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Тип" />
+              <SelectValue placeholder={t('internships.filterType')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все типы</SelectItem>
-              <SelectItem value="paid">Платные</SelectItem>
-              <SelectItem value="unpaid">Без оплаты</SelectItem>
-              <SelectItem value="unknown">Уточняется</SelectItem>
+              <SelectItem value="all">{t('internships.allTypes')}</SelectItem>
+              <SelectItem value="paid">{t('internships.typePaid')}</SelectItem>
+              <SelectItem value="unpaid">{t('internships.typeUnpaid')}</SelectItem>
+              <SelectItem value="unknown">{t('internships.typeUnknown')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -200,19 +201,19 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-primary/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-primary">{stats.total}</p>
-              <p className="text-sm text-muted-foreground">Всего стажировок</p>
+              <p className="text-sm text-muted-foreground">{t('internships.statsTotal')}</p>
             </div>
             <div className="bg-green-500/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-green-500">{stats.paid_count}</p>
-              <p className="text-sm text-muted-foreground">Платно</p>
+              <p className="text-sm text-muted-foreground">{t('internships.statsPaid')}</p>
             </div>
             <div className="bg-blue-500/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-blue-500">{stats.it_count}</p>
-              <p className="text-sm text-muted-foreground">IT стажировки</p>
+              <p className="text-sm text-muted-foreground">{t('internships.statsIt')}</p>
             </div>
             <div className="bg-amber-500/5 rounded-lg p-4 text-center">
               <p className="text-2xl font-bold text-amber-500">{stats.company_count}</p>
-              <p className="text-sm text-muted-foreground">Компаний</p>
+              <p className="text-sm text-muted-foreground">{t('internships.statsCompanies')}</p>
             </div>
           </div>
         )}
@@ -272,13 +273,13 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
                     {internship.link ? (
                       <Button size="sm" asChild>
                         <a href={internship.link} target="_blank" rel="noopener noreferrer">
-                          Откликнуться
+                          {t('internships.apply')}
                           <ExternalLink className="w-3 h-3 ml-1" />
                         </a>
                       </Button>
                     ) : (
                       <Button size="sm" variant="outline" disabled>
-                        Скоро
+                        {t('internships.soon')}
                       </Button>
                     )}
                   </div>
@@ -291,12 +292,12 @@ export function InternshipsSection({ className }: InternshipsSectionProps) {
         {filteredInternships.length === 0 && (
           <div className="text-center py-12">
             <GraduationCap className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">По вашему запросу ничего не найдено</p>
+            <p className="text-muted-foreground">{t('internships.empty')}</p>
             <Button
               variant="link"
               onClick={() => { setSearchQuery(''); setCategoryFilter('all'); setCityFilter('all'); setTypeFilter('all'); }}
             >
-              Сбросить фильтры
+              {t('internships.resetFilters')}
             </Button>
           </div>
         )}

@@ -103,13 +103,13 @@ export function RecommendationCard({
           {/* Pros & Cons */}
           <div className="space-y-2">
             {recommendation.pros.map((pro, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm">
+              <div key={'pro-' + i} className="flex items-start gap-2 text-sm">
                 <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                 <span>{pro}</span>
               </div>
             ))}
             {recommendation.cons.map((con, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm">
+              <div key={'con-' + i} className="flex items-start gap-2 text-sm">
                 <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                 <span>{con}</span>
               </div>
@@ -169,7 +169,7 @@ export function FormattedMessage({ content }: { content: string }) {
         // Заголовки (начинающиеся с ВАРИАНТ или цифр)
         if (line.match(/^(ВАРИАНТ|\d+\.)/)) {
           return (
-            <h4 key={i} className="font-bold text-foreground mt-4 mb-2">
+            <h4 key={'line-' + i} className="font-bold text-foreground mt-4 mb-2">
               {line}
             </h4>
           );
@@ -182,7 +182,7 @@ export function FormattedMessage({ content }: { content: string }) {
           const text = line.replace(/^[-•]\s*/, '').replace(/^Плюс\s*/i, '').replace(/^Минус\s*/i, '');
           
           return (
-            <div key={i} className="flex items-start gap-2 ml-4">
+            <div key={'line-' + i} className="flex items-start gap-2 ml-4">
               <span className={isPro ? 'text-green-600 font-medium' : isCon ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
                 {isPro ? '+' : isCon ? '-' : '·'}
               </span>
@@ -193,11 +193,11 @@ export function FormattedMessage({ content }: { content: string }) {
         
         // Пустые строки
         if (!line.trim()) {
-          return <br key={i} />;
+          return <br key={'line-' + i} />;
         }
         
         // Обычный текст
-        return <p key={i}>{line}</p>;
+        return <p key={'line-' + i}>{line}</p>;
       })}
     </div>
   );

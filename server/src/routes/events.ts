@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { db } from '../db';
 import { events } from '../db/schema/events';
-import { eq, like, sql, gte, lte } from 'drizzle-orm';
+import { eq, like, sql, gte, lte, SQL } from 'drizzle-orm';
 import { authMiddleware } from '../middleware/auth';
 
 const router = new Hono();
@@ -37,8 +37,8 @@ router.get('/', async (c) => {
     const limit = parseInt(c.req.query('limit') || '100');
     const offset = (page - 1) * limit;
 
-    let query: any = db.select().from(events);
-    const conditions: any[] = [];
+    const baseQuery = db.select().from(events);
+    const conditions: SQL[] = [];
 
     if (type && type !== 'all') conditions.push(eq(events.type, type));
     if (city && city !== 'all') conditions.push(eq(events.city, city));
@@ -52,10 +52,9 @@ router.get('/', async (c) => {
       );
     }
 
-    if (conditions.length > 0) {
-      const whereClause = conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`;
-      query = query.where(whereClause);
-    }
+    const query = conditions.length > 0
+      ? baseQuery.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`)
+      : baseQuery;
 
     const results = await query
       .orderBy(events.date)
@@ -72,9 +71,10 @@ router.get('/', async (c) => {
 router.get('/upcoming', async (c) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    let query: any = db.select().from(events);
-    query = query.where(gte(events.date, today));
-    const results = await query.orderBy(events.date).limit(20);
+    const results = await db.select().from(events)
+      .where(gte(events.date, today))
+      .orderBy(events.date)
+      .limit(20);
     return c.json(results);
   } catch (err) {
     console.error('Error fetching upcoming events:', err);
@@ -105,7 +105,7 @@ router.get('/cities', async (c) => {
     const result = await db.execute(sql`
       SELECT DISTINCT city FROM events WHERE city IS NOT NULL ORDER BY city
     `);
-    return c.json(result.rows.map((r: any) => r.city));
+    return c.json((result.rows as { city: string | null }[]).map((r) => r.city));
   } catch (err) {
     console.error('Error fetching cities:', err);
     return c.json({ error: 'Failed to fetch cities' }, 500);
@@ -118,7 +118,7 @@ router.post('/', authMiddleware, async (c) => {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten().fieldErrors }, 400);
 
-    const [item] = await db.insert(events).values(parsed.data as any).returning();
+    const [item] = await db.insert(events).values(parsed.data as typeof events.$inferInsert).returning();
     return c.json(item, 201);
   } catch (err) {
     console.error('Error creating event:', err);
@@ -139,7 +139,7 @@ router.put('/:id', authMiddleware, async (c) => {
     if (!existing) return c.json({ error: 'Not found' }, 404);
 
     const [updated] = await db.update(events)
-      .set(parsed.data as any)
+      .set(parsed.data as typeof events.$inferInsert)
       .where(eq(events.id, id))
       .returning();
 

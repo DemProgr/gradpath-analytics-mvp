@@ -380,7 +380,7 @@ router.get('/verification-status', authMiddleware, async (c) => {
   }
 });
 
-function calculateCompleteness(profile: any) {
+function calculateCompleteness(profile: Pick<typeof profiles.$inferSelect, 'universityId' | 'facultyId' | 'specialtyId' | 'course' | 'enrollmentYear' | 'expectedGraduationYear'>) {
   const fields = [
     { key: 'university', weight: 20, value: profile.universityId },
     { key: 'faculty', weight: 20, value: profile.facultyId },

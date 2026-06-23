@@ -5,6 +5,26 @@ import { professionSalaries } from '../db/schema/profession-salaries';
 import { professionsSalary } from '../db/schema/professions-salary';
 import { eq, ilike, and, sql } from 'drizzle-orm';
 
+interface ProfessionAnalyticsRow {
+  id: string;
+  profession_name: string;
+  category: string;
+  demand_level: string;
+  forecast_year: number;
+  forecast_source: string;
+  forecast_city: string;
+  description: string | null;
+  related_specialties: unknown;
+  avg_salary: string | null;
+  min_salary: string | null;
+  max_salary: string | null;
+  vacancies_count: number | null;
+  salary_year: number | null;
+  salary_month: number | null;
+  salary_source: string | null;
+  overall_rating: string;
+}
+
 const router = new Hono();
 
 router.get('/analytics', async (c) => {
@@ -53,22 +73,22 @@ router.get('/analytics', async (c) => {
         pf.profession_name
     `);
 
-    let rows = results.rows as any[];
+    let rows = results.rows as unknown as ProfessionAnalyticsRow[];
 
     if (demand && demand !== 'all') {
-      rows = rows.filter((r: any) => r.demand_level === demand);
+      rows = rows.filter((r) => r.demand_level === demand);
     }
     if (category && category !== 'all') {
-      rows = rows.filter((r: any) => r.category === category);
+      rows = rows.filter((r) => r.category === category);
     }
     if (city && city !== 'all') {
-      rows = rows.filter((r: any) => r.forecast_city === city);
+      rows = rows.filter((r) => r.forecast_city === city);
     }
     if (year) {
-      rows = rows.filter((r: any) => r.forecast_year === parseInt(year));
+      rows = rows.filter((r) => r.forecast_year === parseInt(year));
     }
     if (search) {
-      rows = rows.filter((r: any) =>
+      rows = rows.filter((r) =>
         r.profession_name?.toLowerCase().includes(search.toLowerCase())
       );
     }
@@ -186,7 +206,7 @@ router.get('/cities', async (c) => {
       WHERE forecast_city IS NOT NULL
       ORDER BY forecast_city
     `);
-    return c.json(results.rows.map((r: any) => r.forecast_city));
+    return c.json((results.rows as { forecast_city: string }[]).map((r) => r.forecast_city));
   } catch (err) {
     console.error('Error fetching cities:', err);
     return c.json({ error: 'Failed to fetch cities' }, 500);

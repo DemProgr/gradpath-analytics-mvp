@@ -502,7 +502,7 @@ export function ScoreCalculator() {
                 <CollapsibleContent className="pt-2 space-y-2">
                   {canApply.slice(0, 15).map((result, idx) => (
                     <div 
-                      key={idx}
+                      key={result.specialtyName + result.universityShortName}
                       className="p-3 border border-green-500/20 rounded-lg bg-card hover:bg-accent/20 transition-colors"
                     >
                       <div className="flex justify-between items-start mb-1">
@@ -554,7 +554,7 @@ export function ScoreCalculator() {
                 <CollapsibleContent className="pt-2 space-y-2">
                   {cannotApply.slice(0, 10).map((result, idx) => (
                     <div 
-                      key={idx}
+                      key={result.specialtyName + result.universityShortName}
                       className="p-3 border border-red-500/20 rounded-lg bg-card"
                     >
                       <div className="flex justify-between items-start mb-1">

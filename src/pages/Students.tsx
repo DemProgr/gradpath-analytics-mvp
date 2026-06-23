@@ -1175,7 +1175,7 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
                                         const trimmedLevel = level.trim();
                                         return (
                                           <motion.div
-                                            key={index}
+                                            key={'career-' + index}
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
@@ -1228,7 +1228,7 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
                                     <div className="space-y-4">
                                       {selectedProfessionData.skillLevels.hard.map((skillData, index) => (
                                         <motion.div
-                                          key={index}
+                                          key={'hard-' + skillData.skill}
                                           initial={{ opacity: 0, x: -10 }}
                                           animate={{ opacity: 1, x: 0 }}
                                           transition={{ delay: index * 0.05 }}
@@ -1253,7 +1253,7 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
                                   <div className="space-y-4">
                                     {selectedProfessionData.skillLevels.soft.map((skillData, index) => (
                                       <motion.div
-                                        key={index}
+                                        key={'soft-' + skillData.skill}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: index * 0.05 }}
@@ -1293,7 +1293,7 @@ const Students = ({ isChatOpen = false }: StudentsProps) => {
                                   <div className="space-y-3">
                                     {selectedProfessionData.education.map((edu, index) => (
                                       <motion.div
-                                        key={index}
+                                        key={'edu-' + edu.substring(0, 30)}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: index * 0.05 }}

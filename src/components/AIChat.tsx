@@ -239,7 +239,7 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                     <div className="flex flex-wrap gap-2 justify-center">
                       {initialQuestions.map((q, i) => (
                         <button
-                          key={i}
+                          key={'initial-q-' + i}
                           onClick={() => handleQuickQuestion(q.prompt)}
                           className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors text-left max-w-[200px] truncate"
                         >
@@ -276,9 +276,9 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                        Пока нет сохраненных вариантов
                      </p>
                    ) : (
-                     savedRecommendations.map((rec, i) => (
-                       <RecommendationCard
-                         key={i}
+                      savedRecommendations.map((rec, i) => (
+                        <RecommendationCard
+                          key={rec.university + rec.faculty}
                          recommendation={rec}
                          isSaved={true}
                        />
@@ -306,9 +306,9 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                      </Button>
                    </div>
                    <div className="space-y-3">
-                     {savedMessages.map((msg, i) => (
-                       <div
-                         key={i}
+                      {savedMessages.map((msg, i) => (
+                        <div
+                          key={msg.timestamp.getTime()}
                          className="flex gap-2"
                        >
                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -326,7 +326,7 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
               {/* Messages */}
               {!showHistory && messages.map((message, index) => (
                 <motion.div
-                  key={index}
+                  key={message.timestamp.getTime()}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={cn(
@@ -360,7 +360,7 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                         <div className="mt-4 space-y-2">
                           {message.recommendations.map((rec, i) => (
                             <RecommendationCard
-                              key={i}
+                              key={rec.university + rec.faculty + i}
                               recommendation={rec}
                             />
                           ))}
@@ -436,7 +436,7 @@ export function AIChat({ isOpen: externalIsOpen, onToggle }: AIChatProps) {
                 <div className="flex flex-wrap gap-1.5">
                   {quickQuestions.map((q, i) => (
                     <button
-                      key={i}
+                      key={'qq-' + i}
                       onClick={() => handleQuickQuestion(q.prompt)}
                       className="text-xs px-2.5 py-1 rounded-md bg-secondary/70 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
                     >

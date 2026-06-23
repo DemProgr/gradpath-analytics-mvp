@@ -508,7 +508,7 @@ export function SimplePassingScoreCalculator() {
                         </CardHeader>
                         <CardContent className="pt-4 space-y-3 max-h-[350px] overflow-y-auto">
                           {canApplyList.map((spec, idx) => (
-                            <div key={idx} className="p-3 bg-muted/50 rounded-lg">
+                            <div key={spec.specialty.name + spec.specialty.university} className="p-3 bg-muted/50 rounded-lg">
                               <div className="flex justify-between items-start">
                                 <div>
                                   <p className="font-semibold">{spec.specialty.name}</p>
@@ -545,7 +545,7 @@ export function SimplePassingScoreCalculator() {
                         </CardHeader>
                         <CardContent className="pt-4 space-y-3 max-h-[250px] overflow-y-auto">
                           {cannotApplyList.slice(0, 20).map((spec, idx) => (
-                            <div key={idx} className="p-3 bg-muted/50 rounded-lg">
+                            <div key={spec.specialty.name + spec.specialty.university} className="p-3 bg-muted/50 rounded-lg">
                               <div className="flex justify-between items-start">
                                 <div>
                                   <p className="font-semibold">{spec.specialty.name}</p>

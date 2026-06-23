@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { GraduationCap, Search, Briefcase, Clock, DollarSign, MapPin, TrendingUp } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
+import { useLanguage } from '@/hooks/useLanguage';
 
 
 const UNIVERSITIES = ['БГУИР', 'БГУ', 'БНТУ'];
@@ -158,12 +159,12 @@ const MOCK_DATA: Record<string, Record<string, {
   },
 };
 
-const STAT_CARDS = [
-  { key: 'employmentRate', label: 'Трудоустройство', suffix: '%', color: 'text-green-500', bg: 'bg-green-500/5', icon: Briefcase },
-  { key: 'avgSearchTime', label: 'Среднее время поиска', suffix: ' мес.', color: 'text-blue-500', bg: 'bg-blue-500/5', icon: Clock },
-  { key: 'avgSalary', label: 'Средняя зарплата', suffix: ' BYN', color: 'text-amber-500', bg: 'bg-amber-500/5', icon: DollarSign },
-  { key: 'inSpecialtyRate', label: 'Работа по специальности', suffix: '%', color: 'text-purple-500', bg: 'bg-purple-500/5', icon: TrendingUp },
-];
+const STAT_KEYS: Record<string, string> = {
+  employmentRate: 'analytics.specialties.employmentRate',
+  avgSearchTime: 'analytics.specialties.avgSearchTime',
+  avgSalary: 'analytics.specialties.avgSalary',
+  inSpecialtyRate: 'analytics.specialties.inSpecialtyRate',
+};
 
 const COLORS = ['#3B82F6', '#14B8A6', '#A855F7', '#F59E0B', '#EF4444', '#6366F1'];
 
@@ -175,16 +176,26 @@ const tooltipStyle = {
 };
 
 export default function SpecialtyAnalytics() {
+  const { t } = useLanguage();
   const [selectedUni, setSelectedUni] = useState('БГУИР');
   const [selectedSpec, setSelectedSpec] = useState('Программная инженерия');
 
   const specialities = Object.keys(MOCK_DATA[selectedUni] || {});
-  const data = MOCK_DATA[selectedUni]?.[selectedSpec];
-  if (!data && specialities.length > 0 && selectedSpec !== specialities[0]) {
-    setSelectedSpec(specialities[0]);
-  }
+
+  useEffect(() => {
+    if (specialities.length > 0 && !MOCK_DATA[selectedUni]?.[selectedSpec]) {
+      setSelectedSpec(specialities[0]);
+    }
+  }, [selectedUni, selectedSpec]);
 
   const currentData = MOCK_DATA[selectedUni]?.[selectedSpec];
+
+  const STAT_CARDS = [
+    { key: 'employmentRate', suffix: '%', color: 'text-green-500', bg: 'bg-green-500/5', icon: Briefcase },
+    { key: 'avgSearchTime', suffix: ` ${t('analytics.specialties.months')}`, color: 'text-blue-500', bg: 'bg-blue-500/5', icon: Clock },
+    { key: 'avgSalary', suffix: ' BYN', color: 'text-amber-500', bg: 'bg-amber-500/5', icon: DollarSign },
+    { key: 'inSpecialtyRate', suffix: '%', color: 'text-purple-500', bg: 'bg-purple-500/5', icon: TrendingUp },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,10 +206,10 @@ export default function SpecialtyAnalytics() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
               <div className="flex items-center gap-2 mb-4">
                 <GraduationCap className="w-6 h-6 text-primary" />
-                <h1 className="text-3xl font-display font-bold text-foreground">Аналитика специальностей</h1>
+                <h1 className="text-3xl font-display font-bold text-foreground">{t('analytics.specialties.title')}</h1>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Реальные данные о трудоустройстве выпускников. На основе опросов выпускников белорусских вузов.
+                {t('analytics.specialties.subtitle')}
               </p>
             </motion.div>
 
@@ -206,7 +217,7 @@ export default function SpecialtyAnalytics() {
               <div className="w-64">
                 <Select value={selectedUni} onValueChange={(v) => { setSelectedUni(v); setSelectedSpec(''); }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Университет" />
+                    <SelectValue placeholder={t('analytics.specialties.selectUni')} />
                   </SelectTrigger>
                   <SelectContent>
                     {UNIVERSITIES.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
@@ -216,7 +227,7 @@ export default function SpecialtyAnalytics() {
               <div className="w-72">
                 <Select value={selectedSpec || specialities[0]} onValueChange={setSelectedSpec}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Специальность" />
+                    <SelectValue placeholder={t('analytics.specialties.selectSpec')} />
                   </SelectTrigger>
                   <SelectContent>
                     {specialities.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -234,7 +245,7 @@ export default function SpecialtyAnalytics() {
                     return (
                       <motion.div key={card.key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-2xl p-4 sm:p-6">
                         <div className="flex items-start justify-between mb-3">
-                          <p className="text-sm text-muted-foreground">{card.label}</p>
+                          <p className="text-sm text-muted-foreground">{t(STAT_KEYS[card.key])}</p>
                           <div className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center`}>
                             <Icon className={`w-5 h-5 ${card.color}`} />
                           </div>
@@ -251,16 +262,16 @@ export default function SpecialtyAnalytics() {
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card-elevated p-6">
                     <h3 className="font-serif text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-primary" />
-                      Страны трудоустройства
+                      {t('analytics.specialties.countries')}
                     </h3>
                     <ResponsiveContainer width="100%" height={350}>
                       <BarChart data={currentData.countries} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} angle={-45} textAnchor="end" />
                         <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value}%`, 'Доля']} />
+                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value}%`, t('analytics.specialties.share')]} />
                         <Bar dataKey="percentage" radius={[4, 4, 0, 0]}>
-                          {currentData.countries.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                          {currentData.countries.map((_, i) => <Cell key={'country-cell-' + i} fill={COLORS[i % COLORS.length]} />)}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
@@ -269,7 +280,7 @@ export default function SpecialtyAnalytics() {
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card-elevated p-6">
                     <h3 className="font-serif text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                       <Briefcase className="w-4 h-4 text-primary" />
-                      Топ работодатели
+                      {t('analytics.specialties.topEmployers')}
                     </h3>
                     <div className="space-y-3">
                       {currentData.topEmployers.map((company, i) => (
@@ -289,7 +300,7 @@ export default function SpecialtyAnalytics() {
             {!currentData && (
               <div className="text-center py-20">
                 <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">Выберите университет и специальность для просмотра аналитики</p>
+                <p className="text-muted-foreground">{t('analytics.specialties.empty')}</p>
               </div>
             )}
           </div>

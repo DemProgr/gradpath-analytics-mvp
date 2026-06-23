@@ -35,8 +35,8 @@ export const EXAM_REQUIREMENTS: ExamRequirement[] = [
   // ФилФ - Иностранный + История + Русский
   { facultyNames: ['Филологический факультет', 'ФилФ'], firstExam: 'english', secondExam: 'world_history', thirdExam: 'russian' },
   
-  // ИстФ - История + Всемирная история + Русский
-  { facultyNames: ['Исторический факультет', 'ИстФ'], firstExam: 'world_history', secondExam: 'world_history', thirdExam: 'russian' },
+  // ИстФ - История Беларуси + Всемирная история + Русский
+  { facultyNames: ['Исторический факультет', 'ИстФ'], firstExam: 'belarus_history', secondExam: 'world_history', thirdExam: 'russian' },
   
   // ФМО - Иностранный + Обществоведение + Русский
   { facultyNames: ['Факультет международных отношений', 'ФМО'], firstExam: 'english', secondExam: 'social_science', thirdExam: 'russian' },

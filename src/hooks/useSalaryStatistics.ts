@@ -41,7 +41,7 @@ export function useSalaryStatistics() {
     async function fetchData() {
       try {
         setLoading(true);
-        const stats = await api.get<any[]>('/api/salaries/statistics');
+        const stats = await api.get<SalaryStat[]>('/api/salaries/statistics');
         setData(stats || []);
       } catch (err) {
         console.error('Error fetching salary statistics:', err);

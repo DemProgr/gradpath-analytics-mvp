@@ -360,7 +360,7 @@ export function AdmissionTable() {
             ) : (
               filteredData.map((item, idx) => (
                 <TableRow 
-                  key={idx}
+                  key={item.specialtyName + '-' + item.universityShortName}
                   className="border-border/30 hover:bg-secondary/30 transition-colors"
                 >
                   <TableCell className="font-medium">

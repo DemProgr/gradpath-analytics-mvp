@@ -35,6 +35,8 @@ import Internships from "./pages/Internships";
 import Events from "./pages/Events";
 import SpecialtyAnalytics from "./pages/SpecialtyAnalytics";
 import CareerMap from "./pages/CareerMap";
+import CareerQuiz from "./pages/CareerQuiz";
+import SurveyLanding from "./pages/SurveyLanding";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import { AIChat } from "@/components/AIChat";
@@ -83,6 +85,8 @@ const AppContent = () => {
         <Route path="/internships" element={<Internships />} />
         <Route path="/events" element={<Events />} />
         <Route path="/analytics/specialties" element={<SpecialtyAnalytics />} />
+        <Route path="/survey" element={<SurveyLanding />} />
+        <Route path="/career-quiz" element={<CareerQuiz />} />
         <Route path="/career-map" element={<CareerMap />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />

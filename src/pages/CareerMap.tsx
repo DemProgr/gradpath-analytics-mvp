@@ -5,6 +5,7 @@ import { GraduationCap, Map as MapIcon, Briefcase, Building2, Users } from 'luci
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
+import { useLanguage } from '@/hooks/useLanguage';
 
 
 const SPECIALTIES = [
@@ -154,6 +155,7 @@ const tooltipStyle = {
 };
 
 export default function CareerMap() {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState(SPECIALTIES[0]);
 
   const data = MOCK_DATA[selected];
@@ -167,17 +169,17 @@ export default function CareerMap() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
               <div className="flex items-center gap-2 mb-4">
                 <MapIcon className="w-6 h-6 text-primary" />
-                <h1 className="text-3xl font-display font-bold text-foreground">Карта карьер выпускников</h1>
+                <h1 className="text-3xl font-display font-bold text-foreground">{t('careerMap.title')}</h1>
               </div>
               <p className="text-muted-foreground max-w-2xl">
-                Куда идут работать выпускники? Распределение по сферам и топ работодатели.
+                {t('careerMap.subtitle')}
               </p>
             </motion.div>
 
             <div className="w-80 mb-8">
               <Select value={selected} onValueChange={setSelected}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Специальность" />
+                  <SelectValue placeholder={t('careerMap.selectSpec')} />
                 </SelectTrigger>
                 <SelectContent>
                   {SPECIALTIES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -190,7 +192,7 @@ export default function CareerMap() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-2xl p-4 sm:p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <p className="text-sm text-muted-foreground">Выпускников</p>
+                      <p className="text-sm text-muted-foreground">{t('careerMap.statGraduates')}</p>
                       <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                         <Users className="w-5 h-5 text-primary" />
                       </div>
@@ -199,7 +201,7 @@ export default function CareerMap() {
                   </motion.div>
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card rounded-2xl p-4 sm:p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <p className="text-sm text-muted-foreground">Сфер деятельности</p>
+                      <p className="text-sm text-muted-foreground">{t('careerMap.statFields')}</p>
                       <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
                         <Briefcase className="w-5 h-5 text-purple-500" />
                       </div>
@@ -208,7 +210,7 @@ export default function CareerMap() {
                   </motion.div>
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card rounded-2xl p-4 sm:p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <p className="text-sm text-muted-foreground">Стран трудоустройства</p>
+                      <p className="text-sm text-muted-foreground">{t('careerMap.statCountries')}</p>
                       <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
                         <Building2 className="w-5 h-5 text-amber-500" />
                       </div>
@@ -219,7 +221,7 @@ export default function CareerMap() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card-elevated p-6">
-                    <h3 className="font-serif text-lg font-semibold text-foreground mb-4">Распределение по сферам</h3>
+                    <h3 className="font-serif text-lg font-semibold text-foreground mb-4">{t('careerMap.chartDistribution')}</h3>
                     <ResponsiveContainer width="100%" height={380}>
                       <PieChart>
                         <Pie
@@ -233,10 +235,10 @@ export default function CareerMap() {
                           nameKey="name"
                         >
                           {data.industries.map((_, i) => (
-                            <Cell key={i} fill={data.industries[i].color} />
+                            <Cell key={'industry-cell-' + i} fill={data.industries[i].color} />
                           ))}
                         </Pie>
-                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value}%`, 'Доля']} />
+                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value}%`, t('careerMap.share')]} />
                         <Legend
                           layout="vertical"
                           align="right"
@@ -248,16 +250,16 @@ export default function CareerMap() {
                   </motion.div>
 
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card-elevated p-6">
-                    <h3 className="font-serif text-lg font-semibold text-foreground mb-4">Топ работодатели</h3>
+                    <h3 className="font-serif text-lg font-semibold text-foreground mb-4">{t('careerMap.chartEmployers')}</h3>
                     <ResponsiveContainer width="100%" height={380}>
                       <BarChart data={data.employers} layout="vertical" margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                         <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} width={90} />
-                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [value, 'Выпускников']} />
+                        <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [value, t('careerMap.graduates')]} />
                         <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                           {data.employers.map((_, i) => (
-                            <Cell key={i} fill={['#3B82F6', '#14B8A6', '#A855F7', '#F59E0B', '#EF4444', '#6366F1', '#EC4899', '#8B5CF6'][i % 8]} />
+                            <Cell key={'employer-cell-' + i} fill={['#3B82F6', '#14B8A6', '#A855F7', '#F59E0B', '#EF4444', '#6366F1', '#EC4899', '#8B5CF6'][i % 8]} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -268,7 +270,7 @@ export default function CareerMap() {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="card-elevated p-6">
                   <h3 className="font-serif text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                     <MapIcon className="w-4 h-4 text-primary" />
-                    География трудоустройства
+                    {t('careerMap.chartGeography')}
                   </h3>
                   <div className="flex flex-wrap gap-3">
                     {data.topCountries.map((country) => (

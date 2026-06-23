@@ -2,7 +2,7 @@ import { api } from '@/lib/api/client';
 
 export interface ParseResult {
   success: boolean;
-  data?: any;
+  data?: unknown;
   message?: string;
   error?: string;
 }

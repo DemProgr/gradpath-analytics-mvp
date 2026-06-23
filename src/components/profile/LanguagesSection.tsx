@@ -9,15 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { useDigitalProfile, Language } from '@/hooks/useDigitalProfile';
 import { useToast } from '@/hooks/use-toast';
 import { ReorderableList } from './ReorderableList';
-
-const CEFR_LABELS: Record<string, string> = {
-  A1: 'A1 — Начальный',
-  A2: 'A2 — Элементарный',
-  B1: 'B1 — Средний',
-  B2: 'B2 — Выше среднего',
-  C1: 'C1 — Продвинутый',
-  C2: 'C2 — В совершенстве',
-};
+import { useLanguage } from '@/hooks/useLanguage';
 
 const CEFR_COLORS: Record<string, string> = {
   A1: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
@@ -29,6 +21,7 @@ const CEFR_COLORS: Record<string, string> = {
 };
 
 export function LanguagesSection() {
+  const { t } = useLanguage();
   const { languages, addLanguage, updateLanguage, deleteLanguage, reorderLanguages } = useDigitalProfile();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -52,34 +45,34 @@ export function LanguagesSection() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите название языка', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('profile.languageNameRequired'), variant: 'destructive' });
       return;
     }
     const { error } = editing
       ? await updateLanguage(editing.id, { name: name.trim(), cefrLevel: cefrLevel as Language['cefrLevel'] })
       : await addLanguage({ name: name.trim(), cefrLevel: cefrLevel as Language['cefrLevel'] });
 
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else { toast({ title: editing ? 'Язык обновлён' : 'Язык добавлен' }); setDialogOpen(false); }
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else { toast({ title: editing ? t('profile.languageUpdated') : t('profile.languageAdded') }); setDialogOpen(false); }
   };
 
   const handleDelete = async (id: number) => {
     const { error } = await deleteLanguage(id);
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else toast({ title: 'Язык удалён' });
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else toast({ title: t('profile.languageDeleted') });
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">Языки</h4>
+        <h4 className="text-sm font-medium">{t('profile.languages')}</h4>
         <Button variant="ghost" size="sm" onClick={openAdd}>
-          <Plus className="w-4 h-4 mr-1" /> Добавить
+          <Plus className="w-4 h-4 mr-1" /> {t('profile.add')}
         </Button>
       </div>
 
       {languages.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-4">Языки не добавлены.</p>
+        <p className="text-sm text-muted-foreground text-center py-4">{t('profile.languagesEmpty')}</p>
       ) : (
         <ReorderableList items={languages} onReorder={reorderLanguages}>
           {(lang) => (
@@ -102,30 +95,30 @@ export function LanguagesSection() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Редактировать язык' : 'Добавить язык'}</DialogTitle>
+            <DialogTitle>{editing ? t('profile.editLanguage') : t('profile.addLanguage')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Язык</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Английский" />
+              <Label>{t('profile.languageName')}</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="English" />
             </div>
             <div className="space-y-2">
-              <Label>Уровень (CEFR)</Label>
+              <Label>{t('profile.cefrLevel')}</Label>
               <Select value={cefrLevel} onValueChange={setCefrLevel}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(CEFR_LABELS).map(([val, label]) => (
-                    <SelectItem key={val} value={val}>{label}</SelectItem>
+                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map(val => (
+                    <SelectItem key={val} value={val}>{t('profile.cefr.' + val.toLowerCase())}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Отмена</Button>
-            <Button onClick={handleSave}>{editing ? 'Сохранить' : 'Добавить'}</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSave}>{editing ? t('common.save') : t('profile.add')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

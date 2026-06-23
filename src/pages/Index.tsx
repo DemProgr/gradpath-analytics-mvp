@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart3, GraduationCap, Users, TrendingUp } from 'lucide-react';
+import { BarChart3, GraduationCap, Users, TrendingUp, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useAuth } from '@/hooks/useAuth';
 import { BelarusMap } from '@/components/BelarusMap';
+import { api } from '@/lib/api/client';
 import {
   Carousel,
   CarouselContent,
@@ -24,7 +26,9 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselApiRef = useRef<any>(null);
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { user } = useAuth();
+  const { t, language } = useLanguage();
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
   
   const sectionsRef = {
     overview: useRef<HTMLDivElement>(null),
@@ -77,6 +81,12 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
     return () => clearInterval(interval);
   }, [currentSlide]);
 
+  useEffect(() => {
+    api.get<any[]>('/api/blogs')
+      .then((items) => setBlogPosts((items || []).slice(0, 4)))
+      .catch(() => {});
+  }, []);
+
   const quickLinks = [
     {
       title: t('quickLinks.forApplicants'),
@@ -123,6 +133,67 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
         <div ref={sectionsRef.overview}>
           <HeroSection onNavigate={handleNavigate} />
         </div>
+
+{/* News and insights */}
+          {blogPosts.length > 0 && (
+            <section className="py-14 px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex items-end justify-between mb-8">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-wider text-primary mb-2">
+                      {language === 'ru' ? 'Новости' : language === 'en' ? 'News' : 'Навіны'}
+                    </p>
+                    <h2 className="text-3xl sm:text-4xl font-bold">
+                      {language === 'ru' ? 'Новости и статьи' : language === 'en' ? 'News and insights' : 'Навіны і артыкулы'}
+                    </h2>
+                  </div>
+                  <a href="/blog" className="text-sm font-medium hover:text-primary transition-colors flex items-center gap-1 shrink-0 ml-4">
+                    {language === 'ru' ? 'Все статьи' : language === 'en' ? 'View all' : 'Усе артыкулы'}
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {blogPosts.map((post, i) => {
+                    const d = new Date(post.publishedAt);
+                    const dateStr = d.toLocaleDateString(
+                      language === 'en' ? 'en-US' : language === 'be' ? 'be-BY' : 'ru-RU',
+                      { day: 'numeric', month: 'long', year: 'numeric' }
+                    );
+                    const tag = post.tags?.[0] || null;
+                    return (
+                      <motion.a
+                        key={post.id}
+                        href={`/blog/${post.slug}`}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.08 }}
+                        className="group block"
+                      >
+                        <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+                          <img
+                            src={post.coverImage || `/blog/${['IT.jpg','salary.jpg','admission.jpg','intership.jpg','rating.jpg','resume.jpg'][i % 6]}`}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                          {tag && (
+                            <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+                              {tag}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-primary mb-1.5">{dateStr}</p>
+                        <h3 className="font-bold text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                          {post.title}
+                        </h3>
+                      </motion.a>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
 
 {/* Hero Slider */}
           <Carousel 
@@ -199,7 +270,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Анкета</p>
                       <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Пройдите анкету</h2>
                       <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ваше мнение важно: примите участие в масштабном опросе об университетах и работе в Беларуси.</p>
-                      <a href="#" className="inline-flex group">
+                      <a href="/survey" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Заполните анкету
                         </span>
@@ -225,7 +296,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
             <div className="absolute bottom-6 left-12 sm:left-24 flex gap-2">
               {['У', 'Д', 'А'].map((letter, index) => (
                 <button 
-                  key={index}
+                  key={'letter-' + letter}
                   style={{ fontFamily: 'Times New Roman, serif' }}
                   className={`w-16 h-2 rounded-full transition-colors ${currentSlide === index ? 'bg-white/80' : 'bg-white/30 hover:bg-amber-500'}`}
                   onClick={() => carouselApiRef.current?.scrollTo(index)}
@@ -270,7 +341,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="bg-blue-950/90 px-12 py-8 rounded-lg text-center max-w-md min-h-[350px] flex flex-col justify-center">
                     <h3 className="text-white text-2xl sm:text-3xl font-medium mb-3">Анкета по окончании курса</h3>
                     <p className="text-white/90 text-base mb-6">Выскажите своё мнение о выбранном вами образовательном пути.</p>
-                    <a href="#" className="inline-flex group">
+                    <a href="/survey" className="inline-flex group">
                       <span className="px-4 py-2 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                         Заполните анкету
                       </span>

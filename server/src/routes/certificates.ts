@@ -74,9 +74,13 @@ router.put('/:id', authMiddleware, async (c) => {
       .where(and(eq(certificates.id, id), eq(certificates.userId, authUser.id)));
     if (!existing) return c.json({ error: 'Certificate not found' }, 404);
 
-    const updateData: any = { ...parsed.data, updatedAt: new Date() };
-    if (parsed.data.issueDate !== undefined) updateData.issueDate = parsed.data.issueDate ? new Date(parsed.data.issueDate) : null;
-    if (parsed.data.expiryDate !== undefined) updateData.expiryDate = parsed.data.expiryDate ? new Date(parsed.data.expiryDate) : null;
+    const { issueDate, expiryDate, ...restData } = parsed.data;
+    const updateData: Partial<typeof certificates.$inferInsert> = {
+      ...restData,
+      updatedAt: new Date(),
+      issueDate: issueDate !== undefined ? (issueDate ? new Date(issueDate) : null) : undefined,
+      expiryDate: expiryDate !== undefined ? (expiryDate ? new Date(expiryDate) : null) : undefined,
+    };
 
     const [updated] = await db.update(certificates)
       .set(updateData)

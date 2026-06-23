@@ -66,7 +66,7 @@ export const UNIVERSITY_LOCATIONS: Record<string, UniversityInfo> = {
   'ПГУ': {
     name: 'Полоцкий государственный университет имени Евфросинии Полоцкой',
     shortName: 'ПГУ',
-    city: 'Витебск',
+    city: 'Новополоцк',
     specializations: ['Инженерия', 'Экономика']
   }
 };

@@ -8,11 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Play, RefreshCw, Database, Globe, CheckCircle2, XCircle, Clock, Shield, LogOut, BarChart3, Square, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, Play, RefreshCw, Database, Globe, CheckCircle2, XCircle, Clock, Shield, LogOut, BarChart3, Square, FileText, ThumbsUp, ThumbsDown, BookOpen } from 'lucide-react';
 import { parsingApi } from '@/lib/api/parsing';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { BlogManager } from '@/components/admin/BlogManager';
 
 interface ParseLog {
   id: string;
@@ -20,7 +22,24 @@ interface ParseLog {
   status: 'pending' | 'success' | 'error';
   message: string;
   timestamp: Date;
-  data?: any;
+  data?: unknown;
+}
+
+interface ParsingSessionData {
+  status: string;
+  currentPage: number;
+  totalPages: number;
+  totalFound: number;
+  newVacancies: number;
+  duplicatesSkipped: number;
+}
+
+interface VerificationDoc {
+  id: number;
+  fileName?: string;
+  userId: number;
+  createdAt: string;
+  fileUrl?: string;
 }
 
 interface ParsingProgress {
@@ -45,6 +64,7 @@ const Admin = () => {
   const [universityUrl, setUniversityUrl] = useState('');
   const [universityName, setUniversityName] = useState('');
   const [parseLogs, setParseLogs] = useState<ParseLog[]>([]);
+  const [activeTab, setActiveTab] = useState<'parsing' | 'blog' | 'verification'>('parsing');
   
   // Progress tracking
   const [progress, setProgress] = useState<ParsingProgress>({
@@ -68,13 +88,13 @@ const Admin = () => {
   // Poll for progress updates
   const pollProgress = useCallback(async (sessionId: number) => {
     try {
-      const data = await api.get<any>(`/api/parsing-sessions/${sessionId}`);
+      const sessionData = await api.get<ParsingSessionData>(`/api/parsing-sessions/${sessionId}`);
 
       // Calculate ETA
       let eta = '';
-      if (data.status === 'running' && data.currentPage > 0) {
+      if (sessionData.status === 'running' && sessionData.currentPage > 0) {
         const avgTimePerPage = 3.5;
-        const remainingPages = Math.max(0, 100 - data.currentPage);
+        const remainingPages = Math.max(0, 100 - sessionData.currentPage);
         const remainingSeconds = remainingPages * avgTimePerPage;
         const minutes = Math.floor(remainingSeconds / 60);
         const seconds = Math.floor(remainingSeconds % 60);
@@ -83,17 +103,17 @@ const Admin = () => {
 
       setProgress({
         sessionId,
-        currentPage: data.currentPage || 0,
-        totalPages: data.totalPages || 100,
-        totalFound: data.totalFound || 0,
-        newVacancies: data.newVacancies || 0,
-        duplicatesSkipped: data.duplicatesSkipped || 0,
-        status: data.status as ParsingProgress['status'],
+        currentPage: sessionData.currentPage || 0,
+        totalPages: sessionData.totalPages || 100,
+        totalFound: sessionData.totalFound || 0,
+        newVacancies: sessionData.newVacancies || 0,
+        duplicatesSkipped: sessionData.duplicatesSkipped || 0,
+        status: sessionData.status as ParsingProgress['status'],
         eta
       });
 
       // Continue polling if still running
-      if (data.status === 'running') {
+      if (sessionData.status === 'running') {
         setTimeout(() => pollProgress(sessionId), 2000);
       }
     } catch (error) {
@@ -177,16 +197,17 @@ const Admin = () => {
 
     try {
       const result = await parsingApi.parseRabota(selectedCategory);
+      const parseData = result.data as { sessionId: number } | null;
       
-      if (result.success && result.data?.sessionId) {
+      if (result.success && parseData?.sessionId) {
         // Start polling for progress
-        setProgress(prev => ({ ...prev, sessionId: result.data.sessionId, status: 'running' }));
-        pollProgress(result.data.sessionId);
+        setProgress(prev => ({ ...prev, sessionId: parseData.sessionId, status: 'running' }));
+        pollProgress(parseData.sessionId);
         
         addLog({
           type: 'rabota',
           status: 'success',
-          message: result.message || `Парсинг запущен (сессия #${result.data.sessionId})`,
+          message: result.message || `Парсинг запущен (сессия #${parseData.sessionId})`,
           data: result.data
         });
         
@@ -312,7 +333,7 @@ const Admin = () => {
   useEffect(() => {
     const checkRunningSessions = async () => {
       try {
-        const sessions = await api.get<any[]>('/api/parsing-sessions');
+        const sessions = await api.get<{ id: number; status: string }[]>('/api/parsing-sessions');
         const running = sessions?.find(s => s.status === 'running');
 
         if (running) {
@@ -330,7 +351,7 @@ const Admin = () => {
   }, [isAdmin, pollProgress]);
 
   // Verification documents
-  const [pendingDocs, setPendingDocs] = useState<any[]>([]);
+  const [pendingDocs, setPendingDocs] = useState<VerificationDoc[]>([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
   const [approvingId, setApprovingId] = useState<number | null>(null);
 
@@ -338,9 +359,10 @@ const Admin = () => {
     if (!isAdmin) return;
     setLoadingDocs(true);
     try {
-      const docs = await api.get<any[]>('/api/profile/admin/verifications');
+      const docs = await api.get<VerificationDoc[]>('/api/profile/admin/verifications');
       setPendingDocs(docs || []);
-    } catch {
+    } catch (err) {
+      console.error('Error fetching pending docs:', err);
       setPendingDocs([]);
     } finally {
       setLoadingDocs(false);
@@ -357,8 +379,8 @@ const Admin = () => {
       await api.post(`/api/profile/admin/verifications/${id}/approve`);
       toast({ title: 'Документ одобрен', description: 'Верификация пользователя подтверждена' });
       fetchPendingDocs();
-    } catch (err: any) {
-      toast({ title: 'Ошибка', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Ошибка', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
     } finally {
       setApprovingId(null);
     }
@@ -372,8 +394,8 @@ const Admin = () => {
       await api.post(`/api/profile/admin/verifications/${id}/reject`, { reason });
       toast({ title: 'Документ отклонён', description: 'Причина указана' });
       fetchPendingDocs();
-    } catch (err: any) {
-      toast({ title: 'Ошибка', description: err.message, variant: 'destructive' });
+    } catch (err: unknown) {
+      toast({ title: 'Ошибка', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
     } finally {
       setApprovingId(null);
     }
@@ -431,7 +453,7 @@ const Admin = () => {
                   Панель администратора
                 </h1>
                 <p className="text-muted-foreground">
-                  Управление парсингом данных с внешних источников
+                  Управление парсингом данных, блогом и верификацией
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -478,6 +500,27 @@ const Admin = () => {
             </motion.div>
           )}
 
+          {/* Tab Navigation */}
+          <div className="mb-8">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'parsing' | 'blog' | 'verification')}>
+              <TabsList>
+                <TabsTrigger value="parsing">
+                  <Database className="w-4 h-4 mr-2" />
+                  Парсинг
+                </TabsTrigger>
+                <TabsTrigger value="blog">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Блог
+                </TabsTrigger>
+                <TabsTrigger value="verification">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Верификация
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {activeTab === 'parsing' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Rabota.by Parsing */}
             <Card className={!isAdmin ? 'opacity-60' : ''}>
@@ -632,8 +675,26 @@ const Admin = () => {
               </CardContent>
             </Card>
           </div>
+          )}
 
-          {/* Document Verifications */}
+          {activeTab === 'blog' && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  Управление блогом
+                </CardTitle>
+                <CardDescription>
+                  Создание, редактирование и удаление статей блога
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BlogManager />
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === 'verification' && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -655,7 +716,7 @@ const Admin = () => {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {pendingDocs.map((doc: any) => (
+                  {pendingDocs.map((doc: { id: number; fileName?: string; userId: number; createdAt: string; fileUrl?: string }) => (
                     <div key={doc.id} className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                       <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
@@ -702,8 +763,9 @@ const Admin = () => {
               )}
             </CardContent>
           </Card>
+          )}
 
-          {/* Parse Logs */}
+          {activeTab === 'parsing' && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -762,6 +824,7 @@ const Admin = () => {
               )}
             </CardContent>
           </Card>
+          )}
         </div>
       </main>
     </div>

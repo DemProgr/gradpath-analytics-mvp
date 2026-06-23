@@ -95,8 +95,8 @@ export function DigitalProfileProvider({ children }: { children: ReactNode }) {
       setLanguages(l || []);
       setProjects(p || []);
       setCertificates(c || []);
-    } catch {
-      // Not logged in or error
+    } catch (err) {
+      console.error('Failed to fetch digital profile data:', err);
     } finally {
       setIsLoading(false);
     }

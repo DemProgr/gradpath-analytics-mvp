@@ -38,7 +38,7 @@ export function VacancyAnalyticsSection() {
           <Skeleton className="h-8 w-64 mb-8" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={'skeleton-' + i} className="h-32" />
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

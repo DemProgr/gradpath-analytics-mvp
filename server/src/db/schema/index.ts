@@ -23,3 +23,4 @@ export { surveys } from './surveys';
 export { internships } from './internships';
 export { events } from './events';
 export { blogs } from './blogs';
+export { regionSalaryStats } from './region-salary-stats';

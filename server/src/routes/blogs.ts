@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { db } from '../db';
 import { blogs } from '../db/schema/blogs';
-import { eq, like, sql, desc } from 'drizzle-orm';
+import { eq, like, sql, desc, SQL } from 'drizzle-orm';
 import { authMiddleware } from '../middleware/auth';
 
 const router = new Hono();
@@ -27,8 +27,8 @@ router.get('/', async (c) => {
     const limit = parseInt(c.req.query('limit') || '50');
     const offset = (page - 1) * limit;
 
-    let query: any = db.select().from(blogs);
-    const conditions: any[] = [];
+    const baseQuery = db.select().from(blogs);
+    const conditions: SQL[] = [];
 
     if (tag) conditions.push(sql`${tag} = ANY(${blogs.tags})`);
     if (search) {
@@ -37,10 +37,9 @@ router.get('/', async (c) => {
       );
     }
 
-    if (conditions.length > 0) {
-      const whereClause = conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`;
-      query = query.where(whereClause);
-    }
+    const query = conditions.length > 0
+      ? baseQuery.where(conditions.length === 1 ? conditions[0] : sql`${conditions[0]}`)
+      : baseQuery;
 
     const results = await query.orderBy(desc(blogs.publishedAt)).limit(limit).offset(offset);
     return c.json(results);
@@ -68,7 +67,7 @@ router.post('/', authMiddleware, async (c) => {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) return c.json({ error: parsed.error.flatten().fieldErrors }, 400);
 
-    const [item] = await db.insert(blogs).values(parsed.data as any).returning();
+    const [item] = await db.insert(blogs).values(parsed.data as typeof blogs.$inferInsert).returning();
     return c.json(item, 201);
   } catch (err) {
     console.error('Error creating blog:', err);
@@ -89,7 +88,7 @@ router.put('/:id', authMiddleware, async (c) => {
     if (!existing) return c.json({ error: 'Not found' }, 404);
 
     const [updated] = await db.update(blogs)
-      .set(parsed.data as any)
+      .set(parsed.data as typeof blogs.$inferInsert)
       .where(eq(blogs.id, id))
       .returning();
 

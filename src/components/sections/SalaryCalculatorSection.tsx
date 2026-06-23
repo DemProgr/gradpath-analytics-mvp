@@ -198,7 +198,7 @@ const salaryDatabase: Record<string, SalaryData> = {
   },
 };
 
-export function SalaryCalculatorSection({ className }: SalaryCalculatorProps) {
+export function SalaryCalculatorSection({ className }: { className?: string }) {
   const [profession, setProfession] = useState('it');
   const [experience, setExperience] = useState(2);
   const [city, setCity] = useState('Минск');

@@ -86,7 +86,7 @@ export class ProfessionService {
   }
 
   static async getCareerPath(category: string): Promise<CareerPath | null> {
-    const data = await api.get<any[]>(`/api/career-paths/${encodeURIComponent(category)}`);
+    const data = await api.get<{ level_name: string; level_order: number; typical_salary_min: number; typical_salary_max: number; years_experience: string; description: string }[]>(`/api/career-paths/${encodeURIComponent(category)}`);
     if (!data || data.length === 0) return null;
     return {
       specialty_category: category,

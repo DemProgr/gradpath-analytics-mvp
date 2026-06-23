@@ -3,12 +3,12 @@ import { z } from 'zod';
 import { db } from '../db';
 import { surveys } from '../db/schema/surveys';
 import { profiles } from '../db/schema/profiles';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { authMiddleware } from '../middleware/auth';
 
 const router = new Hono();
 
-const MILESTONES = ['6months', '2years', '5years'] as const;
+const MILESTONES = ['6months', '12months', '2years', '4years'] as const;
 
 const surveySchema = z.object({
   milestone: z.enum(MILESTONES),
@@ -24,11 +24,104 @@ const surveySchema = z.object({
 function getMilestoneDuration(milestone: string): number {
   switch (milestone) {
     case '6months': return 6;
+    case '12months': return 12;
     case '2years': return 24;
-    case '5years': return 60;
+    case '4years': return 48;
     default: return 0;
   }
 }
+
+// GET /api/surveys/stats — public aggregate statistics
+router.get('/stats', async (c) => {
+  try {
+    const universityId = c.req.query('university_id');
+    const milestone = c.req.query('milestone');
+
+    let milestoneFilter = '';
+    if (milestone && ['6months', '12months', '2years', '4years'].includes(milestone)) {
+      milestoneFilter = `AND s.milestone = '${milestone}'`;
+    }
+
+    let universityJoin = '';
+    let universityFilter = '';
+    if (universityId) {
+      universityJoin = 'JOIN profiles p ON s.user_id = p.user_id';
+      universityFilter = `AND p.university_id = '${universityId}'`;
+    }
+
+    const overall = await db.execute(sql`
+      SELECT
+        s.milestone,
+        COUNT(*)::int AS total,
+        ROUND((AVG(CASE WHEN s.is_employed THEN 1.0 ELSE 0.0 END) * 100)::numeric, 1) AS employment_rate,
+        ROUND(AVG(s.salary)::numeric, 0) AS avg_salary,
+        ROUND((AVG(CASE WHEN s.is_in_specialty THEN 1.0 ELSE 0.0 END) * 100)::numeric, 1) AS in_specialty_rate
+      FROM surveys s
+      ${universityJoin ? sql.raw(universityJoin) : sql``}
+      WHERE 1=1 ${sql.raw(milestoneFilter)} ${sql.raw(universityFilter)}
+      GROUP BY s.milestone
+      ORDER BY s.milestone
+    `);
+
+    const topCompanies = await db.execute(sql`
+      SELECT s.company, COUNT(*)::int AS count
+      FROM surveys s
+      WHERE s.company IS NOT NULL AND s.company != ''
+      GROUP BY s.company
+      ORDER BY count DESC
+      LIMIT 15
+    `);
+
+    const byUniversity = await db.execute(sql`
+      SELECT
+        p.university_id,
+        u.short_name AS university_name,
+        COUNT(*)::int AS total_responses,
+        ROUND((AVG(CASE WHEN s.is_employed THEN 1.0 ELSE 0.0 END) * 100)::numeric, 1) AS employment_rate,
+        ROUND(AVG(s.salary)::numeric, 0) AS avg_salary
+      FROM surveys s
+      JOIN profiles p ON s.user_id = p.user_id
+      JOIN universities u ON p.university_id = u.id
+      ${sql.raw(milestoneFilter ? `AND ${milestoneFilter.replace('AND', 'WHERE')}` : '')}
+      GROUP BY p.university_id, u.short_name
+      HAVING COUNT(*) >= 1
+      ORDER BY total_responses DESC
+      LIMIT 20
+    `);
+
+    const bySpecialty = await db.execute(sql`
+      SELECT
+        p.specialty_id,
+        sp.name AS specialty_name,
+        COUNT(*)::int AS total_responses,
+        ROUND((AVG(CASE WHEN s.is_employed THEN 1.0 ELSE 0.0 END) * 100)::numeric, 1) AS employment_rate,
+        ROUND(AVG(s.salary)::numeric, 0) AS avg_salary
+      FROM surveys s
+      JOIN profiles p ON s.user_id = p.user_id
+      JOIN specialties sp ON p.specialty_id = sp.id
+      WHERE p.specialty_id IS NOT NULL
+      GROUP BY p.specialty_id, sp.name
+      HAVING COUNT(*) >= 1
+      ORDER BY total_responses DESC
+      LIMIT 20
+    `);
+
+    const totalCount = await db.execute(sql`
+      SELECT COUNT(*)::int AS total FROM surveys
+    `);
+
+    return c.json({
+      totalSurveys: totalCount.rows[0]?.total || 0,
+      byMilestone: overall.rows,
+      topCompanies: topCompanies.rows,
+      byUniversity: byUniversity.rows,
+      bySpecialty: bySpecialty.rows,
+    });
+  } catch (err) {
+    console.error('Survey stats error:', err);
+    return c.json({ error: 'Failed to fetch survey stats' }, 500);
+  }
+});
 
 // GET /api/surveys/status — current survey availability
 router.get('/status', authMiddleware, async (c) => {
@@ -39,7 +132,18 @@ router.get('/status', authMiddleware, async (c) => {
     const allUserSurveys = await db.select().from(surveys).where(eq(surveys.userId, authUser.id));
 
     const completedMilestones = allUserSurveys.map(s => s.milestone);
-    const graduationYear = profile?.expectedGraduationYear;
+    const debugGraduationYear = c.req.query('debug_graduation_year');
+    let graduationYear = profile?.expectedGraduationYear;
+    let isDebugMode = false;
+
+    if (debugGraduationYear) {
+      const parsed = parseInt(debugGraduationYear);
+      if (!isNaN(parsed)) {
+        graduationYear = parsed;
+        isDebugMode = true;
+      }
+    }
+
     const now = new Date();
     const currentYear = now.getFullYear();
 
@@ -50,6 +154,7 @@ router.get('/status', authMiddleware, async (c) => {
         graduationYear,
         completedMilestones,
         trajectory: allUserSurveys.sort((a, b) => a.milestone.localeCompare(b.milestone)),
+        isDebugMode,
       });
     }
 
@@ -85,6 +190,7 @@ router.get('/status', authMiddleware, async (c) => {
       completedMilestones,
       nextMilestone,
       trajectory: allUserSurveys.sort((a, b) => a.milestone.localeCompare(b.milestone)),
+      isDebugMode,
     });
   } catch (err) {
     console.error('Survey status error:', err);

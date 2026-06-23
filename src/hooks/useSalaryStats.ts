@@ -16,11 +16,18 @@ export interface SalaryStats {
   lastUpdated: string | null;
 }
 
+interface VacancyRaw {
+  category: string;
+  salary_min: number;
+  salary_max: number;
+  parsed_at: string;
+}
+
 export function useSalaryStats() {
   return useQuery({
     queryKey: ['salary-stats'],
     queryFn: async (): Promise<SalaryStats> => {
-      const vacancies = await api.get<any[]>('/api/vacancies?limit=50000');
+      const vacancies = await api.get<VacancyRaw[]>('/api/vacancies?limit=50000');
 
       const categoryMap = new Map<string, {
         salaryMins: number[];

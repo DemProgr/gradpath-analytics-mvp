@@ -6,16 +6,18 @@ import { LanguagesSection } from './LanguagesSection';
 import { ProjectsSection } from './ProjectsSection';
 import { CertificatesSection } from './CertificatesSection';
 import { useDigitalProfile } from '@/hooks/useDigitalProfile';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function DigitalProfileCard() {
+  const { t } = useLanguage();
   const { skills, languages, projects, certificates, isLoading } = useDigitalProfile();
 
   if (isLoading) {
     return (
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Цифровой профиль</CardTitle>
-          <CardDescription>Навыки, языки, проекты и сертификаты</CardDescription>
+          <CardTitle>{t('profile.digitalProfile')}</CardTitle>
+          <CardDescription>{t('profile.digitalProfileDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -35,16 +37,16 @@ export function DigitalProfileCard() {
     >
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Цифровой профиль</CardTitle>
-          <CardDescription>Навыки, языки, проекты и сертификаты</CardDescription>
+          <CardTitle>{t('profile.digitalProfile')}</CardTitle>
+          <CardDescription>{t('profile.digitalProfileDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="skills">
             <TabsList className="w-full grid grid-cols-4 mb-4">
-              <TabsTrigger value="skills">Навыки {skills.length > 0 && `(${skills.length})`}</TabsTrigger>
-              <TabsTrigger value="languages">Языки {languages.length > 0 && `(${languages.length})`}</TabsTrigger>
-              <TabsTrigger value="projects">Проекты {projects.length > 0 && `(${projects.length})`}</TabsTrigger>
-              <TabsTrigger value="certificates">Сертификаты {certificates.length > 0 && `(${certificates.length})`}</TabsTrigger>
+              <TabsTrigger value="skills">{t('profile.skills')}{skills.length > 0 && ` (${skills.length})`}</TabsTrigger>
+              <TabsTrigger value="languages">{t('profile.languages')}{languages.length > 0 && ` (${languages.length})`}</TabsTrigger>
+              <TabsTrigger value="projects">{t('profile.projects')}{projects.length > 0 && ` (${projects.length})`}</TabsTrigger>
+              <TabsTrigger value="certificates">{t('profile.certificates')}{certificates.length > 0 && ` (${certificates.length})`}</TabsTrigger>
             </TabsList>
             <TabsContent value="skills">
               <SkillsSection />

@@ -56,21 +56,21 @@ class ApiClient {
     return this.request<T>(path);
   }
 
-  post<T>(path: string, body?: any): Promise<T> {
+  post<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>(path, {
       method: 'POST',
       body: body ? JSON.stringify(body) : undefined,
     });
   }
 
-  patch<T>(path: string, body?: any): Promise<T> {
+  patch<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>(path, {
       method: 'PATCH',
       body: body ? JSON.stringify(body) : undefined,
     });
   }
 
-  put<T>(path: string, body?: any): Promise<T> {
+  put<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>(path, {
       method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, ArrowRight, ArrowLeft, Check, Sparkles, RefreshCw, Bookmark } from 'lucide-react';
+import { Brain, ArrowRight, ArrowLeft, Check, Sparkles, RefreshCw, Bookmark, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -117,6 +117,7 @@ export function CareerGuidanceQuiz({ className }: CareerGuidanceQuizProps) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [recommendations, setRecommendations] = useState<CareerRecommendation[]>([]);
+  const [saved, setSaved] = useState(false);
 
   const handleAnswer = (value: string) => {
     const newAnswers = [...answers, value];
@@ -173,6 +174,17 @@ export function CareerGuidanceQuiz({ className }: CareerGuidanceQuizProps) {
     setAnswers([]);
     setShowResults(false);
     setRecommendations([]);
+    setSaved(false);
+  };
+
+  const saveResults = () => {
+    const data = {
+      answers,
+      recommendations: recommendations.map(r => ({ category: r.category, matchPercent: r.matchPercent })),
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('gradpath-career-quiz-results', JSON.stringify(data));
+    setSaved(true);
   };
 
   const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
@@ -313,9 +325,18 @@ export function CareerGuidanceQuiz({ className }: CareerGuidanceQuizProps) {
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Пройти заново
                       </Button>
-                      <Button className="flex-1">
-                        <Bookmark className="w-4 h-4 mr-2" />
-                        Сохранить результаты
+                      <Button className="flex-1" onClick={saveResults} disabled={saved}>
+                        {saved ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                            Сохранено
+                          </>
+                        ) : (
+                          <>
+                            <Bookmark className="w-4 h-4 mr-2" />
+                            Сохранить результаты
+                          </>
+                        )}
                       </Button>
                     </div>
                   </CardContent>

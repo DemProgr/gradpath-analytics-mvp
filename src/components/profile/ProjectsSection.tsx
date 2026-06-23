@@ -8,8 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { useDigitalProfile, Project } from '@/hooks/useDigitalProfile';
 import { useToast } from '@/hooks/use-toast';
 import { ReorderableList } from './ReorderableList';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function ProjectsSection() {
+  const { t, language } = useLanguage();
   const { projects, addProject, updateProject, deleteProject, reorderProjects } = useDigitalProfile();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -40,7 +42,7 @@ export function ProjectsSection() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      toast({ title: 'Ошибка', description: 'Введите название проекта', variant: 'destructive' });
+      toast({ title: t('common.error'), description: t('profile.projectTitleRequired'), variant: 'destructive' });
       return;
     }
 
@@ -57,32 +59,34 @@ export function ProjectsSection() {
       ? await updateProject(editing.id, data)
       : await addProject(data);
 
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else { toast({ title: editing ? 'Проект обновлён' : 'Проект добавлен' }); setDialogOpen(false); }
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else { toast({ title: editing ? t('profile.projectUpdated') : t('profile.projectAdded') }); setDialogOpen(false); }
   };
 
   const handleDelete = async (id: number) => {
     const { error } = await deleteProject(id);
-    if (error) toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
-    else toast({ title: 'Проект удалён' });
+    if (error) toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    else toast({ title: t('profile.projectDeleted') });
   };
+
+  const locale = language === 'en' ? 'en-US' : language === 'be' ? 'be-BY' : 'ru-RU';
 
   const formatDate = (d: string | null | undefined) => {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('ru-RU', { year: 'numeric', month: 'short' });
+    return new Date(d).toLocaleDateString(locale, { year: 'numeric', month: 'short' });
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">Проекты</h4>
+        <h4 className="text-sm font-medium">{t('profile.projects')}</h4>
         <Button variant="ghost" size="sm" onClick={openAdd}>
-          <Plus className="w-4 h-4 mr-1" /> Добавить
+          <Plus className="w-4 h-4 mr-1" /> {t('profile.add')}
         </Button>
       </div>
 
       {projects.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-4">Проекты не добавлены.</p>
+        <p className="text-sm text-muted-foreground text-center py-4">{t('profile.projectsEmpty')}</p>
       ) : (
         <ReorderableList items={projects} onReorder={reorderProjects}>
           {(proj) => (
@@ -95,12 +99,12 @@ export function ProjectsSection() {
                   {(proj.startDate || proj.endDate) && (
                     <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {formatDate(proj.startDate)} — {formatDate(proj.endDate) || 'настоящее время'}
+                      {formatDate(proj.startDate)} — {formatDate(proj.endDate) || t('profile.present')}
                     </p>
                   )}
                   {proj.url && (
                     <a href={proj.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1">
-                      <ExternalLink className="w-3 h-3" /> Открыть
+                      <ExternalLink className="w-3 h-3" /> {t('profile.open')}
                     </a>
                   )}
                 </div>
@@ -121,39 +125,39 @@ export function ProjectsSection() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Редактировать проект' : 'Добавить проект'}</DialogTitle>
+            <DialogTitle>{editing ? t('profile.editProject') : t('profile.addProject')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
             <div className="space-y-2">
-              <Label>Название *</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Разработка веб-приложения" />
+              <Label>{t('profile.projectTitle')}</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Web App Development" />
             </div>
             <div className="space-y-2">
-              <Label>Роль</Label>
-              <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Backend разработчик" />
+              <Label>{t('profile.projectRole')}</Label>
+              <Input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Backend Developer" />
             </div>
             <div className="space-y-2">
-              <Label>Описание</Label>
-              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Краткое описание проекта" rows={3} />
+              <Label>{t('profile.projectDescription')}</Label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t('profile.projectDescription')} rows={3} />
             </div>
             <div className="space-y-2">
-              <Label>Ссылка</Label>
+              <Label>{t('profile.projectUrl')}</Label>
               <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://github.com/..." />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label>Дата начала</Label>
+                <Label>{t('profile.projectStartDate')}</Label>
                 <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Дата окончания</Label>
+                <Label>{t('profile.projectEndDate')}</Label>
                 <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Отмена</Button>
-            <Button onClick={handleSave}>{editing ? 'Сохранить' : 'Добавить'}</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSave}>{editing ? t('common.save') : t('profile.add')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

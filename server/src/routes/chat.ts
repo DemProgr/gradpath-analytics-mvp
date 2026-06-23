@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { authMiddleware } from '../middleware/auth';
 
 const router = new Hono();
 
@@ -23,7 +24,7 @@ const SYSTEM_PROMPT = `Ты - эксперт по образованию в Бе
 
 const OPENROUTER_MODEL = 'google/gemini-2.0-flash-001';
 
-router.post('/', async (c) => {
+router.post('/', authMiddleware, async (c) => {
   try {
     const { message, history = [] } = await c.req.json();
 
@@ -38,7 +39,7 @@ router.post('/', async (c) => {
 
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },
-      ...history.slice(-6).map((m: any) => ({
+      ...history.slice(-6).map((m: { role: string; content: string }) => ({
         role: m.role,
         content: m.content,
       })),

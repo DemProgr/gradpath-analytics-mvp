@@ -471,7 +471,7 @@ export function CareerProspectsCalculator({ className }: { className?: string })
                   <div className="space-y-6">
                     {data.growthProspects.map((step, index) => {
                       return (
-                        <div key={index} className="relative flex items-start gap-4 pl-8">
+                        <div key={'growth-' + index} className="relative flex items-start gap-4 pl-8">
                           <div className="absolute left-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold z-10 bg-secondary">
                             {index + 1}
                           </div>

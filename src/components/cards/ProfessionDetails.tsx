@@ -100,7 +100,7 @@ export function ProfessionDetails({ profession }: ProfessionDetailsProps) {
           </h3>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {profession.keySkills.map((skill, index) => (
-              <Badge key={index} variant="outline" className="text-sm">
+              <Badge key={skill} variant="outline" className="text-sm">
                 {skill}
               </Badge>
             ))}
@@ -119,7 +119,7 @@ export function ProfessionDetails({ profession }: ProfessionDetailsProps) {
           </h3>
           <div className="space-y-2">
             {profession.improvementAreas.map((area, index) => (
-              <div key={index} className="flex items-start gap-2">
+              <div key={'area-' + index} className="flex items-start gap-2">
                 <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
                 <p className="text-muted-foreground">{area}</p>
               </div>
@@ -139,7 +139,7 @@ export function ProfessionDetails({ profession }: ProfessionDetailsProps) {
           </h3>
           <div className="space-y-2">
             {profession.education.map((edu, index) => (
-              <div key={index} className="flex items-start gap-2">
+              <div key={'edu-' + index} className="flex items-start gap-2">
                 <div className="flex-shrink-0 w-2 h-2 bg-primary rounded-full mt-2"></div>
                 <p className="text-muted-foreground">{edu}</p>
               </div>

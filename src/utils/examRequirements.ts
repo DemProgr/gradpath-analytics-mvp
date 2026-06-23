@@ -51,7 +51,7 @@ export async function loadExamRequirements(): Promise<FacultyExamRequirement[]> 
       return FALLBACK_REQUIREMENTS;
     }
     
-    const requirements: FacultyExamRequirement[] = (data as any[]).map((row: any) => {
+    const requirements: FacultyExamRequirement[] = (data as Record<string, unknown>[]).map((row) => {
       const getVal = (candidates: string[]) => {
         for (const c of candidates) {
           if (row[c] !== undefined) return String(row[c]).trim();

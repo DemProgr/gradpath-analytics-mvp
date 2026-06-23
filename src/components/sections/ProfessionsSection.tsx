@@ -11,22 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-
-const demandFilters: { value: DemandLevel | 'all'; label: string }[] = [
-  { value: 'all', label: 'Все' },
-  { value: 'high', label: 'Высокий спрос' },
-  { value: 'medium', label: 'Средний спрос' },
-  { value: 'low', label: 'Низкий спрос' },
-];
-
-const categoryFilters: { value: ProfessionCategory | 'all'; label: string }[] = [
-  { value: 'all', label: 'Все категории' },
-  { value: 'worker', label: 'Рабочие' },
-  { value: 'employee', label: 'Служащие' },
-  { value: 'specialist', label: 'Специалисты' },
-];
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function ProfessionsSection() {
+  const { t } = useLanguage();
   const [professions, setProfessions] = useState<ProfessionAnalytics[]>([]);
   const [stats, setStats] = useState<ProfessionStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +41,7 @@ export function ProfessionsSection() {
       setStats(statsData);
     } catch (err) {
       console.error('Error loading professions:', err);
-      setError('Не удалось загрузить данные о профессиях. Пожалуйста, попробуйте позже.');
+      setError(t('professions.loadError'));
     } finally {
       setLoading(false);
     }
@@ -81,7 +69,7 @@ export function ProfessionsSection() {
             <Skeleton className="h-4 w-full" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className="h-64" />
+                <Skeleton key={'skeleton-' + i} className="h-64" />
               ))}
             </div>
           </div>
@@ -99,7 +87,7 @@ export function ProfessionsSection() {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
           <Button onClick={loadData} className="mt-4">
-            Попробовать снова
+            {t('professions.retry')}
           </Button>
         </div>
       </section>
@@ -119,12 +107,11 @@ export function ProfessionsSection() {
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-6 h-6 text-primary" />
             <h2 className="text-3xl font-display font-bold text-foreground">
-              Востребованные профессии 2026
+              {t('professions.title')}
             </h2>
           </div>
           <p className="text-muted-foreground max-w-3xl">
-            Прогноз востребованности профессий в Беларуси на 2026 год на основе данных 
-            Минтруда, Мингорисполкома и анализа рынка труда.
+            {t('professions.subtitle')}
           </p>
 
           {/* Stats */}
@@ -209,7 +196,12 @@ export function ProfessionsSection() {
             </div>
             
             <div className="flex flex-wrap gap-2">
-              {demandFilters.map((filter) => (
+              {[
+                { value: 'all' as const, label: t('professions.all') },
+                { value: 'high' as const, label: t('professions.highDemand') },
+                { value: 'medium' as const, label: t('professions.mediumDemand') },
+                { value: 'low' as const, label: t('professions.lowDemand') },
+              ].map((filter) => (
                 <Button
                   key={filter.value}
                   variant={selectedDemand === filter.value ? 'default' : 'outline'}
@@ -223,7 +215,12 @@ export function ProfessionsSection() {
           </div>
 
           <div className="flex flex-wrap gap-2 mt-4">
-            {categoryFilters.map((filter) => (
+            {[
+              { value: 'all' as const, label: t('professions.allCategories') },
+              { value: 'worker' as const, label: t('professions.workers') },
+              { value: 'employee' as const, label: t('professions.employees') },
+              { value: 'specialist' as const, label: t('professions.specialists') },
+            ].map((filter) => (
               <Button
                 key={filter.value}
                 variant={selectedCategory === filter.value ? 'default' : 'outline'}

@@ -77,10 +77,10 @@ export function BlogSection({ className }: BlogSectionProps) {
   };
 
   const getImage = (post: BlogPost) =>
-    post.coverImage || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
+    (post.coverImage ? imagePath(post.coverImage) : null) || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
 
   const getSidebarImage = (post: BlogPost) =>
-    post.coverImage || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
+    (post.coverImage ? imagePath(post.coverImage) : null) || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
 
   const getCategory = (post: BlogPost) =>
     post.tags && post.tags.length > 0 ? post.tags[0] : null;

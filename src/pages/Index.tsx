@@ -153,7 +153,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                       >
                         <div className="relative h-48 rounded-xl overflow-hidden mb-4">
                           <img
-                            src={post.coverImage || imagePath(`/blog/${['IT.jpg','salary.jpg','admission.jpg','intership.jpg','rating.jpg','resume.jpg'][i % 6]}`)}
+                            src={(post.coverImage ? imagePath(post.coverImage) : null) || imagePath(`/blog/${['IT.jpg','salary.jpg','admission.jpg','intership.jpg','rating.jpg','resume.jpg'][i % 6]}`)}
                             alt={post.title}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />

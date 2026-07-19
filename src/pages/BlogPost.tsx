@@ -86,7 +86,7 @@ export default function BlogPost() {
   };
 
   const getCoverImage = () =>
-    post.coverImage || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
+    (post.coverImage ? imagePath(post.coverImage) : null) || SLUG_TO_IMAGE[post.slug] || FALLBACK_IMAGES[post.id % FALLBACK_IMAGES.length];
 
   const renderContent = (text: string) => {
     return text.split('\n').map((line, i) => {

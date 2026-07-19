@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, GraduationCap, Briefcase, BarChart3, Search, Sparkles } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/lib/api/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUniversities } from '@/hooks/useUniversities';
@@ -31,37 +29,6 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
     return () => clearInterval(interval);
   }, [heroImages.length]);
   
-  const { data: universityCount } = useQuery({
-    queryKey: ['university-count'],
-    queryFn: async () => {
-      const universities = await api.get<unknown[]>('/api/universities');
-      return universities.length;
-    }
-  });
-
-  const { data: vacancyCount } = useQuery({
-    queryKey: ['vacancy-count-hero'],
-    queryFn: async () => {
-      const { count } = await api.get<{ count: number }>('/api/vacancies/count');
-      return count;
-    }
-  });
-
-  const quickStats = [
-    { 
-      label: t('hero.unis'), 
-      value: universityCount !== undefined ? String(universityCount) : '...',
-    },
-    { 
-      label: t('hero.vacancies'), 
-      value: vacancyCount !== undefined ? String(vacancyCount) : '...',
-    },
-    { 
-      label: t('hero.sources'), 
-      value: '3+',
-    },
-  ];
-
   const searchResults = searchQuery.length >= 2 && universities
     ? universities.filter(uni => 
         (uni.short_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -172,20 +139,6 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
               <p className="text-muted-foreground text-sm">{t('hero.noResults')}</p>
             </motion.div>
           )}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="flex items-center justify-center gap-8 sm:gap-12 mb-10"
-        >
-          {quickStats.map((stat, index) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-2xl sm:text-3xl font-serif font-semibold text-foreground">{stat.value}</p>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-            </div>
-          ))}
         </motion.div>
 
         <motion.div

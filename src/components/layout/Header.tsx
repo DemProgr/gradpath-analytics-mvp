@@ -151,10 +151,10 @@ const navItems = [
           if ('ontouchstart' in window) setIsHeaderHovered(prev => !prev)
         }}
         animate={{
-          maxWidth: isScrolled ? 1024 : 10000,
-          borderRadius: isScrolled ? 16 : 0,
+          maxWidth: isScrolled && !isMobile ? 1024 : '100%',
+          borderRadius: isScrolled && !isMobile ? 16 : 0,
           boxShadow: isScrolled ? '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)' : 'none',
-          marginTop: isScrolled ? 12 : 0,
+          marginTop: isScrolled && !isMobile ? 12 : 0,
           backgroundColor: isScrolled ? 'rgb(15,26,28)' : 'rgba(255,255,255,0.8)',
           borderBottom: isScrolled ? '0px solid transparent' : '1px solid hsl(var(--border))',
           color: isScrolled ? 'rgb(255,255,255)' : 'inherit',
@@ -169,12 +169,12 @@ const navItems = [
             </div>
             <motion.span
               animate={{
-                maxWidth: isScrolled ? 0 : 400,
+                maxWidth: isScrolled ? 0 : (isMobile ? 180 : 400),
                 opacity: isScrolled ? 0 : 1,
-                marginRight: isScrolled ? 0 : 12,
+                marginRight: isScrolled ? 0 : (isMobile ? 8 : 12),
               }}
               transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-              className="inline-block font-serif text-xl sm:text-2xl font-semibold overflow-hidden whitespace-nowrap"
+              className="inline-block font-serif text-base sm:text-xl lg:text-2xl font-semibold overflow-hidden whitespace-nowrap"
             >
               GradPath Analytics
             </motion.span>
@@ -337,9 +337,9 @@ const navItems = [
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
               className={cn(
-                "overflow-hidden fixed left-0 right-0 top-16 sm:top-20",
+                "overflow-hidden fixed left-0 right-0 top-16 sm:top-20 z-50",
                 isScrolled
-                  ? "bg-[#0f1a1c] shadow-lg rounded-2xl mt-1 max-w-5xl mx-auto"
+                  ? "bg-[#0f1a1c] shadow-lg"
                   : "bg-background border-b border-border"
               )}
           >

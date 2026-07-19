@@ -61,7 +61,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           transition={{ duration: 0.8 }}
           className="w-full"
         >
-          <div className="relative w-full" style={{ height: '100vh' }}>
+          <div className="relative w-full" style={{ height: '100dvh' }}>
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentImageIndex}
@@ -83,7 +83,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium text-foreground leading-tight mb-4">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-foreground leading-tight mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>

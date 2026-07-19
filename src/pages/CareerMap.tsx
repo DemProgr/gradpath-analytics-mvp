@@ -73,7 +73,7 @@ export default function CareerMap() {
               </p>
             </motion.div>
 
-            <div className="w-80 mb-8">
+            <div className="w-full sm:w-80 mb-8">
               <Select value={selected} onValueChange={setSelected}>
                 <SelectTrigger>
                   <SelectValue placeholder={t('careerMap.selectSpec')} />

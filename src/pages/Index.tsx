@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { imagePath } from '@/lib/imagePath';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface IndexProps {
   isChatOpen?: boolean;
@@ -23,6 +24,7 @@ interface IndexProps {
 }
 
 const Index = ({ isChatOpen = false }: IndexProps) => {
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('overview');
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselApiRef = useRef<any>(null);
@@ -105,7 +107,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
       
       <motion.main
         animate={{
-          marginRight: isChatOpen ? '450px' : '0px'
+          marginRight: isChatOpen && !isMobile ? '450px' : '0px'
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="relative"
@@ -295,9 +297,9 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
                   />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-blue-950/90 px-12 py-8 rounded-lg text-center max-w-md min-h-[350px] flex flex-col justify-center">
-                    <h3 className="text-white text-2xl sm:text-3xl font-medium mb-3">Выбираете направление обучения?</h3>
-                    <p className="text-white/90 text-base mb-6">GradPath поможет вам принять самые важные решения: вся необходимая информация, чтобы найти правильный для вас путь.</p>
+                  <div className="bg-blue-950/90 px-6 sm:px-12 py-6 sm:py-8 rounded-lg text-center max-w-md flex flex-col justify-center">
+                    <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-medium mb-3">Выбираете направление обучения?</h3>
+                    <p className="text-white/90 text-sm sm:text-base mb-6">GradPath поможет вам принять самые важные решения: вся необходимая информация, чтобы найти правильный для вас путь.</p>
                     <a href="/applicants" className="inline-flex group">
                       <span className="px-4 py-2 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                         Узнайте, как

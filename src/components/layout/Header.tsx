@@ -143,11 +143,13 @@ const navItems = [
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 flex justify-center"
-      style={{ marginRight: chatOpen ? '450px' : '0px' }}
     >
       <motion.div
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => setIsHeaderHovered(false)}
+        onClick={() => {
+          if ('ontouchstart' in window) setIsHeaderHovered(prev => !prev)
+        }}
         animate={{
           maxWidth: isScrolled ? 1024 : 10000,
           borderRadius: isScrolled ? 16 : 0,
@@ -335,12 +337,11 @@ const navItems = [
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
               className={cn(
-                "overflow-hidden fixed left-0 right-0 top-auto",
+                "overflow-hidden fixed left-0 right-0 top-16 sm:top-20",
                 isScrolled
                   ? "bg-[#0f1a1c] shadow-lg rounded-2xl mt-1 max-w-5xl mx-auto"
                   : "bg-background border-b border-border"
               )}
-            style={{ top: isScrolled ? 76 : 80 }}
           >
             <nav className="px-4 py-4 space-y-1">
               {navItems.map((item, index) => (

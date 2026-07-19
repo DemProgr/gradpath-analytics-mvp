@@ -671,7 +671,7 @@ const UniversityDetail = () => {
                 <CardContent>
                   {/* Filters as Select */}
                   <div className="flex flex-wrap gap-4 mb-6">
-                    <div className="w-[180px]">
+                    <div className="w-full sm:w-[180px]">
                       <Select value={selectedYear?.toString() || "all"} onValueChange={(v) => { setSelectedYear(v === "all" ? null : parseInt(v)); setHasInteracted(true); }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Год" />
@@ -685,7 +685,7 @@ const UniversityDetail = () => {
                       </Select>
                     </div>
 
-                    <div className="w-[280px]">
+                    <div className="w-full sm:w-[280px]">
                       <Select value={selectedFaculty || "all"} onValueChange={(v) => { setSelectedFaculty(v === "all" ? null : v); setSelectedSpecialty(null); setHasInteracted(true); }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Факультет / Институт" />
@@ -713,7 +713,7 @@ const UniversityDetail = () => {
                     </div>
 
                     {selectedFaculty && (
-                      <div className="w-[320px]">
+                      <div className="w-full sm:w-[320px]">
                         <Select value={selectedSpecialty || "all"} onValueChange={(v) => { setSelectedSpecialty(v === "all" ? null : v); setHasInteracted(true); }}>
                           <SelectTrigger>
                             <SelectValue placeholder="Специальность" />
@@ -865,6 +865,7 @@ if (selectedYear && stat.year !== selectedYear) return false;
                   })()}
                   
                   <div className="max-h-[500px] overflow-auto">
+                    <div className="min-w-[700px]">
                     <Table>
                       <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                         <TableRow>
@@ -943,6 +944,7 @@ if (selectedYear && stat.year !== selectedYear) return false;
                         ))}
                       </TableBody>
                     </Table>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

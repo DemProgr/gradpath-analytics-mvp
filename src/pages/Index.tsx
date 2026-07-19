@@ -15,6 +15,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import useEmblaCarousel from "embla-carousel-react";
+import { imagePath } from '@/lib/imagePath';
 
 interface IndexProps {
   isChatOpen?: boolean;
@@ -152,7 +153,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                       >
                         <div className="relative h-48 rounded-xl overflow-hidden mb-4">
                           <img
-                            src={post.coverImage || `/blog/${['IT.jpg','salary.jpg','admission.jpg','intership.jpg','rating.jpg','resume.jpg'][i % 6]}`}
+                            src={post.coverImage || imagePath(`/blog/${['IT.jpg','salary.jpg','admission.jpg','intership.jpg','rating.jpg','resume.jpg'][i % 6]}`)}
                             alt={post.title}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
@@ -207,7 +208,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/students.jpg" 
+                        src={imagePath('/students.jpg')} 
                         alt="Студенты" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -235,7 +236,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/data.jpg" 
+                        src={imagePath('/data.jpg')} 
                         alt="Данные" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -263,7 +264,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                     </div>
                     <div className="hidden sm:block flex-shrink-0">
                       <img 
-                        src="/anket2.jpg" 
+                        src={imagePath('/anket2.jpg')} 
                         alt="Анкета" 
                         className="h-[400px] sm:h-[500px] w-auto object-cover rounded-lg"
                       />
@@ -289,7 +290,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="relative group">
                   <img 
-                    src="/way.jpg" 
+                    src={imagePath('/way.jpg')} 
                     alt="Путь" 
                     className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
                   />
@@ -312,7 +313,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
               </div>
               <div className="relative group">
                   <img 
-                    src="/anket.jpg" 
+                    src={imagePath('/anket.jpg')} 
                     alt="Анкета" 
                     className="w-full h-[450px] sm:h-[550px] object-cover rounded-lg transition-all duration-300 group-hover:blur-sm"
                   />

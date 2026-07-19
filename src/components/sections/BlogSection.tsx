@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { api } from '@/lib/api/client';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useToast } from '@/hooks/use-toast';
+import { imagePath } from '@/lib/imagePath';
 
 interface BlogPost {
   id: number;
@@ -21,21 +22,21 @@ interface BlogPost {
 }
 
 const SLUG_TO_IMAGE: Record<string, string> = {
-  'kak-vybrat-it-specialnost': '/blog/IT.jpg',
-  'srednie-zarplaty-vypusknikov-2026': '/blog/salary.jpg',
-  'kuda-uezzhayut-vypuskniki': '/blog/admission.jpg',
-  'stazhirovki-2026-gde-iskat': '/blog/intership.jpg',
-  'reiting-vuzov-belarusi-2026': '/blog/rating.jpg',
-  'kak-sostavit-rezume-studentu': '/blog/resume.jpg',
+  'kak-vybrat-it-specialnost': imagePath('/blog/IT.jpg'),
+  'srednie-zarplaty-vypusknikov-2026': imagePath('/blog/salary.jpg'),
+  'kuda-uezzhayut-vypuskniki': imagePath('/blog/admission.jpg'),
+  'stazhirovki-2026-gde-iskat': imagePath('/blog/intership.jpg'),
+  'reiting-vuzov-belarusi-2026': imagePath('/blog/rating.jpg'),
+  'kak-sostavit-rezume-studentu': imagePath('/blog/resume.jpg'),
 };
 
 const FALLBACK_IMAGES = [
-  '/blog/IT.jpg',
-  '/blog/salary.jpg',
-  '/blog/admission.jpg',
-  '/blog/intership.jpg',
-  '/blog/rating.jpg',
-  '/blog/resume.jpg',
+  imagePath('/blog/IT.jpg'),
+  imagePath('/blog/salary.jpg'),
+  imagePath('/blog/admission.jpg'),
+  imagePath('/blog/intership.jpg'),
+  imagePath('/blog/rating.jpg'),
+  imagePath('/blog/resume.jpg'),
 ];
 
 interface BlogSectionProps {

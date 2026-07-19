@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
+import { imagePath } from '@/lib/imagePath';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -162,7 +163,7 @@ const navItems = [
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="w-9 h-9 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
-              <img src="/favicon.png" alt="GradPath" className="w-6 h-6 object-contain" />
+              <img src={imagePath('/favicon.png')} alt="GradPath" className="w-6 h-6 object-contain" />
             </div>
             <motion.span
               animate={{

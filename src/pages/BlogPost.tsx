@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/Header';
 import { api } from '@/lib/api/client';
 import { useLanguage } from '@/hooks/useLanguage';
+import { imagePath } from '@/lib/imagePath';
 
 interface BlogPost {
   id: number;
@@ -21,17 +22,16 @@ interface BlogPost {
 }
 
 const SLUG_TO_IMAGE: Record<string, string> = {
-  'kak-vybrat-it-specialnost': '/blog/IT.jpg',
-  'srednie-zarplaty-vypusknikov-2026': '/blog/salary.jpg',
-  'kuda-uezzhayut-vypuskniki': '/blog/admission.jpg',
-  'stazhirovki-2026-gde-iskat': '/blog/intership.jpg',
-  'reiting-vuzov-belarusi-2026': '/blog/rating.jpg',
-  'kak-sostavit-rezume-studentu': '/blog/resume.jpg',
+  'kak-vybrat-it-specialnost': imagePath('/blog/IT.jpg'),
+  'srednie-zarplaty-vypusknikov-2026': imagePath('/blog/salary.jpg'),
+  'kuda-uezzhayut-vypuskniki': imagePath('/blog/admission.jpg'),
+  'stazhirovki-2026-gde-iskat': imagePath('/blog/intership.jpg'),
+  'reiting-vuzov-belarusi-2026': imagePath('/blog/rating.jpg'),
+  'kak-sostavit-rezume-studentu': imagePath('/blog/resume.jpg'),
 };
 
-// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const FALLBACK_IMAGES = [
-  '/placeholder.svg',
+  imagePath('/placeholder.svg'),
 ];
 
 export default function BlogPost() {

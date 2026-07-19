@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/hooks/useLanguage';
+import { imagePath } from '@/lib/imagePath';
 import {
   Select,
   SelectContent,
@@ -57,22 +58,22 @@ interface AdmissionStat {
 // University images mapping - проверенные фотографии университетов
 const universityImages: Record<string, string> = {
   'БГУ': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Belarus-Minsk-BSU-Rector%27s_Office-2.jpg/1280px-Belarus-Minsk-BSU-Rector%27s_Office-2.jpg',
-  'БГУИР': '/pics/bsuir.jpg',
+  'БГУИР': imagePath('/pics/bsuir.jpg'),
   'БНТУ': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Main_building_of_BNTU.jpg/1280px-Main_building_of_BNTU.jpg',
-  'БГЭУ': '/pics/bseu.jpg',
-  'БГМУ': '/pics/bsmu.jpg',
-  'БГПУ': '/pics/bspu.jpg',
-  'ГрГУ': '/pics/uniofgrodno.jpg',
-  'ВГУ': '/pics/vsu.jpg',
-  'ПГУ': '/pics/pgu.jpg',
-  'ГГТУ': '/pics/gstu.jpg',
-  'БГУИЯ': '/pics/bsufl.jpg',
-  'Академия управления': '/pics/akademiaupr.jpg',
-  'Академия МВД': '/pics/akademiamvd.jpg',
-  'БрГУ': '/pics/brsu.jpg',
-  'БГАА': '/pics/bsaa.jpg',
-  'БГУКИ': '/pics/bsuca.jpg',
-  'БГУФК': '/pics/bsups.jpg',
+  'БГЭУ': imagePath('/pics/bseu.jpg'),
+  'БГМУ': imagePath('/pics/bsmu.jpg'),
+  'БГПУ': imagePath('/pics/bspu.jpg'),
+  'ГрГУ': imagePath('/pics/uniofgrodno.jpg'),
+  'ВГУ': imagePath('/pics/vsu.jpg'),
+  'ПГУ': imagePath('/pics/pgu.jpg'),
+  'ГГТУ': imagePath('/pics/gstu.jpg'),
+  'БГУИЯ': imagePath('/pics/bsufl.jpg'),
+  'Академия управления': imagePath('/pics/akademiaupr.jpg'),
+  'Академия МВД': imagePath('/pics/akademiamvd.jpg'),
+  'БрГУ': imagePath('/pics/brsu.jpg'),
+  'БГАА': imagePath('/pics/bsaa.jpg'),
+  'БГУКИ': imagePath('/pics/bsuca.jpg'),
+  'БГУФК': imagePath('/pics/bsups.jpg'),
 };
 
 // Extended descriptions for universities
@@ -326,7 +327,7 @@ const UniversityDetail = () => {
             onError={(e) => {
               // Fallback to local image or placeholder if external image fails
               const target = e.target as HTMLImageElement;
-              target.src = '/pics/placeholder-university.jpg';
+              target.src = imagePath('/pics/placeholder-university.jpg');
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />

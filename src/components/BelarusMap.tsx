@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { imagePath } from '@/lib/imagePath';
 
 interface Region {
   id: string;
@@ -155,7 +156,7 @@ export function BelarusMap() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/belarus-map.svg')
+    fetch(imagePath('/belarus-map.svg'))
       .then(res => res.text())
       .then(svgText => {
         const parser = new DOMParser();

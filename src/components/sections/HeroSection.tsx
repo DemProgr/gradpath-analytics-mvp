@@ -7,6 +7,7 @@ import { api } from '@/lib/api/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUniversities } from '@/hooks/useUniversities';
+import { imagePath } from '@/lib/imagePath';
 
 interface HeroSectionProps {
   onNavigate: (section: string) => void;
@@ -21,7 +22,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   const { t } = useLanguage();
   const { universities } = useUniversities();
 
-  const heroImages = ['/design/vuzmain.jpg', '/grodnoimage2.png', '/bntu.png', '/bntu2.png'];
+  const heroImages = ['/grodnoimage2.png', '/bntu.png', '/bntu2.png', '/design.png'];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -97,7 +98,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentImageIndex}
-                src={heroImages[currentImageIndex]}
+                src={imagePath(heroImages[currentImageIndex])}
                 alt="Gradpath Analytics"
                 className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                 initial={{ opacity: 0 }}

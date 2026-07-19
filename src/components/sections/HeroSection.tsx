@@ -222,15 +222,6 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             </a>
           )}
         </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-center text-xs text-muted-foreground mt-8"
-        >
-          {t('hero.dataNotice')}
-        </motion.p>
       </div>
     </section>
   );

@@ -25,6 +25,7 @@ interface HeaderProps {
 
 export function Header({ activeSection, onSectionChange, chatOpen = false }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedNavItem, setExpandedNavItem] = useState<string | null>(null);
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isMobile = useIsMobile();
@@ -344,25 +345,84 @@ const navItems = [
               )}
           >
             <nav className="px-4 py-4 space-y-1">
-              {navItems.map((item, index) => (
-                <Link key={item.id} to={item.id} onClick={() => setMobileOpen(false)}>
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.05 * index }}
-                    className={cn(
-                      "w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium",
-                      isActiveRoute(item.id)
-                        ? "bg-primary text-primary-foreground"
-                        : isScrolled
-                          ? "text-white/70 hover:bg-white/10"
-                          : "text-muted-foreground hover:bg-secondary"
-                    )}
-                  >
-                    {item.label}
-                  </motion.div>
-                </Link>
-              ))}
+              {navItems.map((item, index) => {
+                const isExpanded = expandedNavItem === item.id;
+                return (
+                  <div key={item.id}>
+                    <motion.div
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.05 * index }}
+                      onClick={() => setExpandedNavItem(isExpanded ? null : item.id)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
+                        isActiveRoute(item.id)
+                          ? "bg-primary text-primary-foreground"
+                          : isScrolled
+                            ? "text-white/70 hover:bg-white/10"
+                            : "text-muted-foreground hover:bg-secondary"
+                      )}
+                    >
+                      <span>{item.label}</span>
+                      <svg
+                        className={cn(
+                          "w-4 h-4 transition-transform duration-200",
+                          isExpanded && "rotate-180"
+                        )}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </motion.div>
+                    <AnimatePresence>
+                      {isExpanded && item.dropdownItems && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="ml-4 pl-3 border-l-2 border-primary/30 space-y-0.5 mt-0.5 mb-1">
+                            {item.dropdownItems.map((sub) => (
+                              sub.isRoute ? (
+                                <Link
+                                  key={sub.id}
+                                  to={sub.id}
+                                  onClick={() => setMobileOpen(false)}
+                                  className={cn(
+                                    "block px-4 py-2 rounded-lg text-sm transition-colors",
+                                    isActiveRoute(sub.id)
+                                      ? "text-primary font-medium"
+                                      : isScrolled
+                                        ? "text-white/60 hover:text-white hover:bg-white/5"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                                  )}
+                                >
+                                  {sub.label}
+                                  {sub.isStub && <span className="text-xs ml-1">(скоро)</span>}
+                                </Link>
+                              ) : (
+                                <span
+                                  key={sub.id}
+                                  className={cn(
+                                    "block px-4 py-2 rounded-lg text-sm",
+                                    isScrolled
+                                      ? "text-white/30 cursor-not-allowed"
+                                      : "text-muted-foreground/50 cursor-not-allowed"
+                                  )}
+                                >
+                                  {sub.label}
+                                  <span className="text-xs ml-1">(скоро)</span>
+                                </span>
+                              )
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
 
               {user ? (
                 <>

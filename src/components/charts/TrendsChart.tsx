@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { YEARLY_TRENDS } from '@/data/belarusData';

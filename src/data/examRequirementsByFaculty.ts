@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 export interface ExamRequirement {
   facultyNames: string[];
   firstExam: string;

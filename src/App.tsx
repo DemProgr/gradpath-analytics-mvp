@@ -39,6 +39,8 @@ import CareerQuiz from "./pages/CareerQuiz";
 import SurveyLanding from "./pages/SurveyLanding";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Services from "./pages/Services";
+import Data from "./pages/Data";
 import { AIChat } from "@/components/AIChat";
 import { FooterSection } from "@/components/sections/FooterSection";
 import { useState } from "react";
@@ -94,6 +96,8 @@ const AppContent = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/data" element={<Data />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <FooterSection />
@@ -114,7 +118,7 @@ const App = () => (
               <SurveyProvider>
               <TooltipProvider>
                 <Toaster />
-                <BrowserRouter>
+                <BrowserRouter basename={import.meta.env.BASE_URL}>
                   <AppContent />
                 </BrowserRouter>
               </TooltipProvider>

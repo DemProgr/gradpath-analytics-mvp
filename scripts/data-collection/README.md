@@ -66,17 +66,11 @@ npm run collect:all
 
 ## Импорт в базу данных
 
-### Supabase Dashboard
-
-1. Откройте SQL Editor в Supabase Dashboard
-2. Выполните SQL из файла `profession-forecasts-2026.sql`
-3. Выполните SQL из файла `profession-salaries-2026.sql`
-
 ### psql CLI
 
 ```bash
-psql $SUPABASE_DB_URL -f output/profession-forecasts-2026.sql
-psql $SUPABASE_DB_URL -f output/profession-salaries-2026.sql
+psql $DATABASE_URL -f output/profession-forecasts-2026.sql
+psql $DATABASE_URL -f output/profession-salaries-2026.sql
 ```
 
 ## Обновление данных

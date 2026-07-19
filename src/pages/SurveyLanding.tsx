@@ -8,14 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
+// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const sidebarLinks = [
-  { label: 'surveyLanding.sidebar.main', href: '/students', isSection: true },
-  { label: 'surveyLanding.sidebar.questionnaire', href: '/survey', isActive: true },
-  { label: 'surveyLanding.sidebar.register', href: '/register' },
-  { label: 'surveyLanding.sidebar.quiz', href: '/career-quiz' },
-  { label: 'surveyLanding.sidebar.internships', href: '/internships' },
-  { label: 'surveyLanding.sidebar.events', href: '/events' },
-  { label: 'surveyLanding.sidebar.faq', href: '/faq' },
+  { label: 'surveyLanding.sidebar.main', href: '/', isSection: true },
 ];
 
 export default function SurveyLanding() {
@@ -23,11 +18,9 @@ export default function SurveyLanding() {
   const { t } = useLanguage();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const faqs = [
     { q: t('surveyLanding.faq1q'), a: t('surveyLanding.faq1a') },
-    { q: t('surveyLanding.faq2q'), a: t('surveyLanding.faq2a') },
-    { q: t('surveyLanding.faq3q'), a: t('surveyLanding.faq3a') },
-    { q: t('surveyLanding.faq4q'), a: t('surveyLanding.faq4a') },
   ];
 
   return (

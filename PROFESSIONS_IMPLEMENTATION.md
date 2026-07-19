@@ -198,20 +198,11 @@ npm run collect:salaries
 npm run collect:all
 ```
 
-### 3. Применить миграции БД
+### 3. Импортировать данные
 ```bash
-# Supabase CLI
-supabase db push
-
-# Или через SQL Editor
-# Выполнить: supabase/migrations/20250221_add_profession_tables.sql
-```
-
-### 4. Импортировать данные
-```bash
-# Supabase SQL Editor
-# 1. Выполнить: output/profession-forecasts-2026.sql
-# 2. Выполнить: output/profession-salaries-2026.sql
+# Через psql
+psql $DATABASE_URL -f output/profession-forecasts-2026.sql
+psql $DATABASE_URL -f output/profession-salaries-2026.sql
 ```
 
 ### 5. Запустить приложение
@@ -233,13 +224,8 @@ npm run dev
 
 ## Примечания
 
-### Типы Supabase
-В файле `src/services/professionService.ts` есть приведение типов `(as any)` для обхода проверки типов Supabase. Это связано с тем, что новые таблицы не включены в сгенерированные типы.
-
-Для исправления нужно запустить:
-```bash
-supabase gen types typescript --project-id <your-project-id> --schema public > src/integrations/supabase/types.ts
-```
+### Типы данных
+В файле `src/services/professionService.ts` есть приведение типов `(as any)` для обхода проверки типов. В будущем нужно сгенерировать типы на основе схемы БД.
 
 ### Данные о зарплатах
 Данные о зарплатах основаны на маркетинговых исследованиях. Для актуализации рекомендуется:

@@ -77,10 +77,7 @@ scripts/data-collection/output/
 ```
 
 ### Миграции БД
-```
-supabase/migrations/
-└── 20250221_add_profession_tables.sql  # Новые таблицы
-```
+Миграции находятся в `server/migrate/`
 
 ## Структура новых таблиц БД
 
@@ -111,7 +108,7 @@ supabase/migrations/
 
 1. ✅ Создать SQL миграции - ГОТОВО
 2. ✅ Подготовить данные для импорта - ГОТОВО
-3. Импортировать данные в Supabase
+3. ✅ Импортировать данные в БД - ГОТОВО
 4. Создать API endpoints
 5. Разработать UI компоненты
 6. Интегрировать в страницу Applicants
@@ -136,12 +133,9 @@ npm run collect:all
 ## Импорт в БД
 
 ```bash
-# Supabase CLI
-supabase db push
-
-# Или через psql
-psql $SUPABASE_DB_URL -f scripts/data-collection/output/profession-forecasts-2026.sql
-psql $SUPABASE_DB_URL -f scripts/data-collection/output/profession-salaries-2026.sql
+# Через psql
+psql $DATABASE_URL -f scripts/data-collection/output/profession-forecasts-2026.sql
+psql $DATABASE_URL -f scripts/data-collection/output/profession-salaries-2026.sql
 ```
 
 ## Примечания

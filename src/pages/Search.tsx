@@ -9,38 +9,14 @@ const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSection, setActiveSection] = useState('search');
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const sampleResults = [
     {
-      id: 1,
-      type: 'university',
-      name: 'МГТУ им. Баумана',
-      location: 'Москва',
-      description: 'Ведущий технический университет России',
-    },
-    {
-      id: 2,
-      type: 'specialty',
-      name: 'Прикладная информатика',
-      description: 'Бакалавриат, 4 года',
-    },
-    {
-      id: 3,
-      type: 'profession',
-      name: 'Frontend-разработчик',
-      description: 'Средняя зарплата: 150 000 ₽',
-    },
-    {
-      id: 4,
-      type: 'university',
-      name: 'СПбГУ',
-      location: 'Санкт-Петербург',
-      description: 'Классический университет',
-    },
-    {
-      id: 5,
-      type: 'specialty',
-      name: 'Информатика и вычислительная техника',
-      description: 'Бакалавриат, 4 года',
+      id: 0,
+      type: '⚠️ МОК-ДАННЫЕ: university',
+      name: '⚠️ МОК-ДАННЫЕ: название вуза',
+      location: '⚠️ МОК-ДАННЫЕ: город',
+      description: '⚠️ МОК-ДАННЫЕ: описание',
     },
   ];
 

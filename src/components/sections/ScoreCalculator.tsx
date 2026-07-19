@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, BookOpen, Sparkles } from 'lucide-react';
@@ -27,15 +28,9 @@ interface MatchingSpecialty extends SpecialtyRequirement {
   passingScore?: number;
 }
 
+// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const POPULAR_SUBJECT_SETS = [
-  { id: 'tech', name: 'Технические / IT', subjects: ['math', 'physics', 'russian'] },
-  { id: 'med', name: 'Медицина', subjects: ['biology', 'chemistry', 'russian'] },
-  { id: 'econ', name: 'Экономика / Бизнес', subjects: ['math', 'social_science', 'russian'] },
-  { id: 'law', name: 'Юриспруденция', subjects: ['world_history', 'social_science', 'russian'] },
-  { id: 'eng', name: 'Инженер / Техник', subjects: ['math', 'physics', 'russian'] },
-  { id: 'pedag', name: 'Педагогика', subjects: ['world_history', 'russian', 'belarusian'] },
-  { id: 'geo', name: 'География', subjects: ['geography', 'world_history', 'russian'] },
-  { id: 'bio', name: 'Биология / Экология', subjects: ['biology', 'geography', 'russian'] },
+  { id: 'mock', name: '⚠️ МОК', subjects: ['⚠️ МОК', '⚠️ МОК', '⚠️ МОК'] },
 ];
 
 interface PassingScoreData {

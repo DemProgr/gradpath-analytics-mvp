@@ -87,34 +87,14 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
       .catch(() => {});
   }, []);
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const quickLinks = [
     {
-      title: t('quickLinks.forApplicants'),
-      description: t('quickLinks.forApplicantsDesc'),
+      title: '⚠️ МОК-ДАННЫЕ: title',
+      description: '⚠️ МОК-ДАННЫЕ: description',
       icon: GraduationCap,
-      path: '/applicants#specialties',
+      path: '/',
       color: 'bg-blue-500/10 text-blue-600',
-    },
-    {
-      title: t('quickLinks.forStudents'),
-      description: t('quickLinks.forStudentsDesc'),
-      icon: Users,
-      path: '/students#market',
-      color: 'bg-green-500/10 text-green-600',
-    },
-    {
-      title: t('quickLinks.statistics'),
-      description: t('quickLinks.statisticsDesc'),
-      icon: BarChart3,
-      path: '/statistics#vacancies',
-      color: 'bg-purple-500/10 text-purple-600',
-    },
-    {
-      title: t('quickLinks.admission'),
-      description: t('quickLinks.admissionDesc'),
-      icon: TrendingUp,
-      path: '/admission-stats',
-      color: 'bg-orange-500/10 text-orange-600',
     },
   ];
 
@@ -212,8 +192,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Услуги</p>
-                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Мир услуг для тех, кто учится, и для тех, кто заканчивает обучение</h2>
-                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ориентация, обучение, рынок труда и руководство по образованию в Беларуси: все услуги, доступные для абитуриентов, студентов и выпускников.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Мир услуг для тех, кто учится, и для тех, кто заканчивает обучение</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90">Ориентация, обучение, рынок труда и руководство по образованию в Беларуси: все услуги, доступные для абитуриентов, студентов и выпускников.</p>
                       <a href="/applicants" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Узнать больше
@@ -240,8 +220,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Данные</p>
-                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Актуальные и надёжные данные</h2>
-                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Данные о проходных баллах и специальностях с 2020 года. Простота в использовании данных. Надёжность и качественность.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Актуальные и надёжные данные</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90">Данные о проходных баллах и специальностях с 2020 года. Простота в использовании данных. Надёжность и качественность.</p>
                       <a href="/statistics" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Узнать больше
@@ -268,8 +248,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
                   <div className="flex items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex-1 text-blue-950 pr-8">
                       <p className="text-base uppercase tracking-wider mb-2 opacity-80">Анкета</p>
-                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>Пройдите анкету</h2>
-                      <p className="text-lg sm:text-xl mb-6 opacity-90" style={{ fontFamily: 'Times New Roman, serif' }}>Ваше мнение важно: примите участие в масштабном опросе об университетах и работе в Беларуси.</p>
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Пройдите анкету</h2>
+                      <p className="text-lg sm:text-xl mb-6 opacity-90">Ваше мнение важно: примите участие в масштабном опросе об университетах и работе в Беларуси.</p>
                       <a href="/survey" className="inline-flex group">
                         <span className="px-6 py-3 font-medium transition-colors hover:bg-amber-500 bg-red-700 text-white rounded-l-lg">
                           Заполните анкету
@@ -295,9 +275,8 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
             </CarouselContent>
             <div className="absolute bottom-6 left-12 sm:left-24 flex gap-2">
               {['У', 'Д', 'А'].map((letter, index) => (
-                <button 
+                  <button 
                   key={'letter-' + letter}
-                  style={{ fontFamily: 'Times New Roman, serif' }}
                   className={`w-16 h-2 rounded-full transition-colors ${currentSlide === index ? 'bg-white/80' : 'bg-white/30 hover:bg-amber-500'}`}
                   onClick={() => carouselApiRef.current?.scrollTo(index)}
                   aria-label={`Slide ${letter}`}

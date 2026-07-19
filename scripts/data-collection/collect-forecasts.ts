@@ -311,9 +311,8 @@ async function main() {
   
   console.log('\n✅ Data collection complete!');
   console.log('\nNext steps:');
-  console.log('  1. Run the SQL in your Supabase database');
+  console.log('  1. Run the SQL in your Neon database');
   console.log('  2. Verify data was inserted correctly');
-  console.log('  3. Proceed to data processing phase');
 }
 
 main().catch(console.error);

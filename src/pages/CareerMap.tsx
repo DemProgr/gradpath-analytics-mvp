@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
@@ -8,143 +9,39 @@ import { Header } from '@/components/layout/Header';
 import { useLanguage } from '@/hooks/useLanguage';
 
 
-const SPECIALTIES = [
-  'Программная инженерия (БГУИР)',
-  'Вычислительные машины (БГУИР)',
-  'Информационные технологии (БГУИР)',
-  'Прикладная математика (БГУ)',
-  'Машиностроение (БНТУ)',
-  'Энергетика (БНТУ)',
-];
+interface CountryData {
+  country: string;
+  percentage: number;
+}
 
-const MOCK_DATA: Record<string, {
-  industries: { name: string; percentage: number; color: string }[];
-  employers: { name: string; count: number }[];
+interface IndustryData {
+  name: string;
+  percentage: number;
+  color: string;
+  graduates: number;
+}
+
+interface EmployerData {
+  name: string;
+  graduates: number;
+}
+
+interface CareerMapData {
   totalGraduates: number;
-  topCountries: string[];
-}> = {
-  'Программная инженерия (БГУИР)': {
-    totalGraduates: 245,
-    topCountries: ['Беларусь', 'Польша', 'Литва', 'Германия', 'США'],
-    industries: [
-      { name: 'IT и разработка', percentage: 68, color: '#3B82F6' },
-      { name: 'Финансы', percentage: 10, color: '#14B8A6' },
-      { name: 'Консалтинг', percentage: 7, color: '#A855F7' },
-      { name: 'Собственный бизнес', percentage: 6, color: '#F59E0B' },
-      { name: 'Наука и образование', percentage: 4, color: '#EF4444' },
-      { name: 'Другие', percentage: 5, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'EPAM Systems', count: 45 },
-      { name: 'Wargaming', count: 28 },
-      { name: 'IBA Group', count: 22 },
-      { name: 'Andersen', count: 18 },
-      { name: 'ISsoft', count: 15 },
-      { name: 'Yandex', count: 12 },
-      { name: 'JetBrains', count: 10 },
-      { name: 'Playtika', count: 8 },
-    ],
-  },
-  'Вычислительные машины (БГУИР)': {
-    totalGraduates: 180,
-    topCountries: ['Беларусь', 'Польша', 'Россия', 'Литва'],
-    industries: [
-      { name: 'IT и разработка', percentage: 58, color: '#3B82F6' },
-      { name: 'Производство', percentage: 12, color: '#14B8A6' },
-      { name: 'Финансы', percentage: 10, color: '#A855F7' },
-      { name: 'Наука и образование', percentage: 8, color: '#F59E0B' },
-      { name: 'Собственный бизнес', percentage: 5, color: '#EF4444' },
-      { name: 'Другие', percentage: 7, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'EPAM Systems', count: 30 },
-      { name: 'Intel', count: 20 },
-      { name: 'IBA Group', count: 18 },
-      { name: 'Wargaming', count: 15 },
-      { name: 'SAIC', count: 12 },
-      { name: 'Центр обработки данных', count: 8 },
-    ],
-  },
-  'Информационные технологии (БГУИР)': {
-    totalGraduates: 210,
-    topCountries: ['Беларусь', 'Польша', 'Германия', 'Литва', 'США'],
-    industries: [
-      { name: 'IT и разработка', percentage: 72, color: '#3B82F6' },
-      { name: 'Финансы и финтех', percentage: 8, color: '#14B8A6' },
-      { name: 'Консалтинг', percentage: 6, color: '#A855F7' },
-      { name: 'Собственный бизнес', percentage: 5, color: '#F59E0B' },
-      { name: 'Наука и образование', percentage: 4, color: '#EF4444' },
-      { name: 'Другие', percentage: 5, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'EPAM Systems', count: 50 },
-      { name: 'Yandex', count: 30 },
-      { name: 'Wargaming', count: 25 },
-      { name: 'JetBrains', count: 18 },
-      { name: 'Andersen', count: 16 },
-      { name: 'Godel Technologies', count: 12 },
-    ],
-  },
-  'Прикладная математика (БГУ)': {
-    totalGraduates: 120,
-    topCountries: ['Беларусь', 'Польша', 'Германия', 'Россия'],
-    industries: [
-      { name: 'IT и разработка', percentage: 42, color: '#3B82F6' },
-      { name: 'Финансы и банки', percentage: 20, color: '#14B8A6' },
-      { name: 'Наука и образование', percentage: 15, color: '#A855F7' },
-      { name: 'Консалтинг', percentage: 10, color: '#F59E0B' },
-      { name: 'Собственный бизнес', percentage: 5, color: '#EF4444' },
-      { name: 'Другие', percentage: 8, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'EPAM Systems', count: 22 },
-      { name: 'IBA Group', count: 15 },
-      { name: 'Национальный банк', count: 12 },
-      { name: 'БПС-Сбербанк', count: 10 },
-      { name: 'Wargaming', count: 8 },
-      { name: 'НИИ ПММ', count: 6 },
-    ],
-  },
-  'Машиностроение (БНТУ)': {
-    totalGraduates: 160,
-    topCountries: ['Беларусь', 'Россия', 'Польша', 'Литва'],
-    industries: [
-      { name: 'Производство и промышленность', percentage: 45, color: '#3B82F6' },
-      { name: 'IT и разработка', percentage: 15, color: '#14B8A6' },
-      { name: 'Энергетика', percentage: 12, color: '#A855F7' },
-      { name: 'Строительство', percentage: 10, color: '#F59E0B' },
-      { name: 'Наука и образование', percentage: 8, color: '#EF4444' },
-      { name: 'Другие', percentage: 10, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'МАЗ', count: 30 },
-      { name: 'МТЗ', count: 25 },
-      { name: 'БелАЗ', count: 18 },
-      { name: 'Горизонт', count: 12 },
-      { name: 'Атлант', count: 10 },
-      { name: 'EPAM Systems', count: 8 },
-    ],
-  },
-  'Энергетика (БНТУ)': {
-    totalGraduates: 140,
-    topCountries: ['Беларусь', 'Россия', 'Польша', 'Литва'],
-    industries: [
-      { name: 'Энергетика', percentage: 50, color: '#3B82F6' },
-      { name: 'Производство', percentage: 15, color: '#14B8A6' },
-      { name: 'IT и разработка', percentage: 10, color: '#A855F7' },
-      { name: 'Строительство', percentage: 8, color: '#F59E0B' },
-      { name: 'Наука и образование', percentage: 7, color: '#EF4444' },
-      { name: 'Другие', percentage: 10, color: '#6366F1' },
-    ],
-    employers: [
-      { name: 'Белэнерго', count: 35 },
-      { name: 'Минскэнерго', count: 28 },
-      { name: 'Атомстрой', count: 15 },
-      { name: 'Газпром', count: 12 },
-      { name: 'Белорусская АЭС', count: 10 },
-      { name: 'Энергетик', count: 8 },
-    ],
-  },
+  topCountries: CountryData[];
+  industries: IndustryData[];
+  topEmployers: EmployerData[];
+}
+
+const SPECIALTIES: string[] = ['⚠️ МОК-ДАННЫЕ: загрузить из БД'];
+
+const MOCK_DATA: Record<string, CareerMapData> = {
+  '⚠️ МОК-ДАННЫЕ: загрузить из БД': {
+    totalGraduates: 0,
+    topCountries: [{ country: '⚠️ МОК', percentage: 0 }],
+    industries: [{ name: '⚠️ МОК', percentage: 0, color: '#ccc', graduates: 0 }],
+    topEmployers: [{ name: '⚠️ МОК', graduates: 0 }],
+  }
 };
 
 const tooltipStyle = {

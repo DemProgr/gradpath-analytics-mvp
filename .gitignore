@@ -6,7 +6,6 @@ dist
 *.log
 .DS_Store
 Thumbs.db
-supabase/.temp/
 nul
 design/
 populate_universities.sql
@@ -26,3 +25,5 @@ scripts/test_*.mjs
 scripts/update_*.mjs
 scripts/bsu_2024.sql
 scripts/insert_bntu_full.mjs
+*.pdf
+supabase/

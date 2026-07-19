@@ -29,13 +29,9 @@ const SLUG_TO_IMAGE: Record<string, string> = {
   'kak-sostavit-rezume-studentu': '/blog/resume.jpg',
 };
 
+// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const FALLBACK_IMAGES = [
-  '/blog/IT.jpg',
-  '/blog/salary.jpg',
-  '/blog/admission.jpg',
-  '/blog/intership.jpg',
-  '/blog/rating.jpg',
-  '/blog/resume.jpg',
+  '/placeholder.svg',
 ];
 
 export default function BlogPost() {

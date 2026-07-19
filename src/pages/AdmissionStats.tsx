@@ -108,7 +108,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
   });
 
   // Get unique cities from universities
-  const cities = ['Минск', 'Гомель', 'Гродно', 'Брест', 'Витебск', 'Могилёв'];
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
+  const cities = ["⚠️ МОК: из БД"];
 
   // Calculate aggregated stats
   const aggregatedStats = admissionStats?.reduce((acc, stat) => {
@@ -182,7 +183,8 @@ const AdmissionStats = ({ isChatOpen = false }: AdmissionStatsProps) => {
 
   const chartDataArray = prepareChartData();
 
-  const years = ['2025', '2024', '2023', '2022', '2021', '2020'];
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
+  const years = ["2025", "2026"];
 
   return (
     <div className="min-h-screen bg-background">

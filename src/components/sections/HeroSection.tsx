@@ -101,7 +101,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 alt="Gradpath Analytics"
                 className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                animate={{ opacity: 0.7 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1 }}
               />

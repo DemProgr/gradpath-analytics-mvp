@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -8,7 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { useLanguage } from '@/hooks/useLanguage';
 
 
-const UNIVERSITIES = ['БГУИР', 'БГУ', 'БНТУ'];
+const UNIVERSITIES: string[] = ['⚠️ МОК-ДАННЫЕ: из БД'];
 
 const MOCK_DATA: Record<string, Record<string, {
   employmentRate: number;
@@ -18,155 +19,26 @@ const MOCK_DATA: Record<string, Record<string, {
   countries: { name: string; percentage: number }[];
   topEmployers: string[];
 }>> = {
-  'БГУИР': {
-    'Программная инженерия': {
-      employmentRate: 94, avgSearchTime: 1.8, avgSalary: 3200, inSpecialtyRate: 86,
-      countries: [
-        { name: 'Беларусь', percentage: 55 },
-        { name: 'Польша', percentage: 20 },
-        { name: 'Литва', percentage: 8 },
-        { name: 'Германия', percentage: 7 },
-        { name: 'США', percentage: 5 },
-        { name: 'Другие', percentage: 5 },
-      ],
-      topEmployers: ['EPAM Systems', 'Wargaming', 'IBA Group', 'Andersen', 'ISsoft'],
-    },
-    'Вычислительные машины': {
-      employmentRate: 91, avgSearchTime: 2.1, avgSalary: 2800, inSpecialtyRate: 82,
-      countries: [
-        { name: 'Беларусь', percentage: 58 },
-        { name: 'Польша', percentage: 18 },
-        { name: 'Россия', percentage: 8 },
-        { name: 'Литва', percentage: 6 },
-        { name: 'Другие', percentage: 10 },
-      ],
-      topEmployers: ['EPAM Systems', 'Intel', 'IBA Group', 'Wargaming', 'SAIC'],
-    },
-    'Информационные технологии': {
-      employmentRate: 96, avgSearchTime: 1.5, avgSalary: 3500, inSpecialtyRate: 90,
-      countries: [
-        { name: 'Беларусь', percentage: 50 },
-        { name: 'Польша', percentage: 22 },
-        { name: 'Германия', percentage: 10 },
-        { name: 'Литва', percentage: 7 },
-        { name: 'США', percentage: 6 },
-        { name: 'Другие', percentage: 5 },
-      ],
-      topEmployers: ['EPAM Systems', 'Yandex', 'Wargaming', 'JetBrains', 'Andersen'],
-    },
-    'Электронная экономика': {
-      employmentRate: 88, avgSearchTime: 2.5, avgSalary: 2400, inSpecialtyRate: 75,
-      countries: [
-        { name: 'Беларусь', percentage: 62 },
-        { name: 'Польша', percentage: 15 },
-        { name: 'Россия', percentage: 10 },
-        { name: 'Другие', percentage: 13 },
-      ],
-      topEmployers: ['Банки', 'EPAM Systems', 'IBA Group', 'IT-компании', 'Гос. сектор'],
-    },
-  },
-  'БГУ': {
-    'Прикладная математика': {
-      employmentRate: 89, avgSearchTime: 2.3, avgSalary: 2600, inSpecialtyRate: 78,
-      countries: [
-        { name: 'Беларусь', percentage: 52 },
-        { name: 'Польша', percentage: 18 },
-        { name: 'Германия', percentage: 12 },
-        { name: 'Россия', percentage: 8 },
-        { name: 'Другие', percentage: 10 },
-      ],
-      topEmployers: ['EPAM Systems', 'IBA Group', 'Банки', 'Научные институты', 'Wargaming'],
-    },
-    'Физика': {
-      employmentRate: 72, avgSearchTime: 3.8, avgSalary: 1800, inSpecialtyRate: 55,
-      countries: [
-        { name: 'Беларусь', percentage: 65 },
-        { name: 'Россия', percentage: 12 },
-        { name: 'Германия', percentage: 8 },
-        { name: 'Польша', percentage: 5 },
-        { name: 'Другие', percentage: 10 },
-      ],
-      topEmployers: ['НИИ', 'Образование', 'IT-компании', 'Производство', 'Энергетика'],
-    },
-    'Химия': {
-      employmentRate: 76, avgSearchTime: 3.5, avgSalary: 1600, inSpecialtyRate: 60,
-      countries: [
-        { name: 'Беларусь', percentage: 70 },
-        { name: 'Россия', percentage: 10 },
-        { name: 'Польша', percentage: 8 },
-        { name: 'Германия', percentage: 5 },
-        { name: 'Другие', percentage: 7 },
-      ],
-      topEmployers: ['Белнефтехим', 'НИИ', 'Фармацевтика', 'Лаборатории', 'Образование'],
-    },
-    'Биология': {
-      employmentRate: 68, avgSearchTime: 4.2, avgSalary: 1400, inSpecialtyRate: 52,
-      countries: [
-        { name: 'Беларусь', percentage: 72 },
-        { name: 'Россия', percentage: 10 },
-        { name: 'Польша', percentage: 6 },
-        { name: 'Германия', percentage: 4 },
-        { name: 'Другие', percentage: 8 },
-      ],
-      topEmployers: ['НИИ', 'Медицина', 'Фармацевтика', 'Образование', 'Экология'],
-    },
-  },
-  'БНТУ': {
-    'Машиностроение': {
-      employmentRate: 85, avgSearchTime: 2.8, avgSalary: 2000, inSpecialtyRate: 70,
-      countries: [
-        { name: 'Беларусь', percentage: 68 },
-        { name: 'Россия', percentage: 12 },
-        { name: 'Польша', percentage: 8 },
-        { name: 'Литва', percentage: 4 },
-        { name: 'Другие', percentage: 8 },
-      ],
-      topEmployers: ['МАЗ', 'МТЗ', 'БелАЗ', 'Горизонт', 'Атлант'],
-    },
-    'Энергетика': {
-      employmentRate: 88, avgSearchTime: 2.5, avgSalary: 2200, inSpecialtyRate: 76,
-      countries: [
-        { name: 'Беларусь', percentage: 72 },
-        { name: 'Россия', percentage: 10 },
-        { name: 'Польша', percentage: 6 },
-        { name: 'Литва', percentage: 3 },
-        { name: 'Другие', percentage: 9 },
-      ],
-      topEmployers: ['Белэнерго', 'Минскэнерго', 'Атомстрой', 'Газпром', 'Энергетик'],
-    },
-    'Строительство': {
-      employmentRate: 82, avgSearchTime: 3.0, avgSalary: 1900, inSpecialtyRate: 68,
-      countries: [
-        { name: 'Беларусь', percentage: 70 },
-        { name: 'Россия', percentage: 12 },
-        { name: 'Польша', percentage: 5 },
-        { name: 'Литва', percentage: 3 },
-        { name: 'Другие', percentage: 10 },
-      ],
-      topEmployers: ['Минскстрой', 'Белстрой', 'Трест', 'Дорожно-строительные', 'Частные компании'],
-    },
-    'Архитектура': {
-      employmentRate: 79, avgSearchTime: 3.2, avgSalary: 1800, inSpecialtyRate: 65,
-      countries: [
-        { name: 'Беларусь', percentage: 65 },
-        { name: 'Россия', percentage: 14 },
-        { name: 'Польша', percentage: 7 },
-        { name: 'Литва', percentage: 4 },
-        { name: 'Другие', percentage: 10 },
-      ],
-      topEmployers: ['Белпроект', 'Минскпроект', 'Архитектурные бюро', 'Частные фирмы', 'Дизайн-студии'],
+  '⚠️ МОК-ДАННЫЕ: из БД': {
+    '⚠️ МОК': {
+      employmentRate: 0,
+      avgSearchTime: 0,
+      avgSalary: 0,
+      inSpecialtyRate: 0,
+      countries: [{ name: '⚠️ МОК', percentage: 0 }],
+      topEmployers: ['⚠️ МОК'],
     },
   },
 };
 
 const STAT_KEYS: Record<string, string> = {
-  employmentRate: 'analytics.specialties.employmentRate',
-  avgSearchTime: 'analytics.specialties.avgSearchTime',
-  avgSalary: 'analytics.specialties.avgSalary',
-  inSpecialtyRate: 'analytics.specialties.inSpecialtyRate',
+  employmentRate: '⚠️ МОК',
+  avgSearchTime: '⚠️ МОК',
+  avgSalary: '⚠️ МОК',
+  inSpecialtyRate: '⚠️ МОК',
 };
 
-const COLORS = ['#3B82F6', '#14B8A6', '#A855F7', '#F59E0B', '#EF4444', '#6366F1'];
+const COLORS = ['#ccc', '#ccc', '#ccc'];
 
 const tooltipStyle = {
   backgroundColor: 'hsl(var(--card))',
@@ -191,10 +63,7 @@ export default function SpecialtyAnalytics() {
   const currentData = MOCK_DATA[selectedUni]?.[selectedSpec];
 
   const STAT_CARDS = [
-    { key: 'employmentRate', suffix: '%', color: 'text-green-500', bg: 'bg-green-500/5', icon: Briefcase },
-    { key: 'avgSearchTime', suffix: ` ${t('analytics.specialties.months')}`, color: 'text-blue-500', bg: 'bg-blue-500/5', icon: Clock },
-    { key: 'avgSalary', suffix: ' BYN', color: 'text-amber-500', bg: 'bg-amber-500/5', icon: DollarSign },
-    { key: 'inSpecialtyRate', suffix: '%', color: 'text-purple-500', bg: 'bg-purple-500/5', icon: TrendingUp },
+    { key: 'employmentRate', suffix: '%', color: 'text-gray-500', bg: 'bg-gray-500/5', icon: Briefcase },
   ];
 
   return (

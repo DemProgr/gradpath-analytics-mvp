@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 export interface CTSubject {
   id: string;
   name: string;
@@ -43,7 +44,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'math',
     secondSubject: 'physics',
     thirdSubject: 'russian',
-    minTotalScore: 180,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-mm',
@@ -54,7 +55,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'math',
     secondSubject: 'physics',
     thirdSubject: 'russian',
-    minTotalScore: 160,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-phys',
@@ -65,7 +66,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'physics',
     secondSubject: 'math',
     thirdSubject: 'russian',
-    minTotalScore: 150,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-bio',
@@ -76,7 +77,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'biology',
     secondSubject: 'chemistry',
     thirdSubject: 'russian',
-    minTotalScore: 140,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-geo',
@@ -87,7 +88,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'geography',
     secondSubject: 'world_history',
     thirdSubject: 'russian',
-    minTotalScore: 130,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-law',
@@ -98,7 +99,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'world_history',
     secondSubject: 'social_science',
     thirdSubject: 'russian',
-    minTotalScore: 190,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-econ',
@@ -109,7 +110,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'math',
     secondSubject: 'social_science',
     thirdSubject: 'russian',
-    minTotalScore: 160,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-journ',
@@ -120,7 +121,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'russian',
     secondSubject: 'world_history',
     thirdSubject: 'social_science',
-    minTotalScore: 180,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-phil',
@@ -131,7 +132,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'russian',
     secondSubject: 'world_history',
     thirdSubject: 'social_science',
-    minTotalScore: 150,
+    minTotalScore: 0,
   },
   {
     specialtyId: 'bsu-psih',
@@ -142,7 +143,7 @@ export const CT_REQUIREMENTS: SpecialtyRequirement[] = [
     firstSubject: 'biology',
     secondSubject: 'social_science',
     thirdSubject: 'russian',
-    minTotalScore: 150,
+    minTotalScore: 0,
   },
 ];
 

@@ -65,8 +65,8 @@ export default {
         "3xl": "2rem",
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        sans: ['Sk Modernist', 'system-ui', 'sans-serif'],
+        serif: ['Sk Modernist', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

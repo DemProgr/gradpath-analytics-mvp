@@ -39,11 +39,9 @@ interface Specialty {
 
 type Step = 'university' | 'faculty' | 'specialty' | 'details';
 
+// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const STEPS: { id: Step; label: string; icon: typeof Building2 }[] = [
-  { id: 'university', label: 'Университет', icon: Building2 },
-  { id: 'faculty', label: 'Факультет', icon: GraduationCap },
-  { id: 'specialty', label: 'Специальность', icon: BookOpen },
-  { id: 'details', label: 'Курс и даты', icon: Calendar },
+  { id: 'university', label: '⚠️ МОК-ДАННЫЕ: шаг', icon: Building2 },
 ];
 
 const COURSES = [1, 2, 3, 4, 5, 6];

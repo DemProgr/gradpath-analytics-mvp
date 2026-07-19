@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { motion } from 'framer-motion';
 import { GraduationCap, BarChart3, Users, TrendingUp, PieChart, ArrowUpRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -9,7 +10,7 @@ export function AnalyticsDashboard() {
     queryKey: ['university-count-dashboard'],
     queryFn: async () => {
       const data = await api.get<any[]>('/api/universities');
-      return data.length || 41;
+      return data.length || 0;
     }
   });
 
@@ -17,40 +18,28 @@ export function AnalyticsDashboard() {
     queryKey: ['vacancy-count-dashboard'],
     queryFn: async () => {
       const data = await api.get<{ count: number }>('/api/vacancies/count');
-      return data.count || 10538;
+      return data.count || 0;
     }
   });
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const stats = [
-    { label: 'Total Universities', value: universityCount || 41, icon: GraduationCap, color: 'bg-blue-500' },
-    { label: 'Total Specialties', value: 653, icon: BarChart3, color: 'bg-purple-500' },
-    { label: 'Total Vacancies', value: vacancyCount || 10538, icon: Users, color: 'bg-green-500' },
-    { label: 'Average Salary', value: '1,473', suffix: 'BYN', icon: TrendingUp, color: 'bg-orange-500' },
+    { label: "⚠️ МОК-ДАННЫЕ: стат", value: 0, icon: GraduationCap, color: 'bg-blue-500' },
   ];
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const categories = [
-    { name: 'Engineering', value: 35, color: '#3b82f6' },
-    { name: 'Business', value: 25, color: '#8b5cf6' },
-    { name: 'Medicine', value: 20, color: '#10b981' },
-    { name: 'Arts', value: 12, color: '#f59e0b' },
-    { name: 'IT', value: 8, color: '#ef4444' },
+    { name: "⚠️ МОК-ДАННЫЕ: категория", value: 0, color: '#ccc' },
   ];
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const yearlyData = [
-    { year: '2020', value: 4200 },
-    { year: '2021', value: 4800 },
-    { year: '2022', value: 5600 },
-    { year: '2023', value: 7200 },
-    { year: '2024', value: 8900 },
-    { year: '2025', value: 10538 },
+    { year: "⚠️ МОК", value: 0 },
   ];
 
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const tableData = [
-    { name: 'Alex Johnson', score: 386, university: 'BSU', faculty: 'Computer Science' },
-    { name: 'Maria Petrova', score: 392, university: 'BSUIR', faculty: 'Engineering' },
-    { name: 'Ivan Sokolov', score: 378, university: 'BNTU', faculty: 'Business' },
-    { name: 'Anna Kim', score: 395, university: 'BSU', faculty: 'Medicine' },
-    { name: 'Dmitry Ivanov', score: 381, university: 'BSPU', faculty: 'Education' },
+    { name: "⚠️ МОК-ДАННЫЕ: имя", score: 0, university: "⚠️ МОК-ДАННЫЕ: вуз", faculty: "⚠️ МОК-ДАННЫЕ: факультет" },
   ];
 
   const maxBarValue = Math.max(...yearlyData.map(d => d.value));

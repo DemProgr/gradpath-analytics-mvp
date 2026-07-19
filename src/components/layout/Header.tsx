@@ -143,10 +143,10 @@ const navItems = [
     <header
       className="fixed top-0 left-0 right-0 z-50 flex justify-center"
       style={{ marginRight: chatOpen ? '450px' : '0px' }}
-      onMouseEnter={() => setIsHeaderHovered(true)}
-      onMouseLeave={() => setIsHeaderHovered(false)}
     >
       <motion.div
+        onMouseEnter={() => setIsHeaderHovered(true)}
+        onMouseLeave={() => setIsHeaderHovered(false)}
         animate={{
           maxWidth: isScrolled ? 1024 : 10000,
           borderRadius: isScrolled ? 16 : 0,

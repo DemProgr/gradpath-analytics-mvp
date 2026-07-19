@@ -1,6 +1,6 @@
 -- ============================================================
 -- GradPath MVP — Neon Database Schema
--- Generated from Supabase migrations
+-- Database schema for GradPath
 -- Run this in Neon SQL Editor (https://console.neon.tech)
 -- ============================================================
 
@@ -282,7 +282,7 @@ CREATE TABLE region_salary_stats (
 );
 
 -- ============================================================
--- 15. USERS (for our auth, not Supabase auth)
+-- 15. USERS (for our custom auth)
 -- ============================================================
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,

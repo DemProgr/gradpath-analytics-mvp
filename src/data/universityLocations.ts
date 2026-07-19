@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 // University to city mapping for Belarus
 // Each university is located in a specific city
 

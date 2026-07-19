@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
@@ -71,23 +72,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "JavaScript/TypeScript", level: 95 },
-        { skill: "React/Vue", level: 90 },
-        { skill: "CSS/SCSS", level: 85 },
-        { skill: "Git", level: 80 },
-        { skill: "Английский язык", level: 75 }
+        { skill: "JavaScript/TypeScript", level: 0 },
+        { skill: "React/Vue", level: 0 },
+        { skill: "CSS/SCSS", level: 0 },
+        { skill: "Git", level: 0 },
+        { skill: "Английский язык", level: 0 }
       ],
       soft: [
-        { skill: "Коммуникация", level: 85 },
-        { skill: "Работа в команде", level: 90 },
-        { skill: "Управление временем", level: 80 },
-        { skill: "Критическое мышление", level: 88 }
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Работа в команде", level: 0 },
+        { skill: "Управление временем", level: 0 },
+        { skill: "Критическое мышление", level: 0 }
       ]
     },
     improvementAreas: ["Углубление в TypeScript", "Оптимизация производительности", "Архитектура приложений", "Mentorship"],
     education: ["ВУЗ: компьютерные науки", "Курсы веб-разработки", "Буткемпы", "Онлайн-платформы (Hexlet, Coursera)"],
     salary: {
-      average: 3400,
+      average: 0,
       range: "1700 - 6000 BYN",
       growth: "+15% в год"
     },
@@ -107,23 +108,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Python", level: 98 },
-        { skill: "ML алгоритмы", level: 95 },
-        { skill: "SQL", level: 85 },
-        { skill: "Статистика", level: 80 },
-        { skill: "Big Data (Spark)", level: 78 }
+        { skill: "Python", level: 0 },
+        { skill: "ML алгоритмы", level: 0 },
+        { skill: "SQL", level: 0 },
+        { skill: "Статистика", level: 0 },
+        { skill: "Big Data (Spark)", level: 0 }
       ],
       soft: [
-        { skill: "Аналитическое мышление", level: 92 },
-        { skill: "Визуализация данных", level: 85 },
-        { skill: "Презентации", level: 80 },
-        { skill: "Бизнес-аналитика", level: 82 }
+        { skill: "Аналитическое мышление", level: 0 },
+        { skill: "Визуализация данных", level: 0 },
+        { skill: "Презентации", level: 0 },
+        { skill: "Бизнес-аналитика", level: 0 }
       ]
     },
     improvementAreas: ["Глубокое изучение ML", "Облачные платформы (AWS, GCP)", "Специализация (NLP, CV)", "Менеджмент"],
     education: ["ВУЗ: математика/физика/информатика", "Магистратура по Data Science", "Сертификации AWS ML", "Coursera/Kaggle"],
     salary: {
-      average: 2800,
+      average: 0,
       range: "2200 - 3800 BYN",
       growth: "+22% в год"
     },
@@ -143,23 +144,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Figma/Sketch", level: 95 },
-        { skill: "User Research", level: 90 },
-        { skill: "Прототипирование", level: 85 },
-        { skill: "Визуальный дизайн", level: 88 },
-        { skill: "Дизайн-системы", level: 82 }
+        { skill: "Figma/Sketch", level: 0 },
+        { skill: "User Research", level: 0 },
+        { skill: "Прототипирование", level: 0 },
+        { skill: "Визуальный дизайн", level: 0 },
+        { skill: "Дизайн-системы", level: 0 }
       ],
       soft: [
-        { skill: "Критическое мышление", level: 85 },
-        { skill: "Креативность", level: 92 },
-        { skill: "Эмпатия", level: 88 },
-        { skill: "Презентации", level: 80 }
+        { skill: "Критическое мышление", level: 0 },
+        { skill: "Креативность", level: 0 },
+        { skill: "Эмпатия", level: 0 },
+        { skill: "Презентации", level: 0 }
       ]
     },
     improvementAreas: ["Новые инструменты (Framer)", "UX-исследования", "Motion design", "Мобильный дизайн"],
     education: ["ВУЗ: дизайн, графика", "Курсы Google UX Design", "Буткемпы", "Конференции (Awwwards)"],
      salary: {
-       average: 2400,
+       average: 0,
        range: "1400 - 2400 BYN",
        growth: "+12% в год"
      },
@@ -168,12 +169,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Figma", importance: 98 },
-      { skill: "User Research", importance: 90 },
-      { skill: "UI-дизайн", importance: 88 },
-      { skill: "Прототипирование", importance: 85 },
-      { skill: "Креативность", importance: 80 },
-      { skill: "Критическое мышление", importance: 75 }
+      { skill: "Figma", importance: 0 },
+      { skill: "User Research", importance: 0 },
+      { skill: "UI-дизайн", importance: 0 },
+      { skill: "Прототипирование", importance: 0 },
+      { skill: "Креативность", importance: 0 },
+      { skill: "Критическое мышление", importance: 0 }
     ]
   },
   {
@@ -187,24 +188,24 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Kubernetes", level: 95 },
-        { skill: "Docker", level: 93 },
-        { skill: "CI/CD", level: 90 },
-        { skill: "Облачные платформы", level: 88 },
-        { skill: "Linux", level: 85 },
-        { skill: "Terraform", level: 80 }
+        { skill: "Kubernetes", level: 0 },
+        { skill: "Docker", level: 0 },
+        { skill: "CI/CD", level: 0 },
+        { skill: "Облачные платформы", level: 0 },
+        { skill: "Linux", level: 0 },
+        { skill: "Terraform", level: 0 }
       ],
       soft: [
-        { skill: "Решение проблем", level: 92 },
-        { skill: "Автоматизация", level: 90 },
-        { skill: "Документация", level: 85 },
-        { skill: "Командная работа", level: 88 }
+        { skill: "Решение проблем", level: 0 },
+        { skill: "Автоматизация", level: 0 },
+        { skill: "Документация", level: 0 },
+        { skill: "Командная работа", level: 0 }
       ]
     },
     improvementAreas: ["Облачная безопасность (DevSecOps)", "Новые инструменты", "SRE практики", "Менеджмент"],
     education: ["ВУЗ: IT/системное администрирование", "Сертификации (CKA, AWS)", "Курсы (Linux Academy)", "Практический опыт"],
     salary: {
-      average: 3300,
+      average: 0,
       range: "2200 - 7200 BYN",
       growth: "+18% в год"
     },
@@ -213,12 +214,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Очень высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Kubernetes", importance: 95 },
-      { skill: "Docker", importance: 93 },
-      { skill: "CI/CD", importance: 90 },
-      { skill: "Облачные платформы", importance: 88 },
-      { skill: "Linux", importance: 85 },
-      { skill: "Terraform", importance: 80 }
+      { skill: "Kubernetes", importance: 0 },
+      { skill: "Docker", importance: 0 },
+      { skill: "CI/CD", importance: 0 },
+      { skill: "Облачные платформы", importance: 0 },
+      { skill: "Linux", importance: 0 },
+      { skill: "Terraform", importance: 0 }
     ]
   },
   {
@@ -232,24 +233,24 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Swift/Kotlin", level: 90 },
-        { skill: "React Native/Flutter", level: 85 },
-        { skill: "iOS/Android SDK", level: 88 },
-        { skill: "UI/UX principles", level: 80 },
-        { skill: "API Integration", level: 85 },
-        { skill: "Performance optimization", level: 75 }
+        { skill: "Swift/Kotlin", level: 0 },
+        { skill: "React Native/Flutter", level: 0 },
+        { skill: "iOS/Android SDK", level: 0 },
+        { skill: "UI/UX principles", level: 0 },
+        { skill: "API Integration", level: 0 },
+        { skill: "Performance optimization", level: 0 }
       ],
       soft: [
-        { skill: "Адаптивность", level: 88 },
-        { skill: "Внимание к деталям", level: 90 },
-        { skill: "Коммуникация", level: 85 },
-        { skill: "Управление временем", level: 82 }
+        { skill: "Адаптивность", level: 0 },
+        { skill: "Внимание к деталям", level: 0 },
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Управление временем", level: 0 }
       ]
     },
     improvementAreas: ["Кроссплатформенные технологии", "Мобильная безопасность", "AR/VR разработка", "Оптимизация"],
     education: ["ВУЗ: компьютерные науки", "Курсы (Udacity, Ray Wenderlich)", "Сертификации Apple/Google"],
     salary: {
-      average: 2500,
+      average: 0,
       range: "1300 - 4000 BYN",
       growth: "+16% в год"
     },
@@ -258,12 +259,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Swift/Kotlin", importance: 90 },
-      { skill: "React Native/Flutter", importance: 85 },
-      { skill: "iOS/Android SDK", importance: 88 },
-      { skill: "UI/UX principles", importance: 80 },
-      { skill: "API Integration", importance: 85 },
-      { skill: "Performance optimization", importance: 75 }
+      { skill: "Swift/Kotlin", importance: 0 },
+      { skill: "React Native/Flutter", importance: 0 },
+      { skill: "iOS/Android SDK", importance: 0 },
+      { skill: "UI/UX principles", importance: 0 },
+      { skill: "API Integration", importance: 0 },
+      { skill: "Performance optimization", importance: 0 }
     ]
   },
   {
@@ -277,23 +278,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Linux/Windows", level: 90 },
-        { skill: "Сети", level: 88 },
-        { skill: "Безопасность", level: 85 },
-        { skill: "Скриптинг (Bash/PowerShell)", level: 80 },
-        { skill: "Виртуализация", level: 75 }
+        { skill: "Linux/Windows", level: 0 },
+        { skill: "Сети", level: 0 },
+        { skill: "Безопасность", level: 0 },
+        { skill: "Скриптинг (Bash/PowerShell)", level: 0 },
+        { skill: "Виртуализация", level: 0 }
       ],
       soft: [
-        { skill: "Реакция на инциденты", level: 90 },
-        { skill: "Документация", level: 82 },
-        { skill: "Планирование", level: 80 },
-        { skill: "Коммуникация", level: 85 }
+        { skill: "Реакция на инциденты", level: 0 },
+        { skill: "Документация", level: 0 },
+        { skill: "Планирование", level: 0 },
+        { skill: "Коммуникация", level: 0 }
       ]
     },
     improvementAreas: ["Глубокие знания сетей", "Кибербезопасность", "DevOps инструменты", "Облачные технологии"],
     education: ["ВУЗ: IT/телеммуникации", "Сертификации (Cisco CCNA, RHCSA)", "Курсы системного администрирования"],
     salary: {
-      average: 2300,
+      average: 0,
       range: "1300 - 4600 BYN",
       growth: "+15% в год"
     },
@@ -302,12 +303,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Средний",
     location: "Офлайн",
     skillImportance: [
-      { skill: "Linux/Windows", importance: 90 },
-      { skill: "Сети", importance: 88 },
-      { skill: "Безопасность", importance: 85 },
-      { skill: "Скриптинг (Bash/PowerShell)", importance: 80 },
-      { skill: "Виртуализация", importance: 75 },
-      { skill: "Документация", importance: 70 }
+      { skill: "Linux/Windows", importance: 0 },
+      { skill: "Сети", importance: 0 },
+      { skill: "Безопасность", importance: 0 },
+      { skill: "Скриптинг (Bash/PowerShell)", importance: 0 },
+      { skill: "Виртуализация", importance: 0 },
+      { skill: "Документация", importance: 0 }
     ]
   },
   {
@@ -321,23 +322,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Сбор требований", level: 95 },
-        { skill: "BPMN", level: 85 },
-        { skill: "Анализ данных", level: 88 },
-        { skill: "Документирование", level: 80 },
-        { skill: "Agile/Scrum", level: 85 }
+        { skill: "Сбор требований", level: 0 },
+        { skill: "BPMN", level: 0 },
+        { skill: "Анализ данных", level: 0 },
+        { skill: "Документирование", level: 0 },
+        { skill: "Agile/Scrum", level: 0 }
       ],
       soft: [
-        { skill: "Коммуникация", level: 90 },
-        { skill: "Переговоры", level: 88 },
-        { skill: "Презентации", level: 85 },
-        { skill: "Критическое мышление", level: 92 }
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Переговоры", level: 0 },
+        { skill: "Презентации", level: 0 },
+        { skill: "Критическое мышление", level: 0 }
       ]
     },
     improvementAreas: ["Углубление в бизнес-процессы", "Agile сертификации", "Data analysis", "Специализация в отрасли"],
     education: ["ВУЗ: экономика/менеджмент", "Сертификации (IIBA CBAP, PMI-PBA)", "Курсы бизнес-аналитики", "MBA"],
     salary: {
-      average: 3100,
+      average: 0,
       range: "1000 - 6400 BYN",
       growth: "+12% в год"
     },
@@ -346,12 +347,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Сбор требований", importance: 95 },
-      { skill: "BPMN", importance: 85 },
-      { skill: "Анализ данных", importance: 88 },
-      { skill: "Agile/Scrum", importance: 85 },
-      { skill: "Коммуникация", importance: 90 },
-      { skill: "Документирование", importance: 80 }
+      { skill: "Сбор требований", importance: 0 },
+      { skill: "BPMN", importance: 0 },
+      { skill: "Анализ данных", importance: 0 },
+      { skill: "Agile/Scrum", importance: 0 },
+      { skill: "Коммуникация", importance: 0 },
+      { skill: "Документирование", importance: 0 }
     ]
   },
   {
@@ -365,23 +366,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Тест-дизайн", level: 90 },
-        { skill: "Автоматизация тестирования", level: 88 },
-        { skill: "SQL", level: 75 },
-        { skill: "Agile/Scrum", level: 80 },
-        { skill: "Баг-трекинг", level: 85 }
+        { skill: "Тест-дизайн", level: 0 },
+        { skill: "Автоматизация тестирования", level: 0 },
+        { skill: "SQL", level: 0 },
+        { skill: "Agile/Scrum", level: 0 },
+        { skill: "Баг-трекинг", level: 0 }
       ],
       soft: [
-        { skill: "Внимание к деталям", level: 92 },
-        { skill: "Критическое мышление", level: 88 },
-        { skill: "Коммуникация", level: 80 },
-        { skill: "Управление временем", level: 82 }
+        { skill: "Внимание к деталям", level: 0 },
+        { skill: "Критическое мышление", level: 0 },
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Управление временем", level: 0 }
       ]
     },
     improvementAreas: ["Автоматизация (Java/Python)", "Тестирование безопасности", "CI/CD интеграция", "Специализация (API, mobile)"],
     education: ["ВУЗ: информатика/ПО инженерия", "Курсы тестирования (Software-Testing.ru)", "Сертификации (ISTQB)"],
     salary: {
-      average: 2300,
+      average: 0,
       range: "1000 - 4000 BYN",
       growth: "+12% в год"
     },
@@ -390,12 +391,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Средний",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Тест-дизайн", importance: 90 },
-      { skill: "Автоматизация тестирования", importance: 88 },
-      { skill: "SQL", importance: 75 },
-      { skill: "Agile/Scrum", importance: 80 },
-      { skill: "Внимание к деталям", importance: 85 },
-      { skill: "Коммуникация", importance: 75 }
+      { skill: "Тест-дизайн", importance: 0 },
+      { skill: "Автоматизация тестирования", importance: 0 },
+      { skill: "SQL", importance: 0 },
+      { skill: "Agile/Scrum", importance: 0 },
+      { skill: "Внимание к деталям", importance: 0 },
+      { skill: "Коммуникация", importance: 0 }
     ]
   },
   {
@@ -409,24 +410,24 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Планирование", level: 90 },
-        { skill: "Управление рисками", level: 88 },
-        { skill: "Agile/Scrum", level: 85 },
-        { skill: "Бюджетирование", level: 80 },
-        { skill: "Отчетность", level: 82 }
+        { skill: "Планирование", level: 0 },
+        { skill: "Управление рисками", level: 0 },
+        { skill: "Agile/Scrum", level: 0 },
+        { skill: "Бюджетирование", level: 0 },
+        { skill: "Отчетность", level: 0 }
       ],
       soft: [
-        { skill: "Лидерство", level: 88 },
-        { skill: "Коммуникация", level: 92 },
-        { skill: "Переговоры", level: 90 },
-        { skill: "Решение проблем", level: 85 },
-        { skill: "Стратегическое мышление", level: 80 }
+        { skill: "Лидерство", level: 0 },
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Переговоры", level: 0 },
+        { skill: "Решение проблем", level: 0 },
+        { skill: "Стратегическое мышление", level: 0 }
       ]
     },
     improvementAreas: ["Agile методологии (CSM, PMI-ACP)", "Управление изменениями", "Сертификации (PMP, PRINCE2)", "Специализация в отрасли"],
     education: ["ВУЗ: менеджмент/MBA", "Сертификации PMP, PRINCE2", "Курсы управления проектами"],
     salary: {
-      average: 2200,
+      average: 0,
       range: "1600 - 4800 BYN",
       growth: "+14% в год"
     },
@@ -435,12 +436,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Планирование", importance: 90 },
-      { skill: "Управление рисками", importance: 88 },
-      { skill: "Agile/Scrum", importance: 85 },
-      { skill: "Бюджетирование", importance: 80 },
-      { skill: "Коммуникация", importance: 92 },
-      { skill: "Лидерство", importance: 85 }
+      { skill: "Планирование", importance: 0 },
+      { skill: "Управление рисками", importance: 0 },
+      { skill: "Agile/Scrum", importance: 0 },
+      { skill: "Бюджетирование", importance: 0 },
+      { skill: "Коммуникация", importance: 0 },
+      { skill: "Лидерство", importance: 0 }
     ]
   },
   {
@@ -454,23 +455,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Сетевая безопасность", level: 95 },
-        { skill: "Ethical Hacking", level: 90 },
-        { skill: "SIEM/IDS/IPS", level: 88 },
-        { skill: "Криптография", level: 80 },
-        { skill: "Реагирование на инциденты", level: 85 }
+        { skill: "Сетевая безопасность", level: 0 },
+        { skill: "Ethical Hacking", level: 0 },
+        { skill: "SIEM/IDS/IPS", level: 0 },
+        { skill: "Криптография", level: 0 },
+        { skill: "Реагирование на инциденты", level: 0 }
       ],
       soft: [
-        { skill: "Аналитическое мышление", level: 90 },
-        { skill: "Этика", level: 88 },
-        { skill: "Коммуникация", level: 82 },
-        { skill: "Управление кризисами", level: 85 }
+        { skill: "Аналитическое мышление", level: 0 },
+        { skill: "Этика", level: 0 },
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Управление кризисами", level: 0 }
       ]
     },
     improvementAreas: ["Облачная безопасность", "Сертификации (CISSP, CEH, OSCP)", "Изучение регуляций", "APT анализ"],
     education: ["ВУЗ: информационная безопасность", "Сертификации (CISSP, CEH)", "Курсы (Offensive Security)", "CTF-соревнования"],
     salary: {
-      average: 3000,
+      average: 0,
       range: "2000 - 6000 BYN",
       growth: "+18% в год"
     },
@@ -479,12 +480,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Очень высокий",
     location: "Офлайн",
     skillImportance: [
-      { skill: "Сетевая безопасность", importance: 95 },
-      { skill: "Ethical Hacking", importance: 90 },
-      { skill: "SIEM/IDS/IPS", importance: 88 },
-      { skill: "Криптография", importance: 80 },
-      { skill: "Реагирование на инциденты", importance: 85 },
-      { skill: "Аналитическое мышление", importance: 80 }
+      { skill: "Сетевая безопасность", importance: 0 },
+      { skill: "Ethical Hacking", importance: 0 },
+      { skill: "SIEM/IDS/IPS", importance: 0 },
+      { skill: "Криптография", importance: 0 },
+      { skill: "Реагирование на инциденты", importance: 0 },
+      { skill: "Аналитическое мышление", importance: 0 }
     ]
   },
   {
@@ -498,23 +499,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Digital Marketing", level: 92 },
-        { skill: "Google Analytics", level: 90 },
-        { skill: "Контент-маркетинг", level: 85 },
-        { skill: "SMM", level: 83 },
-        { skill: "CRM-системы", level: 80 }
+        { skill: "Digital Marketing", level: 0 },
+        { skill: "Google Analytics", level: 0 },
+        { skill: "Контент-маркетинг", level: 0 },
+        { skill: "SMM", level: 0 },
+        { skill: "CRM-системы", level: 0 }
       ],
       soft: [
-        { skill: "Креативность", level: 90 },
-        { skill: "Анализ данных", level: 88 },
-        { skill: "Коммуникация", level: 85 },
-        { skill: "Стратегическое планирование", level: 82 }
+        { skill: "Креативность", level: 0 },
+        { skill: "Анализ данных", level: 0 },
+        { skill: "Коммуникация", level: 0 },
+        { skill: "Стратегическое планирование", level: 0 }
       ]
     },
     improvementAreas: ["Data-driven маркетинг", "Новые платформы и алгоритмы", "Видео-сторителлинг", "SMM и Influencer Marketing"],
     education: ["ВУЗ: маркетинг/реклама", "Сертификации Google/Facebook", "Курсы (Coursera, Skillbox)", "Онлайн-платформы"],
     salary: {
-      average: 2300,
+      average: 0,
       range: "1600 - 4100 BYN",
       growth: "+12% в год"
     },
@@ -523,12 +524,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Digital Marketing", importance: 92 },
-      { skill: "Google Analytics", importance: 90 },
-      { skill: "Контент-маркетинг", importance: 85 },
-      { skill: "SMM", importance: 83 },
-      { skill: "Креативность", importance: 80 },
-      { skill: "Анализ данных", importance: 78 }
+      { skill: "Digital Marketing", importance: 0 },
+      { skill: "Google Analytics", importance: 0 },
+      { skill: "Контент-маркетинг", importance: 0 },
+      { skill: "SMM", importance: 0 },
+      { skill: "Креативность", importance: 0 },
+      { skill: "Анализ данных", importance: 0 }
     ]
   },
   {
@@ -542,23 +543,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Excel (продвинутый)", level: 95 },
-        { skill: "Финансовый анализ", level: 92 },
-        { skill: "Финансовое моделирование", level: 90 },
-        { skill: "SQL", level: 80 },
-        { skill: "Power BI/Tableau", level: 78 }
+        { skill: "Excel (продвинутый)", level: 0 },
+        { skill: "Финансовый анализ", level: 0 },
+        { skill: "Финансовое моделирование", level: 0 },
+        { skill: "SQL", level: 0 },
+        { skill: "Power BI/Tableau", level: 0 }
       ],
       soft: [
-        { skill: "Внимание к деталям", level: 90 },
-        { skill: "Презентации", level: 85 },
-        { skill: "Бизнес-аналитика", level: 88 },
-        { skill: "Этичность", level: 95 }
+        { skill: "Внимание к деталям", level: 0 },
+        { skill: "Презентации", level: 0 },
+        { skill: "Бизнес-аналитика", level: 0 },
+        { skill: "Этичность", level: 0 }
       ]
     },
     improvementAreas: ["Сертификации (CFA, CMA)", "Корпоративные финансы и M&A", "Risk-менеджмент", "Экономические исследования"],
      education: ["ВУЗ: финансы/экономика", "Магистратура/MBA", "Сертификации (CFA, CMA)", "Курсы финансового моделирования"],
      salary: {
-       average: 2400,
+       average: 0,
        range: "1200 - 5300 BYN",
        growth: "+14% в год"
      },
@@ -567,12 +568,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Высокий",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "Excel (продвинутый)", importance: 95 },
-      { skill: "Финансовый анализ", importance: 92 },
-      { skill: "Финансовое моделирование", importance: 90 },
-      { skill: "SQL", importance: 80 },
-      { skill: "Power BI/Tableau", importance: 78 },
-      { skill: "Внимание к деталям", importance: 85 }
+      { skill: "Excel (продвинутый)", importance: 0 },
+      { skill: "Финансовый анализ", importance: 0 },
+      { skill: "Финансовое моделирование", importance: 0 },
+      { skill: "SQL", importance: 0 },
+      { skill: "Power BI/Tableau", importance: 0 },
+      { skill: "Внимание к деталям", importance: 0 }
     ]
   },
   {
@@ -586,23 +587,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "AutoCAD/Revit", level: 93 },
-        { skill: "Строительные нормы", level: 90 },
-        { skill: "Управление проектами", level: 85 },
-        { skill: "Контроль качества", level: 88 },
-        { skill: "Сметное дело", level: 80 }
+        { skill: "AutoCAD/Revit", level: 0 },
+        { skill: "Строительные нормы", level: 0 },
+        { skill: "Управление проектами", level: 0 },
+        { skill: "Контроль качества", level: 0 },
+        { skill: "Сметное дело", level: 0 }
       ],
       soft: [
-        { skill: "Лидерство", level: 85 },
-        { skill: "Организация", level: 88 },
-        { skill: "Безопасность", level: 90 },
-        { skill: "Коммуникация с подрядчиками", level: 82 }
+        { skill: "Лидерство", level: 0 },
+        { skill: "Организация", level: 0 },
+        { skill: "Безопасность", level: 0 },
+        { skill: "Коммуникация с подрядчиками", level: 0 }
       ]
     },
     improvementAreas: ["Сертификации по BIM", "Экологические нормы", "Управление бригадами", "Новые материалы и технологии"],
     education: ["ВУЗ: строительство/архитектура", "Сертификации BIM Manager", "Курсы повышения квалификации"],
     salary: {
-      average: 2200,
+      average: 0,
       range: "1400 - 3900 BYN",
       growth: "+12% в год"
     },
@@ -611,12 +612,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Средний",
     location: "Офлайн",
     skillImportance: [
-      { skill: "AutoCAD/Revit", importance: 93 },
-      { skill: "Строительные нормы", importance: 90 },
-      { skill: "Управление проектами", importance: 85 },
-      { skill: "Контроль качества", importance: 88 },
-      { skill: "Сметное дело", importance: 80 },
-      { skill: "Безопасность", importance: 85 }
+      { skill: "AutoCAD/Revit", importance: 0 },
+      { skill: "Строительные нормы", importance: 0 },
+      { skill: "Управление проектами", importance: 0 },
+      { skill: "Контроль качества", importance: 0 },
+      { skill: "Сметное дело", importance: 0 },
+      { skill: "Безопасность", importance: 0 }
     ]
   },
   {
@@ -630,23 +631,23 @@ const ALL_PROFESSIONS = [
     },
     skillLevels: {
       hard: [
-        { skill: "Академическое преподавание", level: 92 },
-        { skill: "Научные исследования", level: 90 },
-        { skill: "Публикации", level: 88 },
-        { skill: "Грантовая деятельность", level: 80 },
-        { skill: "Разработка программ", level: 82 }
+        { skill: "Академическое преподавание", level: 0 },
+        { skill: "Научные исследования", level: 0 },
+        { skill: "Публикации", level: 0 },
+        { skill: "Грантовая деятельность", level: 0 },
+        { skill: "Разработка программ", level: 0 }
       ],
       soft: [
-        { skill: "Публичные выступления", level: 85 },
-        { skill: "Наставничество", level: 90 },
-        { skill: "Критическое мышление", level: 88 },
-        { skill: "Международное сотрудничество", level: 80 }
+        { skill: "Публичные выступления", level: 0 },
+        { skill: "Наставничество", level: 0 },
+        { skill: "Критическое мышление", level: 0 },
+        { skill: "Международное сотрудничество", level: 0 }
       ]
     },
       improvementAreas: ["Публикация в международных журналах", "Привлечение грантов", "Современные педагогические технологии", "Международные стажировки"],
       education: ["Ученая степень (кандидат/доктор)", "Аспирантура", "Повышение квалификации", "Стажировки за рубежом"],
       salary: {
-        average: 1000,
+        average: 0,
         range: "800 - 1800 BYN",
         growth: "+6% в год"
       },
@@ -655,12 +656,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Очень высокий",
     location: "Офлайн",
     skillImportance: [
-      { skill: "Академическое преподавание", importance: 92 },
-      { skill: "Научные исследования", importance: 90 },
-      { skill: "Публикации", importance: 88 },
-      { skill: "Грантовая деятельность", importance: 80 },
-      { skill: "Наставничество", importance: 85 },
-      { skill: "Публичные выступления", importance: 78 }
+      { skill: "Академическое преподавание", importance: 0 },
+      { skill: "Научные исследования", importance: 0 },
+      { skill: "Публикации", importance: 0 },
+      { skill: "Грантовая деятельность", importance: 0 },
+      { skill: "Наставничество", importance: 0 },
+      { skill: "Публичные выступления", importance: 0 }
     ]
   },
   {
@@ -674,24 +675,24 @@ const ALL_PROFESSIONS = [
      },
      skillLevels: {
        hard: [
-         { skill: "Диагностика", level: 95 },
-         { skill: "Клинические навыки", level: 93 },
-         { skill: "Фармакология", level: 88 },
-         { skill: "Медицинская документация", level: 85 },
-         { skill: "ЭКГ, анализы", level: 80 }
+         { skill: "Диагностика", level: 0 },
+         { skill: "Клинические навыки", level: 0 },
+         { skill: "Фармакология", level: 0 },
+         { skill: "Медицинская документация", level: 0 },
+         { skill: "ЭКГ, анализы", level: 0 }
        ],
        soft: [
-         { skill: "Эмпатия", level: 90 },
-         { skill: "Коммуникация с пациентами", level: 88 },
-         { skill: "Стрессоустойчивость", level: 85 },
-         { skill: "Этика", level: 82 },
-         { skill: "Работа в команде", level: 80 }
+         { skill: "Эмпатия", level: 0 },
+         { skill: "Коммуникация с пациентами", level: 0 },
+         { skill: "Стрессоустойчивость", level: 0 },
+         { skill: "Этика", level: 0 },
+         { skill: "Работа в команде", level: 0 }
        ]
      },
      improvementAreas: ["Специализация (кардиология, неврология)", "Углубление в диагностику", "Soft skills для коммуникации", "Изучение новых методов лечения"],
     education: ["ВУЗ: медицина (лечебный факультет)", "Интернатура/ординатура", "Сертификации специализаций", "Повышение квалификации"],
     salary: {
-      average: 1800,
+      average: 0,
       range: "1200 - 4100 BYN",
       growth: "+12% в год"
     },
@@ -700,12 +701,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Очень высокий",
     location: "Офлайн",
     skillImportance: [
-      { skill: "Диагностика", importance: 95 },
-      { skill: "Клинические навыки", importance: 93 },
-      { skill: "Фармакология", importance: 88 },
-      { skill: "Эмпатия", importance: 90 },
-      { skill: "Коммуникация с пациентами", importance: 85 },
-      { skill: "Стрессоустойчивость", importance: 85 }
+      { skill: "Диагностика", importance: 0 },
+      { skill: "Клинические навыки", importance: 0 },
+      { skill: "Фармакология", importance: 0 },
+      { skill: "Эмпатия", importance: 0 },
+      { skill: "Коммуникация с пациентами", importance: 0 },
+      { skill: "Стрессоустойчивость", importance: 0 }
     ]
   },
   {
@@ -719,24 +720,24 @@ const ALL_PROFESSIONS = [
      },
      skillLevels: {
        hard: [
-         { skill: "AutoCAD/Revit/ArchiCAD", level: 95 },
-         { skill: "3D-моделирование (3ds Max)", level: 90 },
-         { skill: "Строительные нормы и стандарты", level: 88 },
-         { skill: "Управление проектами", level: 85 },
-         { skill: "Экологическое проектирование", level: 80 }
+         { skill: "AutoCAD/Revit/ArchiCAD", level: 0 },
+         { skill: "3D-моделирование (3ds Max)", level: 0 },
+         { skill: "Строительные нормы и стандарты", level: 0 },
+         { skill: "Управление проектами", level: 0 },
+         { skill: "Экологическое проектирование", level: 0 }
        ],
        soft: [
-         { skill: "Креативность", level: 92 },
-         { skill: "Коммуникация с клиентами", level: 88 },
-         { skill: "Внимание к деталям", level: 90 },
-         { skill: "Лидерство", level: 82 },
-         { skill: "Экологическое мышление", level: 85 }
+         { skill: "Креативность", level: 0 },
+         { skill: "Коммуникация с клиентами", level: 0 },
+         { skill: "Внимание к деталям", level: 0 },
+         { skill: "Лидерство", level: 0 },
+         { skill: "Экологическое мышление", level: 0 }
        ]
      },
       improvementAreas: ["BIM технологии", "Экологичное и энергоэффективное строительство", "Управление проектами", "Новые материалы и технологии"],
      education: ["ВУЗ: архитектура", "Лицензия архитектора", "Сертификации (BIM, LEED)", "Курсы повышения квалификации"],
      salary: {
-       average: 3000,
+       average: 0,
        range: "1300 - 4300 BYN",
        growth: "+15% в год"
      },
@@ -745,12 +746,12 @@ const ALL_PROFESSIONS = [
     marketDemand: "Средний",
      location: "удаленно/офлайн",
     skillImportance: [
-      { skill: "AutoCAD/Revit", importance: 95 },
-      { skill: "3D-моделирование", importance: 88 },
-      { skill: "Креативность", importance: 90 },
-      { skill: "Строительные нормы", importance: 85 },
-      { skill: "Коммуникация с клиентами", importance: 82 },
-      { skill: "Управление проектами", importance: 80 }
+      { skill: "AutoCAD/Revit", importance: 0 },
+      { skill: "3D-моделирование", importance: 0 },
+      { skill: "Креативность", importance: 0 },
+      { skill: "Строительные нормы", importance: 0 },
+      { skill: "Коммуникация с клиентами", importance: 0 },
+      { skill: "Управление проектами", importance: 0 }
     ]
   }
 ];

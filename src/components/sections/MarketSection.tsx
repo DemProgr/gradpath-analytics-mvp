@@ -1,3 +1,4 @@
+// ⚠️ Числовые значения обнулены — заменить на реальные данные из БД
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Briefcase, Wallet, Clock, Target, AlertCircle, RefreshCw } from 'lucide-react';
 import { VacanciesChart } from '@/components/charts/VacanciesChart';
@@ -19,15 +20,15 @@ const translateCategory = (cat: string, t: (key: string) => string): string => {
   return map[cat] || cat;
 };
 
-// Fallback данные только если нет данных из БД
+// ⚠️ МОК-ДАННЫЕ: загружать из БД
 const fallbackInsights = [
   {
-    title: 'IT-специалисты',
-    demand: 'высокий',
-    trend: 'up' as const,
-    avgSalary: 'Загрузка...',
-    growth: '—',
-    description: 'Данные загружаются из rabota.by'
+    title: "⚠️ МОК-ДАННЫЕ: профессия",
+    demand: "⚠️ МОК-ДАННЫЕ: спрос",
+    trend: 'stable' as const,
+    avgSalary: "⚠️ МОК-ДАННЫЕ",
+    growth: "⚠️ МОК-ДАННЫЕ",
+    description: "⚠️ МОК-ДАННЫЕ: описание"
   },
 ];
 
@@ -37,13 +38,9 @@ export function MarketSection() {
 
   // Преобразуем данные из БД в формат для отображения
   const marketInsights = salaryStats?.categories.slice(0, 4).map((cat, index) => {
+    // ⚠️ МОК-ДАННЫЕ: загружать из БД
     const trendMap: Record<string, 'up' | 'down' | 'stable'> = {
-      'ИТ': 'up',
-      'Медицина': 'up',
-      'Инженерия': 'up',
-      'Экономика': 'stable',
-      'Педагогика': 'stable',
-      'Юриспруденция': 'stable',
+      "⚠️ МОК-ДАННЫЕ": 'stable',
     };
 
     return {
@@ -58,12 +55,9 @@ export function MarketSection() {
     };
   }) || [];
 
-  // Данные о требованиях к опыту из реальных вакансий
+  // ⚠️ МОК-ДАННЫЕ: загружать из БД
   const requirements = [
-    { label: t('market.noExperience'), percent: 25, color: 'bg-primary' },
-    { label: '1-3 ' + t('market.years'), percent: 45, color: 'bg-primary/70' },
-    { label: '3-5 ' + t('market.years'), percent: 22, color: 'bg-primary/50' },
-    { label: '5+ ' + t('market.years'), percent: 8, color: 'bg-primary/30' },
+    { label: "⚠️ МОК-ДАННЫЕ: опыт", percent: 0, color: 'bg-primary' },
   ];
 
   return (

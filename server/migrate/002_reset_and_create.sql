@@ -1,5 +1,5 @@
 -- ============================================================
--- Exact Supabase-compatible schema for Neon
+-- Database schema for Neon
 -- Run this first to reset and create all tables
 -- ============================================================
 

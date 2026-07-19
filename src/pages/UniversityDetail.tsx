@@ -107,6 +107,7 @@ const UniversityDetail = () => {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
   const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
@@ -129,83 +130,29 @@ const UniversityDetail = () => {
             website: universityData.website || null,
             description: universityData.description || null
           });
-
-          // Load faculties
-          const facultiesData = await api.get<any[]>(`/api/faculties?universityId=${universityData.id}`);
-
-          // Load specialties
-          const specialtiesData = await api.get<any[]>(`/api/specialties?universityId=${universityData.id}`);
-
-          // Use static data if no data from API, otherwise use API data
-          const useStaticData = !facultiesData || facultiesData.length === 0;
-          
-          if (useStaticData) {
-            loadStaticData();
-          } else {
-            const split = facultiesData.reduce((acc, f) => {
-              if (f.id && f.id.includes('-i')) {
-                acc.institutes.push(f);
-              } else {
-                acc.faculties.push(f);
-              }
-              return acc;
-            }, { faculties: [] as any[], institutes: [] as any[] });
-            setFaculties(split.faculties);
-            setInstitutes(split.institutes);
-            
-            if (specialtiesData && specialtiesData.length > 0) {
-              setSpecialties(specialtiesData);
-            }
-          }
-
-          // Load admission stats
-          const specialtyIds = (specialtiesData || []).map(s => s.id);
-          
-          if (specialtyIds.length > 0) {
-            const allStats = await api.get<any[]>('/api/admission-stats');
-            const admissionData = allStats.filter(s => specialtyIds.includes(s.specialtyId));
-            admissionData.sort((a, b) => (b.year || 0) - (a.year || 0));
-
-            if (admissionData.length > 0) {
-              // Join with specialty names
-              const admissionWithSpecialty = admissionData.map(stat => {
-                const specialty = specialtiesData?.find(s => s.id === stat.specialtyId);
-                return {
-                  ...stat,
-                  specialty: specialty ? { name: specialty.name, code: specialty.code } : null
-                };
-              });
-              setAdmissionStats(admissionWithSpecialty);
-            }
-          }
-        } else {
-          // Fallback to static data
-          loadStaticData();
         }
+
+        // Always use static data for faculties, institutes, and specialties (authoritative source)
+        loadStaticFaculties();
       } catch (error) {
-        console.error('Error fetching from API:', error);
-        // Fallback to static data
-        loadStaticData();
+        console.error('Error fetching university from API:', error);
+        loadStaticFaculties();
       }
+
+      // Always load admission stats from static data (most complete source)
+      // Merges with API data if available
+      await loadStaticAdmissionStats();
 
       setLoading(false);
     }
 
-    async function loadStaticData() {
+    async function loadStaticFaculties() {
       const staticData = getUniversityFacultiesData(decodedShortName);
       const staticUniversity = getUniversityByShortName(decodedShortName);
 
       if (staticData) {
-        const split = (staticData.faculties as any[]).reduce((acc: any, f: any) => {
-          if (f.id && f.id.includes('-i')) {
-            acc.institutes.push(f);
-          } else {
-            acc.faculties.push(f);
-          }
-          return acc;
-        }, { faculties: [], institutes: [] });
-        setFaculties(split.faculties as Faculty[]);
-        setInstitutes(split.institutes as Institute[]);
+        setFaculties(staticData.faculties as Faculty[]);
+        setInstitutes((staticData.institutes || []) as Institute[]);
         setSpecialties(staticData.specialties);
       }
 
@@ -219,66 +166,101 @@ const UniversityDetail = () => {
           description: null
         });
       }
+    }
 
-      // Load admission stats from API using static specialty IDs
-      if (staticData && staticData.specialties.length > 0) {
-        const specialtyIds = staticData.specialties.map(s => s.id);
-        
-        const allStats = await api.get<any[]>('/api/admission-stats');
-        const apiData = allStats.filter(s => specialtyIds.includes(s.specialtyId));
-        apiData.sort((a, b) => (b.year || 0) - (a.year || 0));
+    async function loadStaticAdmissionStats() {
+      const staticData = getUniversityFacultiesData(decodedShortName);
 
-        // Create static specialty map
-        const staticSpecialtyMap = new Map(staticData.specialties.map(s => [s.id, s]));
+      if (!staticData || staticData.specialties.length === 0) return;
 
-        // Convert static passing scores to admission stats format
-        const staticStats = staticData.specialties
-          .filter(s => s.passing_score_budget && s.year)
-          .map(s => ({
-            id: `${s.id}-${s.year}`,
-            specialtyId: s.id,
-            year: s.year,
-            min_score: s.passing_score_budget,
-            passing_score_budget: s.passing_score_budget,
-            specialty: {
-              name: s.name,
-              code: s.code,
-              faculty_id: s.faculty_id,
-              institute_id: s.institute_id
-            }
-          }));
+      const specialtyIds = staticData.specialties.map(s => s.id);
+      
+      let allStats: any[] = [];
+      try {
+        allStats = await api.get<any[]>('/api/admission-stats');
+      } catch {
+        // API not available, use only static data
+      }
 
-        // Merge API data with static data
-        let mergedStats: any[] = [];
-        
-        if (apiData.length > 0) {
-          const apiStats = apiData.map(stat => {
-            const staticSpecialty = staticSpecialtyMap.get(stat.specialtyId);
-            return {
-              ...stat,
-              specialty: staticSpecialty ? { 
-                name: staticSpecialty.name, 
-                code: staticSpecialty.code,
-                faculty_id: staticSpecialty.faculty_id,
-                institute_id: staticSpecialty.institute_id
-              } : null
-            };
-          });
-          mergedStats = apiStats;
-        }
+      const apiData = allStats.filter(s => specialtyIds.includes(s.specialtyId));
+      apiData.sort((a, b) => (b.year || 0) - (a.year || 0));
 
-        // Add static stats (2025) if not already present from API
-        const existingYears = new Set(mergedStats.map(s => s.year));
-        staticStats.forEach(stat => {
-          if (!existingYears.has(stat.year)) {
-            mergedStats.push(stat);
+      const staticSpecialtyMap = new Map(staticData.specialties.map(s => [s.id, s]));
+
+      const staticStats = staticData.specialties
+        .flatMap(s => {
+          if (s.passing_scores && s.passing_scores.length > 0) {
+            return s.passing_scores.map(ps => ({
+              id: `${s.id}-${ps.year}`,
+              specialtyId: s.id,
+              year: ps.year,
+              min_score: ps.budget,
+              passing_score_budget: ps.budget,
+              passing_score_paid: ps.paid,
+              specialty: {
+                name: s.name,
+                code: s.code,
+                faculty_id: s.faculty_id,
+                institute_id: s.institute_id
+              }
+            }));
           }
+          if (s.passing_score_budget && s.year) {
+            return [{
+              id: `${s.id}-${s.year}`,
+              specialtyId: s.id,
+              year: s.year,
+              min_score: s.passing_score_budget,
+              passing_score_budget: s.passing_score_budget,
+              specialty: {
+                name: s.name,
+                code: s.code,
+                faculty_id: s.faculty_id,
+                institute_id: s.institute_id
+              }
+            }];
+          }
+          return [];
         });
 
-        // Sort by year descending
-        mergedStats.sort((a, b) => (b.year || 0) - (a.year || 0));
-        setAdmissionStats(mergedStats);
+      let mergedStats: any[] = [];
+
+      if (apiData.length > 0) {
+        const apiStats = apiData.map(stat => {
+          const staticSpecialty = staticSpecialtyMap.get(stat.specialtyId);
+          return {
+            ...stat,
+            specialty: staticSpecialty ? { 
+              name: staticSpecialty.name, 
+              code: staticSpecialty.code,
+              faculty_id: staticSpecialty.faculty_id,
+              institute_id: staticSpecialty.institute_id
+            } : null
+          };
+        });
+        mergedStats = apiStats;
       }
+
+      const existingKeys = new Set(mergedStats.map(s => `${s.specialtyId}-${s.year}`));
+      staticStats.forEach(stat => {
+        const key = `${stat.specialtyId}-${stat.year}`;
+        if (existingKeys.has(key)) {
+          const existing = mergedStats.find(s => `${s.specialtyId}-${s.year}` === key);
+          const hasActualScores = existing && (
+            (existing.min_score || existing.passing_score_budget) ||
+            (existing.paid_min_score || existing.passing_score_paid)
+          );
+          if (!hasActualScores) {
+            const idx = mergedStats.findIndex(s => `${s.specialtyId}-${s.year}` === key);
+            if (idx !== -1) mergedStats[idx] = stat;
+          }
+        } else {
+          mergedStats.push(stat);
+        }
+      });
+
+      mergedStats.sort((a, b) => (b.year || 0) - (a.year || 0));
+      setAdmissionStats(mergedStats);
     }
 
     fetchUniversity();
@@ -407,6 +389,13 @@ const UniversityDetail = () => {
                 <Link to="#faculties" className="hover:underline">{faculties.length} {t('uni.faculties')}</Link>
               </Badge>
               
+              {institutes.length > 0 && (
+              <Badge variant="outline" className="px-4 py-2 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => document.getElementById('institutes')?.scrollIntoView({ behavior: 'smooth' })}>
+                <GraduationCap className="w-4 h-4 mr-2" />
+                <Link to="#institutes" className="hover:underline">{institutes.length} учреждений образования</Link>
+              </Badge>
+              )}
+              
               {specialties.length > 0 && (
                 <Badge variant="outline" className="px-4 py-2 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => document.getElementById('faculties')?.scrollIntoView({ behavior: 'smooth' })}>
                   <BookOpen className="w-4 h-4 mr-2" />
@@ -520,13 +509,13 @@ const UniversityDetail = () => {
               </Card>
             )}
 
-            {/* Institutes */}
+            {/* Institutes / Учреждения образования */}
             {institutes.length > 0 && (
-              <Card className="mb-8">
+              <Card className="mb-8" id="institutes">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <GraduationCap className="w-5 h-5" />
-                    Институты ({institutes.length})
+                    Учреждения образования ({institutes.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -553,7 +542,9 @@ const UniversityDetail = () => {
                                 )}
                               </div>
                               <p className="text-sm text-muted-foreground mt-1">
-                                {institute.id === 'bspu-i3' ? 'Повышение квалификации' : `${instituteSpecialties.length} специальностей`}
+                                {institute.id === 'bspu-i3' ? 'Повышение квалификации' :
+                                 instituteSpecialties.length > 0 ? `${instituteSpecialties.length} специальностей` :
+                                 'программ ВО нет'}
                               </p>
                             </div>
                             {isExpanded ? (
@@ -588,7 +579,7 @@ const UniversityDetail = () => {
                                       Перейти на сайт института →
                                     </a>
                                   </div>
-                                ) : (
+                                ) : instituteSpecialties.length > 0 ? (
                                   <>
                                     <h5 className="text-sm font-medium text-muted-foreground mb-3">
                                       Специальности:
@@ -612,6 +603,12 @@ const UniversityDetail = () => {
                                       ))}
                                     </ul>
                                   </>
+                                ) : (
+                                  <div className="p-4">
+                                    <p className="text-sm text-muted-foreground">
+                                      Учреждение не ведет подготовку по программам общего высшего образования.
+                                    </p>
+                                  </div>
                                 )}
                               </div>
                             </motion.div>
@@ -674,7 +671,7 @@ const UniversityDetail = () => {
                   {/* Filters as Select */}
                   <div className="flex flex-wrap gap-4 mb-6">
                     <div className="w-[180px]">
-                      <Select value={selectedYear?.toString() || "all"} onValueChange={(v) => setSelectedYear(v === "all" ? null : parseInt(v))}>
+                      <Select value={selectedYear?.toString() || "all"} onValueChange={(v) => { setSelectedYear(v === "all" ? null : parseInt(v)); setHasInteracted(true); }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Год" />
                         </SelectTrigger>
@@ -688,7 +685,7 @@ const UniversityDetail = () => {
                     </div>
 
                     <div className="w-[280px]">
-                      <Select value={selectedFaculty || "all"} onValueChange={(v) => { setSelectedFaculty(v === "all" ? null : v); setSelectedSpecialty(null); }}>
+                      <Select value={selectedFaculty || "all"} onValueChange={(v) => { setSelectedFaculty(v === "all" ? null : v); setSelectedSpecialty(null); setHasInteracted(true); }}>
                         <SelectTrigger>
                           <SelectValue placeholder="Факультет / Институт" />
                         </SelectTrigger>
@@ -702,10 +699,10 @@ const UniversityDetail = () => {
                               ))}
                             </>
                           )}
-                          {institutes.length > 0 && (
+                          {institutes.filter(i => specialties.some(s => s.institute_id === i.id)).length > 0 && (
                             <>
                               <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1">Институты</div>
-                              {institutes.map(institute => (
+                              {institutes.filter(i => specialties.some(s => s.institute_id === i.id)).map(institute => (
                                 <SelectItem key={institute.id} value={institute.id}>{institute.code || institute.name}</SelectItem>
                               ))}
                             </>
@@ -716,7 +713,7 @@ const UniversityDetail = () => {
 
                     {selectedFaculty && (
                       <div className="w-[320px]">
-                        <Select value={selectedSpecialty || "all"} onValueChange={(v) => setSelectedSpecialty(v === "all" ? null : v)}>
+                        <Select value={selectedSpecialty || "all"} onValueChange={(v) => { setSelectedSpecialty(v === "all" ? null : v); setHasInteracted(true); }}>
                           <SelectTrigger>
                             <SelectValue placeholder="Специальность" />
                           </SelectTrigger>
@@ -879,7 +876,19 @@ if (selectedYear && stat.year !== selectedYear) return false;
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {admissionStats
+                        {admissionStats.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                              Нет данных о проходных баллах
+                            </TableCell>
+                          </TableRow>
+                        ) : !hasInteracted ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                              Выберите год, факультет или специальность для отображения проходных баллов
+                            </TableCell>
+                          </TableRow>
+                        ) : admissionStats
                           .filter(stat => {
                             if (selectedYear && stat.year !== selectedYear) return false;
                             
@@ -901,7 +910,7 @@ if (selectedYear && stat.year !== selectedYear) return false;
                             return true;
                           })
                           .reduce((acc, stat) => {
-                            if (!acc.some(s => s.specialtyId === stat.specialtyId)) {
+                            if (!acc.some(s => s.specialtyId === stat.specialtyId && s.year === stat.year)) {
                               acc.push(stat);
                             }
                             return acc;

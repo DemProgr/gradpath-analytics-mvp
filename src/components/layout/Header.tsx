@@ -148,7 +148,7 @@ const navItems = [
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => setIsHeaderHovered(false)}
         onClick={() => {
-          if ('ontouchstart' in window) setIsHeaderHovered(prev => !prev)
+          if (!isMobile && 'ontouchstart' in window) setIsHeaderHovered(prev => !prev)
         }}
         animate={{
           maxWidth: isScrolled && !isMobile ? 1024 : '100%',
@@ -290,7 +290,7 @@ const navItems = [
 
           {/* Desktop dropdown */}
           <AnimatePresence mode="wait">
-            {isHeaderHovered && (
+            {!isMobile && isHeaderHovered && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}

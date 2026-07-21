@@ -114,7 +114,7 @@ const navItems = [
             to={item.id}
             className={cn(
               "text-sm font-semibold whitespace-nowrap hover:text-primary transition-colors",
-              isScrolled ? "text-white" : "text-foreground"
+              "text-white"
             )}
           >
             {item.label}
@@ -126,9 +126,7 @@ const navItems = [
                 to={dropdownItem.isRoute ? dropdownItem.id : '#'}
                 className={cn(
                   "block text-sm py-1 whitespace-nowrap transition-colors",
-                  isScrolled
-                    ? dropdownItem.isStub ? "text-white/40 cursor-not-allowed" : "text-white/70 hover:text-white"
-                    : dropdownItem.isStub ? "text-muted-foreground opacity-60 cursor-not-allowed" : "text-muted-foreground hover:text-primary"
+                  dropdownItem.isStub ? "text-white/40 cursor-not-allowed" : "text-white/70 hover:text-white"
                 )}
               >
                 {dropdownItem.label}
@@ -152,20 +150,24 @@ const navItems = [
           if (!isMobile && 'ontouchstart' in window) setIsHeaderHovered(prev => !prev)
         }}
         animate={{
-          maxWidth: isScrolled && !isMobile ? 1024 : '100%',
-          borderRadius: isScrolled && !isMobile ? 16 : 0,
+          maxWidth: isScrolled ? 1024 : 10000,
+          borderRadius: isScrolled ? 16 : 0,
           boxShadow: isScrolled ? '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)' : 'none',
-          marginTop: isScrolled && !isMobile ? 12 : 0,
-          backgroundColor: isScrolled ? 'rgb(15,26,28)' : 'rgba(255,255,255,0.8)',
-          borderBottom: isScrolled ? '0px solid transparent' : '1px solid hsl(var(--border))',
-          color: isScrolled ? 'rgb(255,255,255)' : 'inherit',
+          marginTop: isScrolled ? 12 : 0,
+          backgroundColor: isScrolled ? 'rgb(15,26,28)' : 'transparent',
+          borderBottom: isScrolled ? '0px solid transparent' : '0px solid transparent',
+          color: 'rgb(255,255,255)',
         }}
         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-        className="w-full px-4 sm:px-6 lg:px-8"
+        className={cn(
+          "w-full px-4 sm:px-6 lg:px-8",
+          isMobile && !isScrolled && "max-w-full",
+          isMobile && isScrolled && "max-w-full"
+        )}
       >
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
               <img src={imagePath('/favicon.png')} alt="GradPath" className="w-6 h-6 object-contain" />
             </div>
             <motion.span
@@ -193,9 +195,7 @@ const navItems = [
                     key={item.id}
                     className={cn(
                       "text-sm font-medium transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer",
-                      isScrolled
-                        ? "text-white/70 hover:text-white"
-                        : "text-muted-foreground hover:text-foreground"
+                      "text-white/70 hover:text-white"
                     )}
                   >
                     {item.label}
@@ -242,12 +242,9 @@ const navItems = [
                   </DropdownMenu>
                 ) : (
                   <Button
-                    variant={isScrolled ? "ghost" : "outline"}
+                    variant="ghost"
                     onClick={handleSignIn}
-                    className={cn(
-                      "flex items-center gap-2",
-                      isScrolled && "border border-white/30 text-white hover:bg-white/10 hover:text-white"
-                    )}
+                    className="flex items-center gap-2 text-white hover:bg-white/10"
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>
@@ -257,7 +254,7 @@ const navItems = [
                 {!chatOpen && (
                   <div className="flex items-center gap-2">
                     <Link to="/search">
-                      <Button variant="ghost" size="icon" className={cn("w-9 h-9", isScrolled && "hover:bg-white/10")}>
+                      <Button variant="ghost" size="icon" className="w-9 h-9 text-white hover:bg-white/10">
                         <Search className="w-4 h-4" />
                       </Button>
                     </Link>
@@ -280,8 +277,8 @@ const navItems = [
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
                 className={cn(
-                  "p-2 rounded-lg transition-colors hover:bg-white/10",
-                  isScrolled ? "text-white" : "text-foreground hover:bg-secondary"
+                  "p-2 rounded-lg transition-colors",
+                  isScrolled ? "text-white hover:bg-white/10" : "text-white hover:bg-white/10"
                 )}
               >
                 {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -301,29 +298,13 @@ const navItems = [
               >
                 <div
                   className={cn(
-                    "py-3 border-t",
+                    "py-3 border-t shadow-lg rounded-2xl mt-1",
                     isScrolled
-                      ? "border-white/10 shadow-lg rounded-2xl mt-1"
-                      : "bg-background/80 border-border"
+                      ? "border-white/10"
+                      : "border-white/10 bg-[#0f1a1c]/95"
                   )}
                 >
-                  {isScrolled ? (
-                    <div className="px-4 sm:px-6 lg:px-8">{navLinks}</div>
-                  ) : (
-                    <div className="section-container">
-                      <div className="flex items-start justify-between">
-                        <div className="invisible flex items-center gap-2 shrink-0 pointer-events-none select-none">
-                          <div className="w-9 h-9 rounded-full bg-muted" />
-                          <span className="font-serif text-xl">GradPath Analytics</span>
-                        </div>
-                        {navLinks}
-                        <div className="invisible flex items-center gap-4 shrink-0 pointer-events-none select-none">
-                          <div className="w-9 h-9 rounded-lg bg-muted" />
-                          <div className="w-28 h-9 rounded-lg bg-primary/20" />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <div className="px-4 sm:px-6 lg:px-8">{navLinks}</div>
                 </div>
               </motion.div>
             )}
@@ -337,12 +318,7 @@ const navItems = [
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-              className={cn(
-                "overflow-hidden fixed left-0 right-0 top-16 sm:top-20 z-50",
-                isScrolled
-                  ? "bg-[#0f1a1c] shadow-lg"
-                  : "bg-background border-b border-border"
-              )}
+              className="overflow-hidden fixed left-0 right-0 top-16 sm:top-20 z-50 bg-[#0f1a1c] shadow-lg"
           >
             <nav className="px-4 py-4 space-y-1">
               {navItems.map((item, index) => {
@@ -358,9 +334,7 @@ const navItems = [
                         "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
                         isActiveRoute(item.id)
                           ? "bg-primary text-primary-foreground"
-                          : isScrolled
-                            ? "text-white/70 hover:bg-white/10"
-                            : "text-muted-foreground hover:bg-secondary"
+                          : "text-white/70 hover:bg-white/10"
                       )}
                     >
                       <span>{item.label}</span>
@@ -389,14 +363,12 @@ const navItems = [
                                   key={sub.id}
                                   to={sub.id}
                                   onClick={() => setMobileOpen(false)}
-                                  className={cn(
-                                    "block px-4 py-2 rounded-lg text-sm transition-colors",
-                                    isActiveRoute(sub.id)
-                                      ? "text-primary font-medium"
-                                      : isScrolled
-                                        ? "text-white/60 hover:text-white hover:bg-white/5"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                                  )}
+className={cn(
+                                      "block px-4 py-2 rounded-lg text-sm transition-colors",
+                                      isActiveRoute(sub.id)
+                                        ? "text-primary font-medium"
+                                        : "text-white/60 hover:text-white hover:bg-white/5"
+                                    )}
                                 >
                                   {sub.label}
                                   {sub.isStub && <span className="text-xs ml-1">(скоро)</span>}
@@ -404,12 +376,7 @@ const navItems = [
                               ) : (
                                 <span
                                   key={sub.id}
-                                  className={cn(
-                                    "block px-4 py-2 rounded-lg text-sm",
-                                    isScrolled
-                                      ? "text-white/30 cursor-not-allowed"
-                                      : "text-muted-foreground/50 cursor-not-allowed"
-                                  )}
+                                  className="block px-4 py-2 rounded-lg text-sm text-white/30 cursor-not-allowed"
                                 >
                                   {sub.label}
                                   <span className="text-xs ml-1">(скоро)</span>
@@ -433,7 +400,7 @@ const navItems = [
                     transition={{ delay: 0.25 }}
                     className="px-4 py-2"
                   >
-                    <p className={cn("text-sm font-medium", isScrolled ? "text-white" : "text-foreground")}>{user.email}</p>
+                    <p className="text-sm font-medium text-white">{user.email}</p>
                     {isAdmin && (
                       <p className="text-xs text-primary mt-1">
                         <Shield className="w-3 h-3 inline mr-1" />Администратор
@@ -445,12 +412,7 @@ const navItems = [
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
                     onClick={() => { navigate('/profile'); setMobileOpen(false); }}
-                    className={cn(
-                      "w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
-                      isScrolled
-                        ? "text-white/70 hover:bg-white/10"
-                        : "text-muted-foreground hover:bg-secondary"
-                    )}
+                    className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer text-white/70 hover:bg-white/10"
                   >
                     <UserCircle className="w-4 h-4 inline mr-2" />Профиль
                   </motion.div>
@@ -460,12 +422,7 @@ const navItems = [
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.35 }}
                       onClick={() => { navigate('/admin'); setMobileOpen(false); }}
-                      className={cn(
-                        "w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
-                        isScrolled
-                          ? "text-white/70 hover:bg-white/10"
-                          : "text-muted-foreground hover:bg-secondary"
-                      )}
+                      className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer text-white/70 hover:bg-white/10"
                     >
                       <Shield className="w-4 h-4 inline mr-2" />Админ-панель
                     </motion.div>
@@ -475,12 +432,7 @@ const navItems = [
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.4 }}
                     onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                    className={cn(
-                      "w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
-                      isScrolled
-                        ? "text-red-400 hover:bg-white/10"
-                        : "text-destructive hover:bg-destructive/10"
-                    )}
+                    className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer text-red-400 hover:bg-white/10"
                   >
                     <LogOut className="w-4 h-4 inline mr-2" />Выйти
                   </motion.div>
@@ -493,12 +445,7 @@ const navItems = [
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.25 }}
                     onClick={() => { navigate('/login'); setMobileOpen(false); }}
-                    className={cn(
-                      "w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer",
-                      isScrolled
-                        ? "border border-white/30 text-white hover:bg-white/10"
-                        : "bg-primary text-primary-foreground"
-                    )}
+                    className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-medium cursor-pointer border border-white/30 text-white hover:bg-white/10"
                   >
                     <LogIn className="w-4 h-4 inline mr-2" />Войти
                   </motion.div>

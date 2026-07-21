@@ -53,37 +53,30 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   };
 
   return (
-    <section className="min-h-screen flex flex-col justify-center pt-20 pb-12 px-0">
-      <div className="w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full"
-        >
-          <div className="relative w-full" style={{ height: '100dvh' }}>
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={currentImageIndex}
-                src={imagePath(heroImages[currentImageIndex])}
-                alt="Gradpath Analytics"
-                className="absolute inset-0 w-full h-full object-cover rounded-2xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
-              />
-            </AnimatePresence>
-          </div>
-        </motion.div>
+    <section className="relative min-h-screen flex flex-col justify-center pb-12 px-0 overflow-hidden rounded-2xl">
+      <div className="absolute inset-0 w-full h-full">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentImageIndex}
+            src={imagePath(heroImages[currentImageIndex])}
+            alt="Gradpath Analytics"
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.7 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          />
+        </AnimatePresence>
+      </div>
 
+      <div className="relative z-10 w-full pt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-foreground leading-tight mb-4">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-white leading-tight mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>
@@ -156,20 +149,20 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           </button>
           <a 
             href="/applicants"
-            className="btn-outline flex items-center gap-2">
+            className="btn-outline flex items-center gap-2 border-white/30 text-white hover:bg-white/10">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="btn-outline flex items-center gap-2">
+            className="btn-outline flex items-center gap-2 border-white/30 text-white hover:bg-white/10">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>
           {!user && (
             <a 
               href="/register"
-              className="btn-secondary flex items-center gap-2">
+              className="bg-white/20 text-white px-6 py-3 rounded-full font-medium hover:bg-white/30 transition-colors flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               {t('hero.register')}
             </a>

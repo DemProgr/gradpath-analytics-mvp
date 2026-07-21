@@ -112,10 +112,7 @@ const navItems = [
         <div key={item.id} className="space-y-2 min-w-0">
           <Link
             to={item.id}
-            className={cn(
-              "text-base font-semibold whitespace-nowrap hover:text-primary transition-colors",
-              "text-white"
-            )}
+            className="text-base font-semibold whitespace-nowrap hover:text-primary transition-colors text-white font-['Organetto']"
           >
             {item.label}
           </Link>
@@ -193,7 +190,7 @@ const navItems = [
                 {navItems.map((item) => (
                   <span
                     key={item.id}
-                    className="text-base font-semibold transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
+                    className="text-base font-semibold transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80 font-['Organetto']"
                   >
                     {item.label}
                   </span>
@@ -239,9 +236,9 @@ const navItems = [
                   </DropdownMenu>
                 ) : (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 text-white hover:bg-white/10"
+                    className="flex items-center gap-2 border-green-500 text-white hover:bg-green-500/20 hover:text-white"
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowUpRight, GraduationCap, Briefcase, BarChart3, Sparkles } from 'lucide-react';
+import { ArrowUpRight, GraduationCap, Briefcase, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { imagePath } from '@/lib/imagePath';
@@ -53,14 +53,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>
-          {!user && (
-            <a 
-              href="/register"
-              className="bg-white text-[#1a284a] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-white/90 transition-colors flex items-center gap-2 text-sm sm:text-base">
-              <Sparkles className="w-4 h-4" />
-              {t('hero.register')}
-            </a>
-          )}
+
         </motion.div>
       </div>
     </section>

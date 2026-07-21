@@ -26,8 +26,8 @@ interface HeaderProps {
 export function Header({ activeSection, onSectionChange, chatOpen = false }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedNavItem, setExpandedNavItem] = useState<string | null>(null);
-  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
@@ -107,12 +107,12 @@ const navItems = [
   };
 
   const navLinks = (
-    <div className="flex items-start gap-6">
+    <div className="flex items-start justify-center gap-10">
       {navItems.map((item) => (
         <div key={item.id} className="space-y-2 min-w-0">
           <Link
             to={item.id}
-            className="text-base font-normal whitespace-nowrap hover:text-primary transition-colors text-white"
+            className={cn("text-base font-normal whitespace-nowrap hover:text-primary transition-colors", isScrolled ? "text-white" : "text-gray-900")}
           >
             {item.label}
           </Link>
@@ -123,7 +123,13 @@ const navItems = [
                 to={dropdownItem.isRoute ? dropdownItem.id : '#'}
                 className={cn(
                   "block text-base py-1 whitespace-nowrap transition-colors",
-                  dropdownItem.isStub ? "text-white/40 cursor-not-allowed" : "text-white/70 hover:text-white"
+                  dropdownItem.isStub
+                    ? isScrolled
+                      ? "text-white/40 cursor-not-allowed"
+                      : "text-gray-400 cursor-not-allowed"
+                    : isScrolled
+                      ? "text-white/70 hover:text-white"
+                      : "text-gray-600 hover:text-primary"
                 )}
               >
                 {dropdownItem.label}
@@ -143,9 +149,6 @@ const navItems = [
       <motion.div
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => setIsHeaderHovered(false)}
-        onClick={() => {
-          if (!isMobile && 'ontouchstart' in window) setIsHeaderHovered(prev => !prev)
-        }}
         animate={{
           maxWidth: isScrolled ? 1024 : 10000,
           borderRadius: isScrolled ? 16 : 0,
@@ -162,44 +165,44 @@ const navItems = [
           isMobile && isScrolled && "max-w-full"
         )}
       >
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-full overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
-              <img src={imagePath('/favicon.png')} alt="GradPath" className="w-6 h-6 object-contain" />
-            </div>
-            <motion.span
-              animate={{
-                maxWidth: isScrolled ? 0 : (isMobile ? 180 : 400),
-                opacity: isScrolled ? 0 : 1,
-                marginRight: isScrolled ? 0 : (isMobile ? 8 : 12),
-              }}
-              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-              className="inline-block font-serif text-base sm:text-xl lg:text-2xl font-semibold overflow-hidden whitespace-nowrap"
-            >
-              GradPath Analytics
-            </motion.span>
-          </Link>
-
-            {!isMobile && (
-              <nav
-                className={cn(
-                  "hidden md:flex items-center gap-6",
-                  isScrolled ? "flex-1 justify-center" : ""
-                )}
+        <div className="flex items-center h-16 sm:h-20">
+          <div className={cn("flex justify-start items-center", isScrolled ? "shrink-0" : "flex-1")}>
+            <Link to="/" className="flex items-center gap-2 shrink-0">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+                <img src={imagePath('/favicon.png')} alt="GradPath" className="w-6 h-6 object-contain" />
+              </div>
+              <motion.span
+                animate={{
+                  maxWidth: isScrolled ? 0 : (isMobile ? 180 : 400),
+                  opacity: isScrolled ? 0 : 1,
+                  marginRight: isScrolled ? 0 : (isMobile ? 8 : 12),
+                }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="inline-block font-serif text-xs sm:text-sm lg:text-base font-normal tracking-[0.15em] overflow-hidden whitespace-nowrap"
               >
-                {navItems.map((item) => (
-                  <span
-                    key={item.id}
-                    className="text-base font-normal transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
-                  >
-                    {item.label}
-                  </span>
-                ))}
-              </nav>
-            )}
+                GradPath Analytics
+              </motion.span>
+            </Link>
+          </div>
 
             {!isMobile && (
-              <div className="hidden md:flex items-center gap-4 shrink-0">
+              <div className={cn("flex justify-center items-center", isScrolled ? "flex-1" : "flex-1")}>
+                <nav className="flex items-center gap-6">
+                  {navItems.map((item) => (
+                    <span
+                      key={item.id}
+                      className="text-base font-normal transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
+                    >
+                      {item.label}
+                    </span>
+                  ))}
+                </nav>
+              </div>
+            )}
+            {isMobile && <div className="flex-1" />}
+
+            {!isMobile && (
+              <div className={cn("flex justify-end items-center gap-4", isScrolled ? "shrink-0" : "flex-1")}>
                 {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -238,7 +241,12 @@ const navItems = [
                   <Button
                     variant="outline"
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 border border-white bg-transparent text-white hover:bg-white/10 hover:text-white"
+                    className={cn(
+                      "flex items-center gap-2",
+                      isScrolled
+                        ? "bg-primary text-primary-foreground border-primary hover:opacity-90"
+                        : "border border-white bg-transparent text-white hover:bg-white/10 hover:text-white"
+                    )}
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>
@@ -256,7 +264,12 @@ const navItems = [
                       <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="btn-primary flex items-center gap-2 text-base"
+                        className={cn(
+                          "flex items-center gap-2 text-base rounded-full font-medium transition-colors",
+                          isScrolled
+                            ? "bg-primary text-primary-foreground px-6 py-3"
+                            : "border border-white bg-transparent text-white px-6 py-2.5 hover:bg-white/10"
+                        )}
                       >
                         Университеты
                         <ArrowUpRight className="w-4 h-4" />
@@ -287,14 +300,7 @@ const navItems = [
                 transition={{ duration: 0.2 }}
                 className="w-full overflow-hidden"
               >
-                <div
-                  className={cn(
-                    "py-3 border-t shadow-lg rounded-2xl mt-1",
-                    isScrolled
-                      ? "border-white/10"
-                      : "border-white/10 bg-[#0f1a1c]/95"
-                  )}
-                >
+                <div className={cn("py-5 border-t shadow-lg rounded-2xl mt-1", isScrolled ? "border-white/10 bg-[#0f1a1c]/95" : "border-gray-200 bg-white")}>
                   <div className="px-4 sm:px-6 lg:px-8">{navLinks}</div>
                 </div>
               </motion.div>

@@ -117,6 +117,18 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
           <HeroSection onNavigate={handleNavigate} />
         </div>
 
+        {/* Tagline */}
+        <div className="py-14 sm:py-20 pl-4 sm:pl-6 lg:pl-8 pr-4 sm:pr-6 lg:pr-8 max-w-5xl">
+          <p className="text-left leading-snug">
+            <span className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-800 block" style={{ fontFamily: "'Organetto Display', 'Organetto', system-ui, sans-serif" }}>
+              GradPath Analytics —
+            </span>
+            <span className="block mt-3 sm:mt-4 ml-16 sm:ml-24 text-2xl sm:text-3xl lg:text-4xl text-gray-600 font-light leading-relaxed">
+              уникальная платформа для помощи абитуриентам поступить и студентам успешно трудоустроиться.
+            </span>
+          </p>
+        </div>
+
 {/* News and insights */}
           {blogPosts.length > 0 && (
             <section className="py-14 px-4 sm:px-6 lg:px-8">

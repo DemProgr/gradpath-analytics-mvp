@@ -23,7 +23,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-4 sm:mb-8"
         >
-          <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-2 sm:mb-4">
+          <h1 className="font-['Organetto'] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight mb-2 sm:mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>

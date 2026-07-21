@@ -113,7 +113,7 @@ const navItems = [
           <Link
             to={item.id}
             className={cn(
-              "text-sm font-semibold whitespace-nowrap hover:text-primary transition-colors",
+              "text-base font-semibold whitespace-nowrap hover:text-primary transition-colors",
               "text-white"
             )}
           >
@@ -125,7 +125,7 @@ const navItems = [
                 key={dropdownItem.id}
                 to={dropdownItem.isRoute ? dropdownItem.id : '#'}
                 className={cn(
-                  "block text-sm py-1 whitespace-nowrap transition-colors",
+                  "block text-base py-1 whitespace-nowrap transition-colors",
                   dropdownItem.isStub ? "text-white/40 cursor-not-allowed" : "text-white/70 hover:text-white"
                 )}
               >
@@ -193,7 +193,7 @@ const navItems = [
                 {navItems.map((item) => (
                   <span
                     key={item.id}
-                    className="text-sm font-semibold transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
+                    className="text-base font-semibold transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
                   >
                     {item.label}
                   </span>
@@ -239,9 +239,9 @@ const navItems = [
                   </DropdownMenu>
                 ) : (
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 border-white text-white hover:bg-white/10 hover:text-white"
+                    className="flex items-center gap-2 text-white hover:bg-white/10"
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>
@@ -259,7 +259,7 @@ const navItems = [
                       <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="btn-primary flex items-center gap-2 text-sm"
+                        className="btn-primary flex items-center gap-2 text-base"
                       >
                         Университеты
                         <ArrowUpRight className="w-4 h-4" />

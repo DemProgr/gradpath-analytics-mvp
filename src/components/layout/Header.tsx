@@ -193,7 +193,7 @@ const navItems = [
                 {navItems.map((item) => (
                   <span
                     key={item.id}
-                    className="text-sm font-medium transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white/70 hover:text-white"
+                    className="text-sm font-semibold transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
                   >
                     {item.label}
                   </span>
@@ -239,9 +239,9 @@ const navItems = [
                   </DropdownMenu>
                 ) : (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 text-white hover:bg-white/10"
+                    className="flex items-center gap-2 border-white text-white hover:bg-white/10 hover:text-white"
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>

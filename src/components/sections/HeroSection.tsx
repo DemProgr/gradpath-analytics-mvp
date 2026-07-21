@@ -23,7 +23,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-4 sm:mb-8"
         >
-          <h1 className="font-['Organetto'] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight mb-2 sm:mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight mb-2 sm:mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>
@@ -36,20 +36,20 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
         >
           <button 
             onClick={() => onNavigate('universities')}
-            className="bg-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/30 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
+            className="bg-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/30 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <GraduationCap className="w-4 h-4" />
             {t('hero.chooseUni')}
             <ArrowUpRight className="w-4 h-4" />
           </button>
           <a 
             href="/applicants"
-            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>

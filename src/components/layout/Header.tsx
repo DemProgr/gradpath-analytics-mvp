@@ -112,7 +112,7 @@ const navItems = [
         <div key={item.id} className="space-y-2 min-w-0">
           <Link
             to={item.id}
-            className="text-base font-normal whitespace-nowrap hover:text-primary transition-colors text-white font-['Organetto']"
+            className="text-base font-normal whitespace-nowrap hover:text-primary transition-colors text-white"
           >
             {item.label}
           </Link>
@@ -190,7 +190,7 @@ const navItems = [
                 {navItems.map((item) => (
                   <span
                     key={item.id}
-                    className="text-base font-normal transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80 font-['Organetto']"
+                    className="text-base font-normal transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer text-white hover:text-white/80"
                   >
                     {item.label}
                   </span>
@@ -256,7 +256,7 @@ const navItems = [
                       <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="btn-primary flex items-center gap-2 text-base font-['Organetto']"
+                        className="btn-primary flex items-center gap-2 text-base"
                       >
                         Университеты
                         <ArrowUpRight className="w-4 h-4" />
@@ -436,7 +436,7 @@ className={cn(
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.25 }}
                     onClick={() => { navigate('/login'); setMobileOpen(false); }}
-                    className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-normal cursor-pointer border border-white bg-transparent text-white hover:bg-white/10 font-['Organetto']"
+                    className="w-full text-left px-4 py-3 rounded-xl transition-colors text-base font-normal cursor-pointer border border-white bg-transparent text-white hover:bg-white/10"
                   >
                     <LogIn className="w-4 h-4 inline mr-2" />Войти
                   </motion.div>

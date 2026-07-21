@@ -1,6 +1,20 @@
 @font-face {
   font-family: 'Organetto';
-  src: url('/fonts/organetto-ultrabold-semiext.ttf') format('truetype');
+  src: url('/fonts/organetto-regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Organetto';
+  src: url('/fonts/organetto-bold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Organetto';
+  src: url('/fonts/organetto-ultrabold.otf') format('opentype');
   font-weight: 800;
   font-display: swap;
 }
@@ -113,11 +127,11 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Sk Modernist', system-ui, sans-serif;
+    font-family: 'Organetto', system-ui, sans-serif;
   }
 
   h1, h2, h3, .font-serif {
-    font-family: 'Sk Modernist', system-ui, sans-serif;
+    font-family: 'Organetto', system-ui, sans-serif;
   }
 }
 

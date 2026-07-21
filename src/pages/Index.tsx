@@ -110,7 +110,7 @@ const Index = ({ isChatOpen = false }: IndexProps) => {
           marginRight: isChatOpen && !isMobile ? '450px' : '0px'
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="relative"
+        className="relative flex flex-col gap-2 p-2"
       >
         {/* Hero / Overview */}
         <div ref={sectionsRef.overview}>

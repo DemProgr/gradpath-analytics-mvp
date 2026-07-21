@@ -43,16 +43,17 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center pb-12 mx-4 my-4 overflow-hidden rounded-3xl">
+    <section className="relative min-h-[85svh] flex flex-col justify-center overflow-hidden rounded-2xl sm:rounded-[2.25rem]" style={{ background: '#fff' }}>
       <div className="absolute inset-0" style={{ backgroundImage: `url(${imagePath('/Background.avif')})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-      <div className="relative z-10 w-full pt-20">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/40" />
+      <div className="relative z-10 w-full pt-16 sm:pt-20 pb-6 sm:pb-10 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center mb-8"
+          className="text-center mb-4 sm:mb-8"
         >
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-[#1a284a] leading-tight mb-4">
+          <h1 className="font-['Organetto'] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight mb-2 sm:mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>
@@ -61,7 +62,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="max-w-xl mx-auto mb-10 relative"
+          className="max-w-xl mx-auto mb-6 sm:mb-10 relative"
         >
           <form onSubmit={handleSearch}>
             <div className="relative">
@@ -114,31 +115,31 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
         >
           <button 
             onClick={() => onNavigate('universities')}
-            className="btn-primary flex items-center gap-2">
+            className="bg-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/30 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <GraduationCap className="w-4 h-4" />
             {t('hero.chooseUni')}
             <ArrowUpRight className="w-4 h-4" />
           </button>
           <a 
             href="/applicants"
-            className="border border-[#1a284a]/30 text-[#1a284a] px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/5 transition-colors flex items-center gap-2">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="border border-[#1a284a]/30 text-[#1a284a] px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/5 transition-colors flex items-center gap-2">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>
           {!user && (
             <a 
               href="/register"
-              className="bg-[#1a284a] text-white px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/90 transition-colors flex items-center gap-2">
+              className="bg-white text-[#1a284a] px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/90 transition-colors flex items-center gap-2 text-sm sm:text-base">
               <Sparkles className="w-4 h-4" />
               {t('hero.register')}
             </a>

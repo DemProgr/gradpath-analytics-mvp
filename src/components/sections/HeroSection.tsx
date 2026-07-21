@@ -42,7 +42,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center pb-12 px-0 overflow-hidden rounded-2xl bg-[#e7f9ff]">
+    <section className="relative min-h-screen flex flex-col justify-center pb-12 px-0 overflow-hidden rounded-2xl bg-gradient-to-b from-[#eff9ff] to-[#fff]">
       <div className="relative z-10 w-full pt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

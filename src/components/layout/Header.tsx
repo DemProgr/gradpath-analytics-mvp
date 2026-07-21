@@ -156,7 +156,7 @@ const navItems = [
           marginTop: isScrolled ? 12 : 0,
           backgroundColor: isScrolled ? 'rgb(15,26,28)' : 'transparent',
           borderBottom: isScrolled ? '0px solid transparent' : '0px solid transparent',
-          color: 'rgb(255,255,255)',
+          color: isScrolled ? 'rgb(255,255,255)' : 'rgb(26,40,74)',
         }}
         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         className={cn(
@@ -167,7 +167,7 @@ const navItems = [
       >
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-full overflow-hidden bg-white/20 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0" style={{ backgroundColor: isScrolled ? 'rgba(255,255,255,0.2)' : 'rgba(26,40,74,0.15)' }}>
               <img src={imagePath('/favicon.png')} alt="GradPath" className="w-6 h-6 object-contain" />
             </div>
             <motion.span
@@ -195,7 +195,7 @@ const navItems = [
                     key={item.id}
                     className={cn(
                       "text-sm font-medium transition-colors duration-200 relative py-2 flex items-center gap-1 cursor-pointer",
-                      "text-white/70 hover:text-white"
+                      isScrolled ? "text-white/70 hover:text-white" : "text-[#1a284a]/70 hover:text-[#1a284a]"
                     )}
                   >
                     {item.label}
@@ -244,7 +244,10 @@ const navItems = [
                   <Button
                     variant="ghost"
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 text-white hover:bg-white/10"
+                    className={cn(
+                      "flex items-center gap-2",
+                      isScrolled ? "text-white hover:bg-white/10" : "text-[#1a284a] hover:bg-[#1a284a]/10"
+                    )}
                   >
                     <LogIn className="w-4 h-4" />
                     <span className="hidden lg:inline">Войти</span>
@@ -254,7 +257,7 @@ const navItems = [
                 {!chatOpen && (
                   <div className="flex items-center gap-2">
                     <Link to="/search">
-                      <Button variant="ghost" size="icon" className="w-9 h-9 text-white hover:bg-white/10">
+                      <Button variant="ghost" size="icon" className={cn("w-9 h-9", isScrolled ? "text-white hover:bg-white/10" : "text-[#1a284a] hover:bg-[#1a284a]/10")}>
                         <Search className="w-4 h-4" />
                       </Button>
                     </Link>
@@ -278,7 +281,7 @@ const navItems = [
                 onClick={() => setMobileOpen(!mobileOpen)}
                 className={cn(
                   "p-2 rounded-lg transition-colors",
-                  isScrolled ? "text-white hover:bg-white/10" : "text-white hover:bg-white/10"
+                  isScrolled ? "text-white hover:bg-white/10" : "text-[#1a284a] hover:bg-[#1a284a]/10"
                 )}
               >
                 {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

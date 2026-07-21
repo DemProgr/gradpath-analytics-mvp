@@ -36,20 +36,20 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
         >
           <button 
             onClick={() => onNavigate('universities')}
-            className="bg-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-white/30 transition-colors flex items-center gap-2 text-sm sm:text-base">
+            className="bg-white/20 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/30 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
             <GraduationCap className="w-4 h-4" />
             {t('hero.chooseUni')}
             <ArrowUpRight className="w-4 h-4" />
           </button>
           <a 
             href="/applicants"
-            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base">
+            className="border border-white/40 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-normal hover:bg-white/10 transition-colors flex items-center gap-2 text-sm sm:text-base font-['Organetto']">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>

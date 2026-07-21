@@ -43,9 +43,8 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center pb-12 px-0 overflow-hidden rounded-2xl">
+    <section className="relative min-h-screen flex flex-col justify-center pb-12 mx-4 my-4 overflow-hidden rounded-3xl">
       <div className="absolute inset-0" style={{ backgroundImage: `url(${imagePath('/Background.avif')})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-      <div className="absolute inset-0 bg-black/20" />
       <div className="relative z-10 w-full pt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -53,7 +52,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-center mb-8"
         >
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-white leading-tight mb-4">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-medium text-[#1a284a] leading-tight mb-4">
             {t('hero.title')}
           </h1>
         </motion.div>
@@ -126,20 +125,20 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           </button>
           <a 
             href="/applicants"
-            className="border border-white/40 text-white px-6 py-3 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
+            className="border border-[#1a284a]/30 text-[#1a284a] px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/5 transition-colors flex items-center gap-2">
             <Briefcase className="w-4 h-4" />
             {t('hero.forApplicants')}
           </a>
           <a 
             href="/statistics"
-            className="border border-white/40 text-white px-6 py-3 rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
+            className="border border-[#1a284a]/30 text-[#1a284a] px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/5 transition-colors flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
             {t('hero.analytics')}
           </a>
           {!user && (
             <a 
               href="/register"
-              className="bg-white/20 text-white px-6 py-3 rounded-full font-medium hover:bg-white/30 transition-colors flex items-center gap-2">
+              className="bg-[#1a284a] text-white px-6 py-3 rounded-full font-medium hover:bg-[#1a284a]/90 transition-colors flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               {t('hero.register')}
             </a>
